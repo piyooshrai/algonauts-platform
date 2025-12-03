@@ -6,13 +6,14 @@ interface LogoProps {
   size?: "sm" | "md" | "lg";
   className?: string;
   showText?: boolean;
+  showSubtext?: boolean;
 }
 
-export function Logo({ size = "md", className, showText = true }: LogoProps) {
+export function Logo({ size = "md", className, showText = true, showSubtext = true }: LogoProps) {
   const sizes = {
-    sm: { icon: "h-6 w-6", text: "text-lg" },
-    md: { icon: "h-8 w-8", text: "text-xl" },
-    lg: { icon: "h-10 w-10", text: "text-2xl" },
+    sm: { icon: "h-6 w-6", text: "text-lg", subtext: "text-[10px]" },
+    md: { icon: "h-8 w-8", text: "text-xl", subtext: "text-xs" },
+    lg: { icon: "h-10 w-10", text: "text-2xl", subtext: "text-sm" },
   };
 
   return (
@@ -45,9 +46,16 @@ export function Logo({ size = "md", className, showText = true }: LogoProps) {
         </svg>
       </div>
       {showText && (
-        <span className={cn("font-semibold tracking-tight", sizes[size].text)}>
-          Algonauts
-        </span>
+        <div className="flex flex-col">
+          <span className={cn("font-semibold tracking-tight leading-tight", sizes[size].text)}>
+            Algonauts
+          </span>
+          {showSubtext && (
+            <span className={cn("text-muted-foreground leading-tight", sizes[size].subtext)}>
+              by The Algorithm
+            </span>
+          )}
+        </div>
       )}
     </div>
   );

@@ -1,0 +1,10 @@
+<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Bottom layer -->
+  <path d="M20 36L4 26V14L20 4L36 14V26L20 36Z" fill="#2563eb" fill-opacity="0.2"/>
+  <!-- Middle layer -->
+  <path d="M20 30L8 22V16L20 8L32 16V22L20 30Z" fill="#2563eb" fill-opacity="0.4"/>
+  <!-- Top layer -->
+  <path d="M20 24L12 19V15L20 10L28 15V19L20 24Z" fill="#2563eb"/>
+  <!-- Center dot -->
+  <circle cx="20" cy="17" r="3" fill="white"/>
+</svg>
