@@ -16,7 +16,6 @@ import {
   Sparkles,
   Target,
   TrendingUp,
-  Users,
   Zap,
 } from "lucide-react";
 import Link from "next/link";
@@ -367,16 +366,15 @@ export default function Home() {
                 Stop Sifting Through Resumes
               </h2>
               <p className="text-lg text-muted-foreground mb-8">
-                Access pre-vetted talent ranked by verified assessments. Set your filters,
-                see matching candidates, and invite the best to apply. No job postings. No resume spam.
+                Access pre-vetted talent ranked by verified assessments. LayersRank doesn&apos;t just score candidates. It tells you how confident we are in that score. No more guessing. No more false positives.
               </p>
 
               <div className="space-y-4">
                 {[
-                  { icon: BarChart3, text: "Filter by LayersRank, skills, and location" },
-                  { icon: Shield, text: "Verified assessment scores you can trust" },
-                  { icon: Zap, text: "Reduce time-to-hire by 60%" },
-                  { icon: Users, text: "Build diverse, high-quality candidate pools" },
+                  { icon: Shield, text: "Confidence-weighted scoring. Every rank comes with a reliability indicator, not just a number." },
+                  { icon: BarChart3, text: "Filter by LayersRank, skills, and location. See only candidates who meet your bar." },
+                  { icon: Zap, text: "Reduce time-to-hire by 60%. Skip the resume pile, go straight to interviews." },
+                  { icon: Brain, text: "Built on assessment science, not keyword matching. We evaluate thinking, not buzzwords." },
                 ].map((item, index) => (
                   <motion.div
                     key={index}
@@ -394,11 +392,11 @@ export default function Home() {
                 ))}
               </div>
 
-              <Link href="/signup">
+              <a href="https://www.layersrank.com/product" target="_blank" rel="noopener noreferrer">
                 <Button size="lg" className="mt-8 gap-2">
-                  Partner With Us <ArrowRight className="h-4 w-4" />
+                  Learn how LayersRank works <ArrowRight className="h-4 w-4" />
                 </Button>
-              </Link>
+              </a>
             </motion.div>
 
             <motion.div
