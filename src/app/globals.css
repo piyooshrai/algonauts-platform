@@ -1,0 +1,195 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Background & Foreground */
+    --background: #fafafa;
+    --foreground: #18181b;
+
+    /* Muted */
+    --muted: #f4f4f5;
+    --muted-foreground: #71717a;
+
+    /* Border & Input */
+    --border: #e4e4e7;
+    --input: #e4e4e7;
+    --ring: #2563eb;
+
+    /* Primary - Blue */
+    --primary: #2563eb;
+    --primary-foreground: #ffffff;
+
+    /* Secondary */
+    --secondary: #f4f4f5;
+    --secondary-foreground: #18181b;
+
+    /* Accent */
+    --accent: #f4f4f5;
+    --accent-foreground: #18181b;
+
+    /* Card */
+    --card: #ffffff;
+    --card-foreground: #18181b;
+
+    /* Radius */
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+  }
+
+  .dark {
+    /* Background & Foreground */
+    --background: #09090b;
+    --foreground: #fafafa;
+
+    /* Muted */
+    --muted: #27272a;
+    --muted-foreground: #a1a1aa;
+
+    /* Border & Input */
+    --border: #27272a;
+    --input: #27272a;
+    --ring: #3b82f6;
+
+    /* Primary - Blue */
+    --primary: #3b82f6;
+    --primary-foreground: #ffffff;
+
+    /* Secondary */
+    --secondary: #27272a;
+    --secondary-foreground: #fafafa;
+
+    /* Accent */
+    --accent: #27272a;
+    --accent-foreground: #fafafa;
+
+    /* Card */
+    --card: #18181b;
+    --card-foreground: #fafafa;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-slate-300 dark:bg-slate-700 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-slate-400 dark:bg-slate-600;
+  }
+
+  /* Selection */
+  ::selection {
+    @apply bg-blue-600/20 text-foreground;
+  }
+}
+
+@layer components {
+  /* Glass effect */
+  .glass {
+    @apply bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-white/20 dark:border-slate-800/50;
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    @apply bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent;
+  }
+
+  /* Focus ring */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background;
+  }
+
+  /* Card hover effect */
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+  }
+
+  /* Shimmer effect for loading states */
+  .shimmer {
+    @apply animate-shimmer bg-gradient-to-r from-transparent via-white/10 to-transparent bg-[length:200%_100%];
+  }
+
+  /* Rank badge styles */
+  .rank-gold {
+    @apply bg-gradient-to-br from-amber-400 to-amber-600 text-white shadow-lg shadow-amber-500/25;
+  }
+
+  .rank-silver {
+    @apply bg-gradient-to-br from-slate-300 to-slate-500 text-white shadow-lg shadow-slate-500/25;
+  }
+
+  .rank-bronze {
+    @apply bg-gradient-to-br from-orange-400 to-orange-600 text-white shadow-lg shadow-orange-500/25;
+  }
+
+  /* Status indicators */
+  .status-online {
+    @apply w-2 h-2 rounded-full bg-success-500 shadow-sm shadow-success-500/50;
+  }
+
+  .status-offline {
+    @apply w-2 h-2 rounded-full bg-slate-400;
+  }
+
+  .status-busy {
+    @apply w-2 h-2 rounded-full bg-warning-500 shadow-sm shadow-warning-500/50;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Stagger animation delays */
+  .stagger-1 { animation-delay: 0.1s; }
+  .stagger-2 { animation-delay: 0.2s; }
+  .stagger-3 { animation-delay: 0.3s; }
+  .stagger-4 { animation-delay: 0.4s; }
+  .stagger-5 { animation-delay: 0.5s; }
+
+  /* Aspect ratios */
+  .aspect-card {
+    aspect-ratio: 16 / 9;
+  }
+
+  .aspect-badge {
+    aspect-ratio: 3 / 4;
+  }
+}
