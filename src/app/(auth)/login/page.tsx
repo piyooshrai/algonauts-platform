@@ -44,7 +44,17 @@ export default function LoginPage() {
 
     setIsLoading(true);
 
-    // Simulate API call
+    // Test user bypass - for development
+    const TEST_USER_EMAIL = "test@college.edu";
+    const TEST_USER_PASSWORD = "test1234";
+
+    if (formData.email === TEST_USER_EMAIL && formData.password === TEST_USER_PASSWORD) {
+      // Bypass auth and go directly to dashboard
+      router.push("/dashboard");
+      return;
+    }
+
+    // Simulate API call for other users
     await new Promise((resolve) => setTimeout(resolve, 1500));
 
     // TODO: Replace with actual authentication

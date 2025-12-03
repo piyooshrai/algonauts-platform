@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard,
@@ -37,8 +37,14 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+
+  const handleSignOut = () => {
+    // Clear any auth state and redirect to home
+    router.push("/");
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -205,7 +211,10 @@ export default function DashboardLayout({
                           </Link>
                         </div>
                         <div className="p-1 border-t border-border">
-                          <button className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-muted transition-colors w-full text-error-600">
+                          <button
+                            onClick={handleSignOut}
+                            className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-muted transition-colors w-full text-error-600"
+                          >
                             <LogOut className="h-4 w-4" />
                             Sign out
                           </button>

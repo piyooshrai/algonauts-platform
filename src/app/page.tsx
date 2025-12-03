@@ -59,12 +59,16 @@ export default function Home() {
               </Link>
             </div>
             <div className="flex items-center gap-3">
-              <Button variant="ghost" size="sm">
-                Sign In
-              </Button>
-              <Button size="sm" className="gap-2">
-                Get Started <ArrowRight className="h-4 w-4" />
-              </Button>
+              <Link href="/login">
+                <Button variant="ghost" size="sm">
+                  Sign In
+                </Button>
+              </Link>
+              <Link href="/signup">
+                <Button size="sm" className="gap-2">
+                  Get Started <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
@@ -111,13 +115,17 @@ export default function Home() {
               variants={fadeInUp}
               className="flex flex-col sm:flex-row items-center justify-center gap-4"
             >
-              <Button size="xl" variant="gradient" className="w-full sm:w-auto gap-2">
-                Start Your Journey <Rocket className="h-5 w-5" />
-              </Button>
-              <Button size="xl" variant="outline" className="w-full sm:w-auto gap-2">
-                <Building2 className="h-5 w-5" />
-                I&apos;m a Company
-              </Button>
+              <Link href="/signup">
+                <Button size="xl" variant="gradient" className="w-full sm:w-auto gap-2">
+                  Start Your Journey <Rocket className="h-5 w-5" />
+                </Button>
+              </Link>
+              <Link href="#for-companies">
+                <Button size="xl" variant="outline" className="w-full sm:w-auto gap-2">
+                  <Building2 className="h-5 w-5" />
+                  I&apos;m a Company
+                </Button>
+              </Link>
             </motion.div>
           </motion.div>
 
@@ -385,9 +393,11 @@ export default function Home() {
                 ))}
               </div>
 
-              <Button size="lg" className="mt-8 gap-2">
-                Partner With Us <ArrowRight className="h-4 w-4" />
-              </Button>
+              <Link href="/signup">
+                <Button size="lg" className="mt-8 gap-2">
+                  Partner With Us <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
             </motion.div>
 
             <motion.div
@@ -455,19 +465,23 @@ export default function Home() {
                 merit-based rankings.
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Button
-                  size="xl"
-                  className="w-full sm:w-auto bg-white text-blue-600 hover:bg-blue-50 gap-2"
-                >
-                  Create Free Account <ArrowRight className="h-5 w-5" />
-                </Button>
-                <Button
-                  size="xl"
-                  variant="outline"
-                  className="w-full sm:w-auto border-white/30 text-white hover:bg-white/10"
-                >
-                  Learn More
-                </Button>
+                <Link href="/signup">
+                  <Button
+                    size="xl"
+                    className="w-full sm:w-auto bg-white text-blue-600 hover:bg-blue-50 gap-2"
+                  >
+                    Create Free Account <ArrowRight className="h-5 w-5" />
+                  </Button>
+                </Link>
+                <Link href="#features">
+                  <Button
+                    size="xl"
+                    variant="outline"
+                    className="w-full sm:w-auto border-white/30 text-white hover:bg-white/10"
+                  >
+                    Learn More
+                  </Button>
+                </Link>
               </div>
             </div>
           </motion.div>
@@ -487,10 +501,10 @@ export default function Home() {
             <div>
               <h4 className="font-semibold mb-4">Platform</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link href="#" className="hover:text-foreground transition-colors">Assessments</Link></li>
-                <li><Link href="#" className="hover:text-foreground transition-colors">Leaderboard</Link></li>
-                <li><Link href="#" className="hover:text-foreground transition-colors">Opportunities</Link></li>
-                <li><Link href="#" className="hover:text-foreground transition-colors">Badges</Link></li>
+                <li><Link href="/assessments" className="hover:text-foreground transition-colors">Assessments</Link></li>
+                <li><Link href="/leaderboard" className="hover:text-foreground transition-colors">Leaderboard</Link></li>
+                <li><Link href="/opportunities" className="hover:text-foreground transition-colors">Opportunities</Link></li>
+                <li><Link href="#features" className="hover:text-foreground transition-colors">Features</Link></li>
               </ul>
             </div>
             <div>
