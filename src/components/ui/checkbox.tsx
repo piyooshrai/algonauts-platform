@@ -5,7 +5,7 @@ import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "type"> {
-  label?: string;
+  label?: React.ReactNode;
 }
 
 const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
