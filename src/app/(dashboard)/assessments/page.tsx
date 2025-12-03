@@ -406,22 +406,24 @@ export default function AssessmentsPage() {
                         <span>{test.questions} questions</span>
                         <span>{test.duration}</span>
                       </div>
-                      <Button
-                        className="w-full"
-                        variant={test.completed ? "outline" : "default"}
-                      >
-                        {test.completed ? (
-                          <>
-                            <CheckCircle2 className="h-4 w-4 mr-2" />
-                            Retake
-                          </>
-                        ) : (
-                          <>
-                            <Play className="h-4 w-4 mr-2" />
-                            Start Practice
-                          </>
-                        )}
-                      </Button>
+                      <Link href={`/assessments/${test.id}/start`}>
+                        <Button
+                          className="w-full"
+                          variant={test.completed ? "outline" : "default"}
+                        >
+                          {test.completed ? (
+                            <>
+                              <CheckCircle2 className="h-4 w-4 mr-2" />
+                              Retake
+                            </>
+                          ) : (
+                            <>
+                              <Play className="h-4 w-4 mr-2" />
+                              Start Practice
+                            </>
+                          )}
+                        </Button>
+                      </Link>
                     </CardContent>
                   </Card>
                 </motion.div>
