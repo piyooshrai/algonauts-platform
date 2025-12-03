@@ -20,6 +20,7 @@ import {
   Zap,
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui";
 import { Logo } from "@/components/logo";
 import { FeatureCard } from "@/components/feature-card";
@@ -494,9 +495,16 @@ export default function Home() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
             <div className="col-span-2 md:col-span-1">
               <Logo className="mb-4" />
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground mb-4">
                 Where talent meets opportunity through verified assessments and transparent rankings.
               </p>
+              <Image
+                src="/images/Algonauts Logo.png"
+                alt="Algonauts Badge"
+                width={80}
+                height={80}
+                className="opacity-80 hover:opacity-100 transition-opacity"
+              />
             </div>
             <div>
               <h4 className="font-semibold mb-4">Platform</h4>

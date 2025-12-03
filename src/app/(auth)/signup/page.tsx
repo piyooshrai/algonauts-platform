@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, Mail, Lock, User, ArrowRight, Loader2, CheckCircle2 } from "lucide-react";
@@ -253,6 +254,18 @@ export default function SignupPage() {
           Sign in
         </Link>
       </p>
+
+      {/* Trust Badge */}
+      <div className="mt-8 flex flex-col items-center gap-2">
+        <Image
+          src="/images/Algonauts Logo.png"
+          alt="Algonauts Verified"
+          width={48}
+          height={48}
+          className="opacity-60"
+        />
+        <p className="text-xs text-muted-foreground">Verified by Algonauts</p>
+      </div>
     </motion.div>
   );
 }
