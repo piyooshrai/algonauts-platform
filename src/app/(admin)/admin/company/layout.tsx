@@ -6,17 +6,17 @@ import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard,
-  Trophy,
-  ClipboardCheck,
+  Search as SearchIcon,
+  Mail,
   Briefcase,
-  User,
-  Settings,
+  CreditCard,
   LogOut,
   Menu,
   X,
   Bell,
-  Search,
   ChevronDown,
+  Building,
+  Settings,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/logo";
@@ -24,15 +24,14 @@ import { Avatar, Badge } from "@/components/ui";
 import { RoleSwitcher } from "@/components/role-switcher";
 
 const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Leaderboard", href: "/leaderboard", icon: Trophy },
-  { name: "Assessments", href: "/assessments", icon: ClipboardCheck },
-  { name: "Opportunities", href: "/opportunities", icon: Briefcase },
-  { name: "Profile", href: "/profile", icon: User },
-  { name: "Settings", href: "/settings", icon: Settings },
+  { name: "Dashboard", href: "/admin/company", icon: LayoutDashboard },
+  { name: "Discover Candidates", href: "/admin/company/discover", icon: SearchIcon },
+  { name: "Invitations", href: "/admin/company/invitations", icon: Mail },
+  { name: "Job Postings", href: "/admin/company/jobs", icon: Briefcase },
+  { name: "Billing", href: "/admin/company/billing", icon: CreditCard },
 ];
 
-export default function DashboardLayout({
+export default function CompanyAdminLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -43,8 +42,14 @@ export default function DashboardLayout({
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   const handleSignOut = () => {
-    // Clear any auth state and redirect to home
     router.push("/");
+  };
+
+  const isActive = (href: string) => {
+    if (href === "/admin/company") {
+      return pathname === href;
+    }
+    return pathname.startsWith(href);
   };
 
   return (
@@ -62,47 +67,71 @@ export default function DashboardLayout({
         )}
       </AnimatePresence>
 
-      {/* Sidebar */}
+      {/* Dark Sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border transform transition-transform duration-200 ease-in-out lg:translate-x-0",
+          "fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 transform transition-transform duration-200 ease-in-out lg:translate-x-0",
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="flex items-center justify-between h-16 px-4 border-b border-border">
-            <Link href="/dashboard">
+          <div className="flex items-center justify-between h-16 px-4 border-b border-slate-800">
+            <Link href="/admin/company" className="flex items-center gap-3">
               <Logo />
+              <Badge variant="secondary" className="bg-slate-800 text-slate-300">
+                Company
+              </Badge>
             </Link>
             <button
-              className="lg:hidden p-2 text-muted-foreground hover:text-foreground"
+              className="lg:hidden p-2 text-slate-400 hover:text-white"
               onClick={() => setSidebarOpen(false)}
             >
               <X className="h-5 w-5" />
             </button>
           </div>
 
+          {/* Company Info */}
+          <div className="px-4 py-4 border-b border-slate-800">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+                <Building className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-white">TechCorp Inc.</p>
+                <p className="text-xs text-slate-400">Enterprise Plan</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Credits Info */}
+          <div className="px-4 py-3 border-b border-slate-800">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-slate-400">Invite Credits</span>
+              <Badge variant="info" className="text-xs">47 remaining</Badge>
+            </div>
+          </div>
+
           {/* Navigation */}
           <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
             {navigation.map((item) => {
-              const isActive = pathname === item.href;
+              const active = isActive(item.href);
               return (
                 <Link
                   key={item.name}
                   href={item.href}
                   className={cn(
                     "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
-                    isActive
-                      ? "bg-primary text-primary-foreground"
-                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                    active
+                      ? "bg-primary text-white"
+                      : "text-slate-400 hover:bg-slate-800 hover:text-white"
                   )}
                   onClick={() => setSidebarOpen(false)}
                 >
                   <item.icon className="h-5 w-5" />
                   {item.name}
-                  {item.name === "Opportunities" && (
-                    <Badge variant="info" className="ml-auto">3</Badge>
+                  {item.name === "Invitations" && (
+                    <Badge variant="warning" className="ml-auto text-xs">5 pending</Badge>
                   )}
                 </Link>
               );
@@ -110,17 +139,17 @@ export default function DashboardLayout({
           </nav>
 
           {/* User section */}
-          <div className="p-4 border-t border-border">
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+          <div className="p-4 border-t border-slate-800">
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-800/50">
               <Avatar
-                fallback="John Doe"
+                fallback="HR Manager"
                 size="sm"
                 status="online"
               />
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">John Doe</p>
-                <p className="text-xs text-muted-foreground truncate">
-                  Rank #247
+                <p className="text-sm font-medium text-white truncate">Sarah Johnson</p>
+                <p className="text-xs text-slate-400 truncate">
+                  HR Manager
                 </p>
               </div>
             </div>
@@ -144,10 +173,10 @@ export default function DashboardLayout({
 
               {/* Search */}
               <div className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/50 border border-border w-64">
-                <Search className="h-4 w-4 text-muted-foreground" />
+                <SearchIcon className="h-4 w-4 text-muted-foreground" />
                 <input
                   type="text"
-                  placeholder="Search..."
+                  placeholder="Search candidates..."
                   className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
                 />
                 <kbd className="hidden sm:inline-flex h-5 items-center gap-1 rounded border border-border bg-background px-1.5 font-mono text-xs text-muted-foreground">
@@ -173,7 +202,7 @@ export default function DashboardLayout({
                   className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-muted transition-colors"
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
                 >
-                  <Avatar fallback="John Doe" size="sm" />
+                  <Avatar fallback="Sarah Johnson" size="sm" />
                   <ChevronDown className="h-4 w-4 text-muted-foreground hidden sm:block" />
                 </button>
 
@@ -191,22 +220,22 @@ export default function DashboardLayout({
                         className="absolute right-0 mt-2 w-56 rounded-lg border border-border bg-card shadow-lg z-50"
                       >
                         <div className="p-3 border-b border-border">
-                          <p className="font-medium">John Doe</p>
+                          <p className="font-medium">Sarah Johnson</p>
                           <p className="text-sm text-muted-foreground">
-                            john@example.com
+                            hr@techcorp.com
                           </p>
                         </div>
                         <div className="p-1">
                           <Link
-                            href="/profile"
+                            href="/admin/company/billing"
                             className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-muted transition-colors"
                             onClick={() => setUserMenuOpen(false)}
                           >
-                            <User className="h-4 w-4" />
-                            Profile
+                            <CreditCard className="h-4 w-4" />
+                            Billing & Plan
                           </Link>
                           <Link
-                            href="/settings"
+                            href="/admin/company/billing"
                             className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-muted transition-colors"
                             onClick={() => setUserMenuOpen(false)}
                           >

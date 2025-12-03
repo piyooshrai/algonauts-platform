@@ -4,13 +4,47 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Eye, EyeOff, Mail, Lock, ArrowRight, Loader2 } from "lucide-react";
-import { Button, Input, Checkbox, Separator } from "@/components/ui";
+import { Eye, EyeOff, Mail, Lock, ArrowRight, Loader2, GraduationCap, Building2, Building, Check } from "lucide-react";
+import { Button, Input, Checkbox, Separator, Badge } from "@/components/ui";
+import { cn } from "@/lib/utils";
+
+type UserRole = "student" | "college_admin" | "company_admin";
+
+const roleOptions = [
+  {
+    value: "student" as UserRole,
+    label: "Student",
+    description: "Access assessments & opportunities",
+    icon: GraduationCap,
+    href: "/dashboard",
+    color: "text-blue-500",
+    bgColor: "bg-blue-500/10",
+  },
+  {
+    value: "college_admin" as UserRole,
+    label: "College Admin",
+    description: "Manage students & placements",
+    icon: Building2,
+    href: "/admin/college",
+    color: "text-purple-500",
+    bgColor: "bg-purple-500/10",
+  },
+  {
+    value: "company_admin" as UserRole,
+    label: "Company Admin",
+    description: "Discover & hire talent",
+    icon: Building,
+    href: "/admin/company",
+    color: "text-green-500",
+    bgColor: "bg-green-500/10",
+  },
+];
 
 export default function LoginPage() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedRole, setSelectedRole] = useState<UserRole>("student");
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -44,21 +78,15 @@ export default function LoginPage() {
 
     setIsLoading(true);
 
-    // Test user bypass - for development
-    const TEST_USER_EMAIL = "test@college.edu";
-    const TEST_USER_PASSWORD = "test1234";
+    // Simulate API call
+    await new Promise((resolve) => setTimeout(resolve, 800));
 
-    if (formData.email === TEST_USER_EMAIL && formData.password === TEST_USER_PASSWORD) {
-      // Bypass auth and go directly to dashboard
-      router.push("/dashboard");
-      return;
-    }
+    // Get redirect path based on selected role
+    const selectedOption = roleOptions.find((r) => r.value === selectedRole);
+    const redirectPath = selectedOption?.href || "/dashboard";
 
-    // Simulate API call for other users
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    // TODO: Replace with actual authentication
-    router.push("/dashboard");
+    // Redirect to appropriate portal
+    router.push(redirectPath);
   };
 
   return (
@@ -71,6 +99,42 @@ export default function LoginPage() {
         <h1 className="text-2xl font-bold mb-2">Welcome back</h1>
         <p className="text-muted-foreground">
           Sign in to continue to your dashboard
+        </p>
+      </div>
+
+      {/* Role Selector - Demo Mode */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-3">
+          <label className="text-sm font-medium">Select Role</label>
+          <Badge variant="warning" className="text-xs">Demo Mode</Badge>
+        </div>
+        <div className="grid grid-cols-3 gap-2">
+          {roleOptions.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              onClick={() => setSelectedRole(option.value)}
+              className={cn(
+                "relative flex flex-col items-center gap-1.5 p-3 rounded-lg border-2 transition-all",
+                selectedRole === option.value
+                  ? "border-primary bg-primary/5"
+                  : "border-border hover:border-primary/50 hover:bg-muted/50"
+              )}
+            >
+              {selectedRole === option.value && (
+                <div className="absolute top-1.5 right-1.5">
+                  <Check className="h-3.5 w-3.5 text-primary" />
+                </div>
+              )}
+              <div className={cn("p-2 rounded-lg", option.bgColor)}>
+                <option.icon className={cn("h-5 w-5", option.color)} />
+              </div>
+              <span className="text-xs font-medium">{option.label}</span>
+            </button>
+          ))}
+        </div>
+        <p className="text-xs text-muted-foreground mt-2 text-center">
+          Choose a role to explore different portal experiences
         </p>
       </div>
 
