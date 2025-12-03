@@ -410,17 +410,34 @@ export default function Home() {
                 <div className="space-y-4">
                   <div>
                     <label className="text-sm text-muted-foreground mb-2 block">Minimum LayersRank</label>
-                    <div className="h-10 rounded-md bg-muted flex items-center px-3">
-                      <span className="font-medium">Top 500</span>
+                    <div className="h-9 rounded-md bg-muted flex items-center px-3">
+                      <span className="font-medium text-sm">Top 500</span>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm text-muted-foreground mb-2 block">Minimum Scores</label>
+                    <div className="space-y-2">
+                      {[
+                        { label: "Technical", value: "70+" },
+                        { label: "Behavioral", value: "75+" },
+                        { label: "Contextual", value: "65+" },
+                      ].map((score) => (
+                        <div key={score.label} className="flex items-center justify-between">
+                          <span className="text-sm text-muted-foreground">{score.label}</span>
+                          <div className="h-7 w-16 rounded bg-muted flex items-center justify-center">
+                            <span className="text-xs font-medium">{score.value}</span>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                   <div>
                     <label className="text-sm text-muted-foreground mb-2 block">Skills</label>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-1.5">
                       {["React", "Node.js", "Python", "System Design"].map((skill) => (
                         <span
                           key={skill}
-                          className="px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-sm"
+                          className="px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs"
                         >
                           {skill}
                         </span>
@@ -429,14 +446,52 @@ export default function Home() {
                   </div>
                   <div>
                     <label className="text-sm text-muted-foreground mb-2 block">Location</label>
-                    <div className="h-10 rounded-md bg-muted flex items-center px-3">
-                      <span className="font-medium">Bangalore, Remote OK</span>
+                    <div className="h-9 rounded-md bg-muted flex items-center px-3">
+                      <span className="font-medium text-sm">Bangalore, Remote OK</span>
                     </div>
                   </div>
-                  <div className="pt-2">
-                    <p className="text-sm text-muted-foreground">
-                      <span className="text-2xl font-bold text-foreground font-display">127</span> matching candidates
+
+                  <div className="border-t border-border pt-4">
+                    <p className="text-sm text-muted-foreground mb-3">
+                      <span className="text-xl font-bold text-foreground font-display">127</span> matching candidates
                     </p>
+
+                    {/* Preview Candidate Card */}
+                    <div className="bg-muted/50 border border-border rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <div>
+                          <span className="text-sm font-semibold text-primary">#247</span>
+                          <span className="text-sm text-muted-foreground"> · XYZ Engineering College</span>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        {[
+                          { label: "Technical", score: 82, confidence: 3, percent: 82 },
+                          { label: "Behavioral", score: 88, confidence: 2, percent: 88 },
+                          { label: "Contextual", score: 71, confidence: 4, percent: 71 },
+                        ].map((item) => (
+                          <div key={item.label} className="flex items-center gap-2">
+                            <span className="text-xs text-muted-foreground w-20">{item.label}</span>
+                            <span className="text-xs font-medium w-6">{item.score}</span>
+                            <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-blue-500 rounded-full"
+                                style={{ width: `${item.percent}%` }}
+                              />
+                            </div>
+                            <span className="text-[10px] text-muted-foreground w-6">±{item.confidence}</span>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="mt-3 pt-3 border-t border-border">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-muted-foreground">Confidence:</span>
+                          <span className="text-xs font-medium text-success-600">High (94%)</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
