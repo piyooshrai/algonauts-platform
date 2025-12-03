@@ -21,6 +21,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/logo";
 import { Avatar, Badge } from "@/components/ui";
+import { RoleSwitcher } from "@/components/role-switcher";
 
 const navigation = [
   { name: "Dashboard", href: "/admin/college", icon: LayoutDashboard },
@@ -175,6 +176,9 @@ export default function CollegeAdminLayout({
 
             {/* Right side */}
             <div className="flex items-center gap-3">
+              {/* Role Switcher - Demo */}
+              <RoleSwitcher variant="compact" />
+
               {/* Notifications */}
               <button className="relative p-2 text-muted-foreground hover:text-foreground transition-colors">
                 <Bell className="h-5 w-5" />
