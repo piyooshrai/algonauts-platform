@@ -113,17 +113,23 @@ export default function Home() {
 
             <motion.div
               variants={fadeInUp}
-              className="flex flex-col sm:flex-row items-center justify-center gap-4"
+              className="flex flex-col sm:flex-row items-center justify-center gap-3"
             >
               <Link href="/signup">
                 <Button size="xl" variant="gradient" className="w-full sm:w-auto gap-2">
                   Start Your Journey <Rocket className="h-5 w-5" />
                 </Button>
               </Link>
-              <Link href="#for-companies">
+              <Link href="/admin/company">
                 <Button size="xl" variant="outline" className="w-full sm:w-auto gap-2">
                   <Building2 className="h-5 w-5" />
                   I&apos;m a Company
+                </Button>
+              </Link>
+              <Link href="/admin/college">
+                <Button size="xl" variant="outline" className="w-full sm:w-auto gap-2">
+                  <GraduationCap className="h-5 w-5" />
+                  I&apos;m a College
                 </Button>
               </Link>
             </motion.div>
@@ -495,6 +501,125 @@ export default function Home() {
                   </div>
                 </div>
               </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* For Colleges Section */}
+      <section id="for-colleges" className="py-24 px-4 sm:px-6 lg:px-8 bg-muted/30">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Visual - College Dashboard Preview */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="relative order-2 lg:order-1"
+            >
+              <div className="bg-card border border-border rounded-lg p-6 shadow-xl">
+                <h3 className="font-semibold mb-4">College Dashboard</h3>
+
+                {/* Stats Row */}
+                <div className="grid grid-cols-3 gap-3 mb-4">
+                  {[
+                    { label: "Students", value: "2,847" },
+                    { label: "Avg. Rank", value: "#312" },
+                    { label: "Placed", value: "78%" },
+                  ].map((stat) => (
+                    <div key={stat.label} className="bg-muted/50 rounded-lg p-3 text-center">
+                      <p className="text-lg font-bold text-foreground">{stat.value}</p>
+                      <p className="text-[10px] text-muted-foreground">{stat.label}</p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Mini Student Table */}
+                <div className="border border-border rounded-lg overflow-hidden mb-4">
+                  <div className="bg-muted/50 px-3 py-2 border-b border-border">
+                    <span className="text-xs font-medium">Top Performers</span>
+                  </div>
+                  <div className="divide-y divide-border">
+                    {[
+                      { name: "Priya S.", rank: "#45", score: 94, status: "Placed" },
+                      { name: "Rahul K.", rank: "#112", score: 89, status: "Interviewing" },
+                      { name: "Ananya M.", rank: "#203", score: 85, status: "Active" },
+                    ].map((student) => (
+                      <div key={student.name} className="px-3 py-2 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
+                            <span className="text-[10px] font-medium text-primary">{student.name.charAt(0)}</span>
+                          </div>
+                          <span className="text-xs font-medium">{student.name}</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <span className="text-xs text-primary font-medium">{student.rank}</span>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-success-100 dark:bg-success-900/30 text-success-600">{student.status}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Cohort Progress */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs text-muted-foreground">2025 Cohort Completion</span>
+                    <span className="text-xs font-medium">67%</span>
+                  </div>
+                  <div className="h-2 bg-muted rounded-full overflow-hidden">
+                    <div className="h-full bg-blue-500 rounded-full" style={{ width: "67%" }} />
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Content */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="order-1 lg:order-2"
+            >
+              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-50 dark:bg-purple-950/50 text-sm font-medium text-purple-700 dark:text-purple-300 mb-4">
+                <GraduationCap className="h-4 w-4" />
+                For Colleges
+              </span>
+              <h2 className="text-display-sm sm:text-display-md font-bold mb-6">
+                Your Students Deserve Better Placements
+              </h2>
+              <p className="text-lg text-muted-foreground mb-8">
+                Join 100+ colleges using Algonauts to track student progress, improve placement rates, and connect your best talent with top companies.
+              </p>
+
+              <div className="space-y-4">
+                {[
+                  { icon: Zap, text: "Bulk onboard students in minutes with CSV upload" },
+                  { icon: BarChart3, text: "Track cohort performance across all assessments" },
+                  { icon: Target, text: "See which companies are hiring your students" },
+                  { icon: TrendingUp, text: "Boost your placement statistics with verified rankings" },
+                ].map((item, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, x: 20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    viewport={{ once: true }}
+                    className="flex items-center gap-3"
+                  >
+                    <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/30">
+                      <item.icon className="h-5 w-5 text-purple-600" />
+                    </div>
+                    <span className="text-foreground">{item.text}</span>
+                  </motion.div>
+                ))}
+              </div>
+
+              <Link href="/admin/college">
+                <Button size="lg" className="mt-8 gap-2">
+                  Partner With Algonauts <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
             </motion.div>
           </div>
         </div>
