@@ -16,11 +16,11 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: {
-    default: "Algonauts - Where Talent Meets Opportunity",
+    default: "Algonauts | Your Rank Is Your Resume",
     template: "%s | Algonauts",
   },
   description:
-    "The premier platform for interns, students, and freshers. Take assessments, earn your LayersRank, and get discovered by top companies.",
+    "The platform for students and freshers to prove their skills through verified assessments, earn a national ranking, and get discovered by top companies.",
   keywords: [
     "Algonauts",
     "LayersRank",
@@ -35,17 +35,27 @@ export const metadata: Metadata = {
   creator: "Algonauts",
   openGraph: {
     type: "website",
-    locale: "en_US",
+    locale: "en_IN",
+    url: "https://algonauts-platform.vercel.app",
     siteName: "Algonauts",
-    title: "Algonauts - Where Talent Meets Opportunity",
+    title: "Algonauts | Your Rank Is Your Resume",
     description:
-      "The premier platform for interns, students, and freshers. Take assessments, earn your LayersRank, and get discovered by top companies.",
+      "Prove your skills. Earn your rank. Get discovered by top companies.",
+    images: [
+      {
+        url: "https://algonauts-platform.vercel.app/images/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Algonauts - Your Rank Is Your Resume",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Algonauts - Where Talent Meets Opportunity",
+    title: "Algonauts | Your Rank Is Your Resume",
     description:
-      "The premier platform for interns, students, and freshers. Take assessments, earn your LayersRank, and get discovered by top companies.",
+      "Prove your skills. Earn your rank. Get discovered by top companies.",
+    images: ["https://algonauts-platform.vercel.app/images/og-image.png"],
   },
   robots: {
     index: true,
