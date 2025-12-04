@@ -687,10 +687,10 @@ export default function Home() {
             <div>
               <h4 className="font-semibold mb-4">Platform</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link href="/assessments" className="hover:text-foreground transition-colors">Assessments</Link></li>
-                <li><Link href="/leaderboard" className="hover:text-foreground transition-colors">Leaderboard</Link></li>
-                <li><Link href="/opportunities" className="hover:text-foreground transition-colors">Opportunities</Link></li>
-                <li><Link href="#features" className="hover:text-foreground transition-colors">Features</Link></li>
+                <li><Link href="/#how-it-works" className="hover:text-foreground transition-colors">How It Works</Link></li>
+                <li><Link href="/#features" className="hover:text-foreground transition-colors">Features</Link></li>
+                <li><Link href="/#for-companies" className="hover:text-foreground transition-colors">For Companies</Link></li>
+                <li><Link href="/#for-colleges" className="hover:text-foreground transition-colors">For Colleges</Link></li>
               </ul>
             </div>
             <div>
