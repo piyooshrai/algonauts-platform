@@ -36,49 +36,49 @@ const staggerContainer = {
 
 const pricingPlans = [
   {
-    name: "Free",
-    price: "$0",
-    period: "forever",
-    description: "Explore the platform",
-    features: [
-      "View candidate profiles",
-      "Basic search filters",
-      "LayersRank visibility",
-      "No invites included",
-    ],
-    cta: "Get Started",
-    highlighted: false,
-  },
-  {
     name: "Starter",
-    price: "$299",
+    price: "₹9,999",
     period: "/month",
     description: "For small teams",
     features: [
-      "Everything in Free",
-      "20 candidate invites/month",
-      "Advanced filters",
+      "25 candidate invites per month",
+      "Filter by LayersRank, skills, location",
       "Email support",
-      "Candidate analytics",
     ],
-    cta: "Start Free Trial",
+    cta: "Get Started",
+    ctaLink: "/admin/company",
     highlighted: false,
   },
   {
-    name: "Pro",
-    price: "$799",
+    name: "Growth",
+    price: "₹24,999",
     period: "/month",
     description: "For growing companies",
     features: [
-      "Everything in Starter",
-      "100 candidate invites/month",
+      "75 candidate invites per month",
+      "Advanced filters (dimension scores, confidence levels)",
+      "Analytics dashboard",
       "Priority support",
-      "Team collaboration",
-      "ATS integration",
-      "Custom branding",
     ],
-    cta: "Start Free Trial",
+    cta: "Get Started",
+    ctaLink: "/admin/company",
     highlighted: true,
+  },
+  {
+    name: "Scale",
+    price: "₹49,999",
+    period: "/month",
+    description: "For scaling organizations",
+    features: [
+      "200 candidate invites per month",
+      "Everything in Growth",
+      "API access",
+      "ATS integration",
+      "Dedicated account manager",
+    ],
+    cta: "Get Started",
+    ctaLink: "/admin/company",
+    highlighted: false,
   },
   {
     name: "Enterprise",
@@ -86,15 +86,15 @@ const pricingPlans = [
     period: "",
     description: "For large organizations",
     features: [
-      "Everything in Pro",
       "Unlimited invites",
-      "Dedicated account manager",
-      "Custom integrations",
-      "SLA guarantee",
-      "On-premise option",
+      "White-label options",
+      "Custom SLA",
+      "Onboarding support",
     ],
     cta: "Contact Sales",
+    ctaLink: "https://www.the-algo.com/contact",
     highlighted: false,
+    external: true,
   },
 ];
 
@@ -410,7 +410,7 @@ export default function ForCompaniesPage() {
               Simple, Transparent Pricing
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Start free, upgrade when you&apos;re ready. All paid plans include a 14-day free trial.
+              Choose the plan that fits your hiring needs. Scale up anytime.
             </p>
           </motion.div>
 
@@ -451,15 +451,37 @@ export default function ForCompaniesPage() {
                     </li>
                   ))}
                 </ul>
-                <Button
-                  className="w-full"
-                  variant={plan.highlighted ? "default" : "outline"}
-                >
-                  {plan.cta}
-                </Button>
+                {plan.external ? (
+                  <a href={plan.ctaLink} target="_blank" rel="noopener noreferrer">
+                    <Button
+                      className="w-full"
+                      variant={plan.highlighted ? "default" : "outline"}
+                    >
+                      {plan.cta}
+                    </Button>
+                  </a>
+                ) : (
+                  <Link href={plan.ctaLink}>
+                    <Button
+                      className="w-full"
+                      variant={plan.highlighted ? "default" : "outline"}
+                    >
+                      {plan.cta}
+                    </Button>
+                  </Link>
+                )}
               </motion.div>
             ))}
           </div>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center text-sm text-muted-foreground mt-8"
+          >
+            All plans include unlimited job postings and team members. No per-seat fees. Cancel anytime.
+          </motion.p>
         </div>
       </section>
 
