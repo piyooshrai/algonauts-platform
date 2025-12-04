@@ -120,13 +120,13 @@ export default function Home() {
                   Start Your Journey <Rocket className="h-5 w-5" />
                 </Button>
               </Link>
-              <Link href="/admin/company">
+              <Link href="/for-companies">
                 <Button size="xl" variant="outline" className="w-full sm:w-auto gap-2">
                   <Building2 className="h-5 w-5" />
                   I&apos;m a Company
                 </Button>
               </Link>
-              <Link href="/admin/college">
+              <Link href="/for-colleges">
                 <Button size="xl" variant="outline" className="w-full sm:w-auto gap-2">
                   <GraduationCap className="h-5 w-5" />
                   I&apos;m a College
@@ -615,7 +615,7 @@ export default function Home() {
                 ))}
               </div>
 
-              <Link href="/admin/college">
+              <Link href="/for-colleges">
                 <Button size="lg" className="mt-8 gap-2">
                   Partner With Algonauts <ArrowRight className="h-4 w-4" />
                 </Button>
