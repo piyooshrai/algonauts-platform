@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180">
+  <rect width="180" height="180" rx="40" fill="#166534"/>
+  <circle cx="90" cy="80" r="45" fill="#2dd4bf"/>
+  <circle cx="72" cy="70" r="10" fill="white"/>
+  <circle cx="108" cy="70" r="10" fill="white"/>
+  <circle cx="72" cy="70" r="5" fill="#1e293b"/>
+  <circle cx="108" cy="70" r="5" fill="#1e293b"/>
+  <path d="M 80 90 L 90 106 L 100 90 Z" fill="#f97316"/>
+  <text x="90" y="150" text-anchor="middle" font-family="Inter, sans-serif" font-weight="bold" font-size="18" fill="white">Saarthi</text>
+</svg>
