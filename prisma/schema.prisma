@@ -1,0 +1,1112 @@
+// Algonaut Platform - Prisma Schema
+// Data acquisition machine disguised as a job platform
+// Core metric: 78% placement prediction accuracy + 90-day verification
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// ENUMS
+// ============================================================================
+
+enum UserType {
+  STUDENT
+  COMPANY
+  COLLEGE_ADMIN
+  PLATFORM_ADMIN
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+  PREFER_NOT_TO_SAY
+}
+
+enum ProfileCompletionStatus {
+  INCOMPLETE
+  BASIC
+  COMPLETE
+  VERIFIED
+}
+
+enum OpportunityStatus {
+  DRAFT
+  PUBLISHED
+  CLOSED
+  FILLED
+  EXPIRED
+}
+
+enum OpportunityType {
+  FULL_TIME
+  INTERNSHIP
+  CONTRACT
+  PART_TIME
+}
+
+enum ApplicationStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  SHORTLISTED
+  INTERVIEW_SCHEDULED
+  INTERVIEWED
+  OFFER_MADE
+  OFFER_ACCEPTED
+  OFFER_REJECTED
+  REJECTED
+  WITHDRAWN
+}
+
+enum InviteStatus {
+  PENDING
+  VIEWED
+  ACCEPTED
+  DECLINED
+  EXPIRED
+}
+
+enum PlacementStatus {
+  PENDING_CONFIRMATION
+  CONFIRMED
+  VERIFICATION_30_PENDING
+  VERIFICATION_30_COMPLETE
+  VERIFICATION_90_PENDING
+  VERIFICATION_90_COMPLETE
+  FAILED
+  DISPUTED
+}
+
+enum VerificationType {
+  SELF_REPORTED
+  EMAIL_VERIFIED
+  EMPLOYER_CONFIRMED
+  COLLEGE_CONFIRMED
+  DOCUMENT_VERIFIED
+}
+
+enum BadgeCategory {
+  ACHIEVEMENT
+  SKILL
+  MILESTONE
+  SPECIAL
+  STREAK
+}
+
+enum BadgeRarity {
+  COMMON
+  UNCOMMON
+  RARE
+  EPIC
+  LEGENDARY
+}
+
+enum NotificationType {
+  OPPORTUNITY
+  APPLICATION
+  INVITE
+  PLACEMENT
+  ACHIEVEMENT
+  STREAK
+  LEADERBOARD
+  SYSTEM
+}
+
+enum NotificationChannel {
+  IN_APP
+  EMAIL
+  PUSH
+  SMS
+  WHATSAPP
+}
+
+enum EventSource {
+  SEARCH
+  RECOMMENDATION
+  NOTIFICATION
+  DIRECT
+  FEED
+  EMAIL
+  REFERRAL
+  EXTERNAL
+}
+
+// ============================================================================
+// CORE MODELS
+// ============================================================================
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  emailVerified DateTime?
+  passwordHash  String?
+  phone         String?
+  phoneVerified DateTime?
+  userType      UserType  @default(STUDENT)
+  isActive      Boolean   @default(true)
+  lastLoginAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  accounts      Account[]
+  sessions      Session[]
+  profile       Profile?
+  companyProfile CompanyProfile?
+  collegeAdmin  CollegeAdmin?
+  events        Event[]
+  applications  Application[]
+  invitesReceived Invite[] @relation("InvitesReceived")
+  placements    Placement[]
+  badges        UserBadge[]
+  streaks       Streak[]
+  notifications Notification[]
+  referralsMade Referral[] @relation("ReferralsMade")
+  referredBy    Referral?  @relation("ReferredUser")
+  assessmentAttempts AssessmentAttempt[]
+  levelHistory  LevelHistory[]
+  feedItems     FeedItem[]
+
+  @@index([email])
+  @@index([userType])
+  @@index([createdAt])
+}
+
+// NextAuth required models
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  createdAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ============================================================================
+// STUDENT PROFILE
+// ============================================================================
+
+model Profile {
+  id                    String                  @id @default(cuid())
+  userId                String                  @unique
+
+  // Basic Info
+  firstName             String?
+  lastName              String?
+  displayName           String?
+  avatarUrl             String?
+  bio                   String?                 @db.Text
+  gender                Gender?
+  dateOfBirth           DateTime?
+
+  // Location
+  city                  String?
+  state                 String?
+  country               String?                 @default("India")
+  pincode               String?
+
+  // Education
+  collegeId             String?
+  collegeName           String?
+  degree                String?
+  branch                String?
+  graduationYear        Int?
+  cgpa                  Float?
+
+  // Professional
+  resumeUrl             String?
+  resumeUpdatedAt       DateTime?
+  linkedinUrl           String?
+  githubUrl             String?
+  portfolioUrl          String?
+
+  // Skills & Preferences
+  skills                String[]
+  preferredRoles        String[]
+  preferredLocations    String[]
+  expectedSalaryMin     Int?
+  expectedSalaryMax     Int?
+  openToRemote          Boolean                 @default(true)
+  openToRelocation      Boolean                 @default(false)
+
+  // LayersRank Scores (THE CORE PRODUCT)
+  layersRankOverall     Float?                  // 0-100
+  layersRankTechnical   Float?                  // 0-100
+  layersRankBehavioral  Float?                  // 0-100
+  layersRankContextual  Float?                  // 0-100
+  confidenceScore       Float?                  // 0-1, how confident we are in the rank
+  rankLastUpdatedAt     DateTime?
+
+  // Engagement Metrics
+  profileCompletionPct  Int                     @default(0)
+  completionStatus      ProfileCompletionStatus @default(INCOMPLETE)
+  totalXp               Int                     @default(0)
+  currentLevel          Int                     @default(1)
+  currentStreak         Int                     @default(0)
+  longestStreak         Int                     @default(0)
+  lastActiveAt          DateTime?
+
+  // Visibility
+  isPublic              Boolean                 @default(true)
+  isSearchable          Boolean                 @default(true)
+  showOnLeaderboard     Boolean                 @default(true)
+
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
+
+  // Relations
+  user                  User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  college               College?                @relation(fields: [collegeId], references: [id])
+  experiences           Experience[]
+  education             Education[]
+  certifications        Certification[]
+
+  @@index([collegeId])
+  @@index([layersRankOverall])
+  @@index([city, state])
+  @@index([graduationYear])
+  @@index([skills])
+}
+
+model Experience {
+  id          String    @id @default(cuid())
+  profileId   String
+  company     String
+  title       String
+  location    String?
+  startDate   DateTime
+  endDate     DateTime?
+  isCurrent   Boolean   @default(false)
+  description String?   @db.Text
+  skills      String[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId])
+}
+
+model Education {
+  id            String   @id @default(cuid())
+  profileId     String
+  institution   String
+  degree        String
+  field         String?
+  startYear     Int
+  endYear       Int?
+  grade         String?
+  activities    String?  @db.Text
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId])
+}
+
+model Certification {
+  id             String    @id @default(cuid())
+  profileId      String
+  name           String
+  issuer         String
+  issueDate      DateTime
+  expiryDate     DateTime?
+  credentialId   String?
+  credentialUrl  String?
+  createdAt      DateTime  @default(now())
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId])
+}
+
+// ============================================================================
+// COMPANY
+// ============================================================================
+
+model CompanyProfile {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+
+  // Company Info
+  companyName     String
+  legalName       String?
+  industry        String?
+  companySize     String?
+  foundedYear     Int?
+  website         String?
+  linkedinUrl     String?
+  logoUrl         String?
+  description     String?  @db.Text
+
+  // Location
+  headquarters    String?
+  locations       String[]
+
+  // Contact
+  contactName     String?
+  contactEmail    String?
+  contactPhone    String?
+
+  // Verification
+  isVerified      Boolean  @default(false)
+  verifiedAt      DateTime?
+  gstNumber       String?
+  panNumber       String?
+
+  // Subscription
+  subscriptionTier String   @default("free")
+  invitesRemaining Int      @default(0)
+  invitesUsedTotal Int      @default(0)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  opportunities   Opportunity[]
+  invitesSent     Invite[]
+
+  @@index([companyName])
+  @@index([industry])
+}
+
+// ============================================================================
+// COLLEGE
+// ============================================================================
+
+model College {
+  id                String   @id @default(cuid())
+  name              String
+  shortName         String?
+  universityName    String?
+
+  // Location
+  city              String?
+  state             String?
+  country           String   @default("India")
+
+  // Details
+  type              String?  // Engineering, Arts, etc.
+  tier              String?  // Tier 1, Tier 2, etc.
+  establishedYear   Int?
+  website           String?
+  logoUrl           String?
+
+  // Rankings
+  overallRank       Int?
+  placementRate     Float?   // Historical placement rate
+  avgPackage        Float?   // Average package in LPA
+
+  // Stats (updated periodically)
+  totalStudents     Int      @default(0)
+  activeStudents    Int      @default(0)
+  placedStudents    Int      @default(0)
+
+  isVerified        Boolean  @default(false)
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  profiles          Profile[]
+  admins            CollegeAdmin[]
+  bulkImports       BulkImport[]
+
+  @@index([name])
+  @@index([state])
+  @@index([overallRank])
+}
+
+model CollegeAdmin {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  collegeId   String
+  role        String   @default("admin") // admin, placement_officer, faculty
+  department  String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  college College @relation(fields: [collegeId], references: [id])
+
+  @@index([collegeId])
+}
+
+model BulkImport {
+  id            String   @id @default(cuid())
+  collegeId     String
+  fileName      String
+  totalRows     Int
+  successCount  Int      @default(0)
+  failedCount   Int      @default(0)
+  status        String   @default("pending") // pending, processing, completed, failed
+  errorLog      Json?
+  createdAt     DateTime @default(now())
+  completedAt   DateTime?
+
+  college College @relation(fields: [collegeId], references: [id])
+
+  @@index([collegeId])
+}
+
+// ============================================================================
+// OPPORTUNITIES (Jobs)
+// ============================================================================
+
+model Opportunity {
+  id                String            @id @default(cuid())
+  companyId         String
+
+  // Basic Info
+  title             String
+  slug              String            @unique
+  description       String            @db.Text
+  requirements      String?           @db.Text
+  responsibilities  String?           @db.Text
+
+  // Type & Location
+  type              OpportunityType   @default(FULL_TIME)
+  isRemote          Boolean           @default(false)
+  locations         String[]
+
+  // Compensation
+  salaryMin         Int?
+  salaryMax         Int?
+  salaryCurrency    String            @default("INR")
+  salaryPeriod      String            @default("yearly") // yearly, monthly, hourly
+
+  // Requirements
+  requiredSkills    String[]
+  preferredSkills   String[]
+  minExperience     Int               @default(0) // in months
+  maxExperience     Int?
+  minEducation      String?
+  preferredDegrees  String[]
+
+  // LayersRank Filters
+  minLayersRank     Float?            // Minimum overall LayersRank
+  minTechnicalRank  Float?
+  minBehavioralRank Float?
+
+  // Dates & Status
+  status            OpportunityStatus @default(DRAFT)
+  publishedAt       DateTime?
+  expiresAt         DateTime?
+  closedAt          DateTime?
+
+  // Stats
+  viewCount         Int               @default(0)
+  applicationCount  Int               @default(0)
+  inviteCount       Int               @default(0)
+
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  // Relations
+  company           CompanyProfile    @relation(fields: [companyId], references: [id])
+  applications      Application[]
+  invites           Invite[]
+
+  @@index([companyId])
+  @@index([status])
+  @@index([type])
+  @@index([locations])
+  @@index([publishedAt])
+}
+
+// ============================================================================
+// APPLICATIONS & INVITES
+// ============================================================================
+
+model Application {
+  id              String            @id @default(cuid())
+  userId          String
+  opportunityId   String
+
+  // Application Data
+  coverLetter     String?           @db.Text
+  resumeUrl       String?
+  answers         Json?             // Custom question answers
+
+  // Status
+  status          ApplicationStatus @default(DRAFT)
+  statusHistory   Json[]            // Array of {status, timestamp, note}
+
+  // Tracking
+  source          EventSource       @default(DIRECT)
+  recommendationId String?          // If from recommendation
+
+  // Dates
+  submittedAt     DateTime?
+  reviewedAt      DateTime?
+
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  // Relations
+  user        User        @relation(fields: [userId], references: [id])
+  opportunity Opportunity @relation(fields: [opportunityId], references: [id])
+  placement   Placement?
+
+  @@unique([userId, opportunityId])
+  @@index([userId])
+  @@index([opportunityId])
+  @@index([status])
+  @@index([submittedAt])
+}
+
+model Invite {
+  id              String       @id @default(cuid())
+  companyId       String
+  userId          String
+  opportunityId   String
+
+  // Invite Details
+  message         String?      @db.Text
+  status          InviteStatus @default(PENDING)
+
+  // Tracking
+  viewedAt        DateTime?
+  respondedAt     DateTime?
+  expiresAt       DateTime
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  // Relations
+  company     CompanyProfile @relation(fields: [companyId], references: [id])
+  user        User           @relation("InvitesReceived", fields: [userId], references: [id])
+  opportunity Opportunity    @relation(fields: [opportunityId], references: [id])
+
+  @@unique([companyId, userId, opportunityId])
+  @@index([userId])
+  @@index([companyId])
+  @@index([status])
+}
+
+// ============================================================================
+// PLACEMENTS - THE MOST VALUABLE DATA
+// ============================================================================
+
+model Placement {
+  id                String           @id @default(cuid())
+  userId            String
+  applicationId     String?          @unique
+
+  // Placement Details
+  companyName       String
+  jobTitle          String
+  location          String?
+  startDate         DateTime
+  salaryOffered     Int?
+
+  // Status & Verification
+  status            PlacementStatus  @default(PENDING_CONFIRMATION)
+  verificationType  VerificationType @default(SELF_REPORTED)
+
+  // 30-Day Verification (CRITICAL FOR ML)
+  verification30RequestedAt DateTime?
+  verification30CompletedAt DateTime?
+  verification30Method      VerificationType?
+  verification30Notes       String?
+
+  // 90-Day Verification (MOST VALUABLE)
+  verification90RequestedAt DateTime?
+  verification90CompletedAt DateTime?
+  verification90Method      VerificationType?
+  verification90Notes       String?
+  isRetainedAt90Days        Boolean?
+
+  // Attribution (for reward calculation)
+  attributedToCollegeId     String?
+  attributedToReferrerId    String?
+  rewardPointsAwarded       Int      @default(0)
+
+  // Document verification
+  offerLetterUrl            String?
+  joiningLetterUrl          String?
+
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
+
+  // Relations
+  user        User         @relation(fields: [userId], references: [id])
+  application Application? @relation(fields: [applicationId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@index([verification90CompletedAt])
+  @@index([startDate])
+}
+
+// ============================================================================
+// ASSESSMENTS
+// ============================================================================
+
+model Assessment {
+  id              String   @id @default(cuid())
+
+  // Basic Info
+  title           String
+  slug            String   @unique
+  description     String?  @db.Text
+  category        String   // technical, behavioral, contextual
+  subcategory     String?  // dsa, aptitude, communication, etc.
+
+  // Configuration
+  duration        Int      // in minutes
+  totalQuestions  Int
+  passingScore    Float    @default(60)
+  maxAttempts     Int      @default(3)
+
+  // Difficulty
+  difficulty      String   @default("medium") // easy, medium, hard
+
+  // Availability
+  isActive        Boolean  @default(true)
+  isPublic        Boolean  @default(true)
+  availableFrom   DateTime?
+  availableUntil  DateTime?
+
+  // Stats
+  attemptCount    Int      @default(0)
+  avgScore        Float?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  questions       Question[]
+  attempts        AssessmentAttempt[]
+
+  @@index([category])
+  @@index([isActive])
+}
+
+model Question {
+  id              String   @id @default(cuid())
+  assessmentId    String
+
+  // Question Content
+  questionText    String   @db.Text
+  questionType    String   // mcq, coding, text, rating
+  options         Json?    // For MCQ: [{id, text, isCorrect}]
+  correctAnswer   String?
+  explanation     String?  @db.Text
+
+  // Scoring
+  points          Int      @default(1)
+  negativeMarking Float    @default(0)
+
+  // Metadata
+  difficulty      String   @default("medium")
+  tags            String[]
+  orderIndex      Int
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  assessment Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  responses  QuestionResponse[]
+
+  @@index([assessmentId])
+}
+
+model AssessmentAttempt {
+  id              String   @id @default(cuid())
+  userId          String
+  assessmentId    String
+
+  // Attempt Details
+  startedAt       DateTime @default(now())
+  submittedAt     DateTime?
+  timeSpentSeconds Int?
+
+  // Scoring
+  score           Float?
+  percentile      Float?
+  isPassed        Boolean?
+
+  // Proctoring (future)
+  proctoringData  Json?
+  flagged         Boolean  @default(false)
+  flagReason      String?
+
+  createdAt       DateTime @default(now())
+
+  // Relations
+  user       User                @relation(fields: [userId], references: [id])
+  assessment Assessment          @relation(fields: [assessmentId], references: [id])
+  responses  QuestionResponse[]
+
+  @@index([userId])
+  @@index([assessmentId])
+  @@index([submittedAt])
+}
+
+model QuestionResponse {
+  id          String   @id @default(cuid())
+  attemptId   String
+  questionId  String
+
+  // Response
+  response    String?  @db.Text
+  isCorrect   Boolean?
+  pointsEarned Float   @default(0)
+  timeSpent   Int?     // seconds
+
+  createdAt   DateTime @default(now())
+
+  attempt  AssessmentAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  question Question          @relation(fields: [questionId], references: [id])
+
+  @@unique([attemptId, questionId])
+  @@index([attemptId])
+  @@index([questionId])
+}
+
+// ============================================================================
+// GAMIFICATION
+// ============================================================================
+
+model Badge {
+  id          String        @id @default(cuid())
+
+  // Badge Info
+  name        String        @unique
+  slug        String        @unique
+  description String
+  iconUrl     String?
+
+  // Classification
+  category    BadgeCategory
+  rarity      BadgeRarity   @default(COMMON)
+
+  // Requirements
+  requirement Json          // {type: "applications", count: 5} etc.
+  xpReward    Int           @default(10)
+
+  // Display
+  isActive    Boolean       @default(true)
+  displayOrder Int          @default(0)
+
+  createdAt   DateTime      @default(now())
+
+  // Relations
+  userBadges UserBadge[]
+
+  @@index([category])
+  @@index([isActive])
+}
+
+model UserBadge {
+  id          String   @id @default(cuid())
+  userId      String
+  badgeId     String
+
+  earnedAt    DateTime @default(now())
+  isDisplayed Boolean  @default(true)
+  sharedAt    DateTime?
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badge Badge @relation(fields: [badgeId], references: [id])
+
+  @@unique([userId, badgeId])
+  @@index([userId])
+  @@index([earnedAt])
+}
+
+model Streak {
+  id            String   @id @default(cuid())
+  userId        String
+
+  streakType    String   // daily_login, assessment, application
+  currentCount  Int      @default(0)
+  longestCount  Int      @default(0)
+  lastActivityAt DateTime?
+  brokenAt      DateTime?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, streakType])
+  @@index([userId])
+}
+
+model LevelHistory {
+  id        String   @id @default(cuid())
+  userId    String
+
+  fromLevel Int
+  toLevel   Int
+  xpAtLevel Int
+
+  achievedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([achievedAt])
+}
+
+model Leaderboard {
+  id          String   @id @default(cuid())
+
+  // Scope
+  type        String   // global, college, city, skill
+  scopeId     String?  // collegeId, city name, skill name
+  period      String   // all_time, monthly, weekly
+
+  // Rankings (stored as JSON for efficiency)
+  rankings    Json     // [{userId, rank, score, delta}]
+
+  calculatedAt DateTime @default(now())
+
+  @@unique([type, scopeId, period])
+  @@index([type, period])
+}
+
+// ============================================================================
+// NOTIFICATIONS
+// ============================================================================
+
+model Notification {
+  id          String              @id @default(cuid())
+  userId      String
+
+  // Content
+  type        NotificationType
+  title       String
+  body        String              @db.Text
+  actionUrl   String?
+  imageUrl    String?
+
+  // Delivery
+  channels    NotificationChannel[]
+
+  // Status
+  isRead      Boolean             @default(false)
+  readAt      DateTime?
+  isClicked   Boolean             @default(false)
+  clickedAt   DateTime?
+  isDismissed Boolean             @default(false)
+  dismissedAt DateTime?
+
+  // Metadata
+  metadata    Json?
+
+  createdAt   DateTime            @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([type])
+  @@index([isRead])
+  @@index([createdAt])
+}
+
+// ============================================================================
+// FEED
+// ============================================================================
+
+model FeedItem {
+  id          String   @id @default(cuid())
+  userId      String
+
+  // Content
+  type        String   // placement, badge, level_up, streak
+  content     Json     // Flexible content structure
+
+  // Display
+  isPublic    Boolean  @default(true)
+
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([type])
+  @@index([createdAt])
+}
+
+// ============================================================================
+// REFERRALS
+// ============================================================================
+
+model Referral {
+  id            String   @id @default(cuid())
+  referrerId    String
+  referredUserId String  @unique
+
+  // Tracking
+  code          String   @unique
+  status        String   @default("pending") // pending, verified, rewarded
+
+  // Rewards
+  referrerReward Int     @default(0)
+  refereeReward  Int     @default(0)
+
+  verifiedAt    DateTime?
+  rewardedAt    DateTime?
+  createdAt     DateTime @default(now())
+
+  referrer     User @relation("ReferralsMade", fields: [referrerId], references: [id])
+  referredUser User @relation("ReferredUser", fields: [referredUserId], references: [id])
+
+  @@index([referrerId])
+  @@index([code])
+}
+
+// ============================================================================
+// EVENTS - THE CORE DATA ASSET
+// ============================================================================
+
+model Event {
+  id              String      @id @default(cuid())
+
+  // User Context
+  userId          String?
+  userType        UserType?
+  sessionId       String?
+
+  // Event Classification
+  eventType       String      // From EVENT-SCHEMA.md
+  eventCategory   String      // auth, profile, opportunity, application, etc.
+
+  // Entity Reference
+  entityType      String?     // opportunity, application, user, etc.
+  entityId        String?
+
+  // Context
+  source          EventSource?
+  position        Int?        // Position in list/feed if applicable
+
+  // Experimentation
+  experimentId    String?
+  experimentGroup String?
+
+  // Reward Attribution (for RL)
+  rewardValue     Float?
+  rewardReason    String?
+
+  // Rich Metadata
+  metadata        Json?
+
+  // Request Context
+  ipAddress       String?
+  userAgent       String?
+  deviceType      String?
+
+  // Timestamps
+  timestamp       DateTime    @default(now())
+  processedAt     DateTime?
+
+  // Relations
+  user            User?       @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([eventType])
+  @@index([eventCategory])
+  @@index([entityType, entityId])
+  @@index([timestamp])
+  @@index([sessionId])
+  @@index([experimentId])
+}
+
+// ============================================================================
+// RECOMMENDATIONS (for ML)
+// ============================================================================
+
+model Recommendation {
+  id              String   @id @default(cuid())
+  userId          String
+  opportunityId   String
+
+  // Model Info
+  modelVersion    String
+  score           Float    // Predicted match score
+  features        Json     // Feature values used
+
+  // Outcome Tracking
+  wasShown        Boolean  @default(false)
+  wasClicked      Boolean  @default(false)
+  wasApplied      Boolean  @default(false)
+  wasHired        Boolean  @default(false)
+
+  // Timestamps
+  generatedAt     DateTime @default(now())
+  shownAt         DateTime?
+  clickedAt       DateTime?
+  appliedAt       DateTime?
+
+  @@index([userId])
+  @@index([opportunityId])
+  @@index([modelVersion])
+  @@index([generatedAt])
+}
+
+// ============================================================================
+// FEATURE STORE (for ML)
+// ============================================================================
+
+model FeatureSnapshot {
+  id          String   @id @default(cuid())
+  userId      String
+
+  // Snapshot
+  features    Json     // All computed features at this point
+
+  // Outcome (for training)
+  wasPlaced   Boolean?
+  wasRetained90Days Boolean?
+
+  snapshotAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([snapshotAt])
+  @@index([wasPlaced])
+}
