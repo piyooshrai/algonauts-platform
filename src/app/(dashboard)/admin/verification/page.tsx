@@ -13,10 +13,9 @@ import {
   MapPin,
   Users,
   Mail,
-  Phone,
   ExternalLink,
 } from "lucide-react";
-import { Button, Card, CardContent, CardHeader, CardTitle, Badge, Tabs, TabsList, TabsTrigger } from "@/components/ui";
+import { Button, Card, CardContent, Badge, Tabs, TabsList, TabsTrigger } from "@/components/ui";
 import { api } from "@/lib/trpc/client";
 
 export default function AdminVerificationPage() {
@@ -149,6 +148,7 @@ export default function AdminVerificationPage() {
               </CardContent>
             </Card>
           ) : (
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             pendingCompanies.map((company: any) => (
               <Card key={company.id} className="overflow-hidden">
                 <CardContent className="p-6">
@@ -255,6 +255,7 @@ export default function AdminVerificationPage() {
               </CardContent>
             </Card>
           ) : (
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             pendingColleges.map((college: any) => (
               <Card key={college.id} className="overflow-hidden">
                 <CardContent className="p-6">

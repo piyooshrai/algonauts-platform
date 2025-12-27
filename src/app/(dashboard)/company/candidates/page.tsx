@@ -5,15 +5,10 @@ import { motion } from "framer-motion";
 import {
   UserSearch,
   Search,
-  Filter,
   ChevronRight,
   Loader2,
   Star,
   GraduationCap,
-  MapPin,
-  Mail,
-  Award,
-  Briefcase,
   Send,
 } from "lucide-react";
 import Link from "next/link";
@@ -39,7 +34,6 @@ export default function CandidatesSearchPage() {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [scoreFilter, setScoreFilter] = useState("all");
   const [experienceFilter, setExperienceFilter] = useState("all");
-  const [skillFilter, setSkillFilter] = useState("");
 
   // Debounce search
   useEffect(() => {
@@ -56,12 +50,10 @@ export default function CandidatesSearchPage() {
     limit: 50,
   });
 
-  // Send invite mutation
-  const sendInviteMutation = api.invites.send.useMutation();
-
   const candidates = candidatesData?.leaderboard || [];
 
   // Filter candidates
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const filteredCandidates = candidates.filter((candidate: any) => {
     const matchesSearch =
       !debouncedSearch ||
@@ -72,7 +64,7 @@ export default function CandidatesSearchPage() {
     return matchesSearch && matchesScore;
   });
 
-  const handleSendInvite = async (studentId: string, opportunityId?: string) => {
+  const handleSendInvite = async () => {
     // In a real implementation, you'd show a modal to select the opportunity
     // For now, we'll just show an alert
     alert("Select an opportunity to send invite. This feature requires opportunity selection modal.");

@@ -29,14 +29,13 @@ import Link from "next/link";
 
 export default function ProfilePage() {
   const { data: session } = useSession();
-  const [isEditing, setIsEditing] = useState(false);
 
   // Fetch real profile data
   const { data: profileData, isLoading: profileLoading } = api.profile.get.useQuery();
   const { data: statsData, isLoading: statsLoading } = api.profile.getStats.useQuery();
   const { data: rankingSummary } = api.leaderboards.getUserRankingSummary.useQuery();
   const { data: badgesData } = api.badges.getMyBadges.useQuery();
-  const { data: streakData } = api.streaks.get.useQuery({ type: "daily_login" });
+  const { data: streakData } = api.streaks.getCurrent.useQuery();
 
   const isLoading = profileLoading || statsLoading;
 

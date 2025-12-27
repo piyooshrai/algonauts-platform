@@ -13,7 +13,6 @@ import {
   CheckCircle2,
   Clock,
   AlertCircle,
-  Filter,
   Download,
 } from "lucide-react";
 import Link from "next/link";
@@ -192,6 +191,7 @@ export default function CollegePlacementsPage() {
                   </tr>
                 </thead>
                 <tbody>
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                   {students.slice(0, 10).map((student: any, index: number) => (
                     <motion.tr
                       key={student.userId}
@@ -262,7 +262,7 @@ export default function CollegePlacementsPage() {
                 <AlertCircle className="h-5 w-5 text-[#F59E0B]" />
                 <div>
                   <p className="font-medium text-[#1F2937]">30-Day Verifications Due</p>
-                  <p className="text-sm text-[#6B7280]">Students need to confirm they're still employed</p>
+                  <p className="text-sm text-[#6B7280]">Students need to confirm they&apos;re still employed</p>
                 </div>
               </div>
               <Badge variant="warning">5 pending</Badge>

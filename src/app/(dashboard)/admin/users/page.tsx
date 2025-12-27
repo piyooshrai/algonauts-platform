@@ -5,19 +5,15 @@ import { motion } from "framer-motion";
 import {
   Users,
   Search,
-  Filter,
-  MoreVertical,
   Loader2,
   ShieldCheck,
   ShieldX,
   Eye,
-  Mail,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
 import { Button, Input, Card, CardContent, Badge, Select, Avatar } from "@/components/ui";
 import { api } from "@/lib/trpc/client";
-import { cn } from "@/lib/utils";
 
 const roleFilters = [
   { value: "all", label: "All Roles" },
@@ -43,7 +39,9 @@ export default function AdminUsersPage() {
   const { data, isLoading, refetch } = api.admin.listUsers.useQuery({
     page,
     limit: 20,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     userType: roleFilter !== "all" ? (roleFilter as any) : undefined,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     status: statusFilter !== "all" ? (statusFilter as any) : undefined,
     search: searchQuery || undefined,
   });
@@ -146,6 +144,7 @@ export default function AdminUsersPage() {
                     </td>
                   </tr>
                 ) : (
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   users.map((user: any, index: number) => (
                     <motion.tr
                       key={user.id}

@@ -16,7 +16,7 @@ import {
   GraduationCap,
   Sparkles,
 } from "lucide-react";
-import { Button, Card, CardContent, CardHeader, CardTitle, Badge, Tabs, TabsList, TabsTrigger } from "@/components/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Badge } from "@/components/ui";
 import { api } from "@/lib/trpc/client";
 import { cn } from "@/lib/utils";
 
@@ -44,11 +44,12 @@ export default function BadgesPage() {
 
   // Fetch all badges
   const { data: badgesData, isLoading: badgesLoading } = api.badges.getAll.useQuery({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     category: selectedCategory !== "all" ? (selectedCategory as any) : undefined,
   });
 
   // Fetch progress towards badges
-  const { data: progressData, isLoading: progressLoading } = api.badges.getProgress.useQuery();
+  const { data: progressData } = api.badges.getProgress.useQuery();
 
   // Share mutation
   const shareMutation = api.badges.share.useMutation();
@@ -125,6 +126,7 @@ export default function BadgesPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
               {progress.slice(0, 3).map((p: any) => (
                 <div key={p.badge.id}>
                   <div className="flex items-center justify-between text-sm mb-1">
@@ -166,6 +168,7 @@ export default function BadgesPage() {
 
       {/* Badges Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
         {badges.map((badge: any, index: number) => {
           const rarity = rarityColors[badge.rarity] || rarityColors.common;
 

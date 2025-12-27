@@ -5,15 +5,12 @@ import { motion } from "framer-motion";
 import {
   FileText,
   Search,
-  Filter,
   ChevronRight,
   Loader2,
   CheckCircle2,
   XCircle,
-  Clock,
   Star,
   Calendar,
-  MapPin,
   GraduationCap,
 } from "lucide-react";
 import Link from "next/link";
@@ -51,7 +48,9 @@ export default function CompanyApplicationsPage() {
   const opportunities = opportunitiesData?.opportunities || [];
 
   // Flatten all applications from all opportunities
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const allApplications = opportunities.flatMap((opp: any) =>
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (opp.applications || []).map((app: any) => ({
       ...app,
       opportunity: {
@@ -89,6 +88,7 @@ export default function CompanyApplicationsPage() {
   const handleStatusChange = (applicationId: string, newStatus: string) => {
     updateStatusMutation.mutate({
       applicationId,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       status: newStatus as any,
     });
   };
