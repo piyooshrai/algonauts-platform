@@ -7,12 +7,10 @@ import {
   Search,
   PlusCircle,
   Edit,
-  Trash2,
   Eye,
   Users,
   Clock,
   MapPin,
-  MoreVertical,
   Loader2,
   CheckCircle2,
   XCircle,
@@ -50,6 +48,7 @@ export default function ManageOpportunitiesPage() {
   const opportunities = data?.opportunities || [];
 
   // Filter opportunities
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const filteredOpportunities = opportunities.filter((opp: any) => {
     const matchesSearch =
       opp.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -133,6 +132,7 @@ export default function ManageOpportunitiesPage() {
         </Card>
       ) : (
         <div className="space-y-4">
+          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           {filteredOpportunities.map((opp: any, index: number) => {
             const status = statusConfig[opp.status] || statusConfig.DRAFT;
             const StatusIcon = status.icon;

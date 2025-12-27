@@ -13,14 +13,13 @@ import {
   Minus,
   Loader2,
 } from "lucide-react";
-import { Button, Input, Card, CardContent, Avatar, Tabs, TabsList, TabsTrigger } from "@/components/ui";
+import { Input, Card, CardContent, Avatar, Tabs, TabsList, TabsTrigger } from "@/components/ui";
 import { cn } from "@/lib/utils";
 import { api } from "@/lib/trpc/client";
 
 type LeaderboardScope = "college" | "state" | "national";
 
 export default function LeaderboardPage() {
-  const { data: session } = useSession();
   const [searchQuery, setSearchQuery] = useState("");
   const [scope, setScope] = useState<LeaderboardScope>("national");
 
@@ -89,7 +88,6 @@ export default function LeaderboardPage() {
   }
 
   const topThree = filteredLeaderboard.slice(0, 3);
-  const restOfLeaderboard = filteredLeaderboard.slice(3);
 
   return (
     <div className="space-y-6">

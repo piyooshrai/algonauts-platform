@@ -8,11 +8,7 @@ import {
   Upload,
   ChevronRight,
   Loader2,
-  GraduationCap,
-  Award,
   CheckCircle2,
-  Clock,
-  Filter,
 } from "lucide-react";
 import Link from "next/link";
 import { Button, Input, Card, CardContent, Badge, Select, Avatar } from "@/components/ui";
@@ -47,6 +43,7 @@ export default function CollegeStudentsPage() {
   const students = studentsData?.leaderboard || [];
 
   // Filter students
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const filteredStudents = students.filter((student: any) => {
     const matchesSearch =
       !searchQuery ||
@@ -139,6 +136,7 @@ export default function CollegeStudentsPage() {
                   </tr>
                 </thead>
                 <tbody>
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                   {filteredStudents.map((student: any, index: number) => (
                     <motion.tr
                       key={student.userId}

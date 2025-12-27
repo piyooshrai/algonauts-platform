@@ -65,7 +65,8 @@ export default function PostOpportunityPage() {
     },
   });
 
-  const handleSubmit = async (e: React.FormEvent, publish: boolean = false) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleSubmit = async (e: React.FormEvent, _publish: boolean = false) => {
     e.preventDefault();
     setIsSubmitting(true);
 

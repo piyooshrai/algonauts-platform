@@ -160,6 +160,7 @@ export default function AdminDashboardPage() {
               <p className="text-center text-[#6B7280] py-8">No users yet</p>
             ) : (
               <div className="space-y-3">
+                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                 {recentUsers.map((user: any) => (
                   <div
                     key={user.id}
@@ -201,6 +202,7 @@ export default function AdminDashboardPage() {
               </div>
             ) : (
               <div className="space-y-3">
+                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                 {pendingCompanies.slice(0, 3).map((company: any) => (
                   <div
                     key={company.id}
@@ -218,6 +220,7 @@ export default function AdminDashboardPage() {
                     </Link>
                   </div>
                 ))}
+                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                 {pendingColleges.slice(0, 3).map((college: any) => (
                   <div
                     key={college.id}

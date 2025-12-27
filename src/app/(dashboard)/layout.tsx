@@ -101,6 +101,7 @@ export default function DashboardLayout({
   };
 
   // Get user data from session and profile
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const userRole = (session?.user as any)?.role || "STUDENT";
   const profile = profileData?.profile;
 

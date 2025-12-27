@@ -15,8 +15,7 @@ import {
   FileText,
 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Button, Card, CardContent, CardHeader, CardTitle, Badge } from "@/components/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
 
 interface ImportResult {
   total: number;
@@ -309,7 +308,7 @@ export default function CollegeStudentImportPage() {
         <CardContent>
           <div className="space-y-4 text-sm text-[#6B7280]">
             <p>
-              If you're having trouble with the import, here are some common solutions:
+              If you&apos;re having trouble with the import, here are some common solutions:
             </p>
             <ul className="space-y-2">
               <li>• Ensure your CSV file is saved with UTF-8 encoding</li>

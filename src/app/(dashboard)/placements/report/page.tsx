@@ -16,12 +16,10 @@ import {
   Sparkles,
 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Textarea, Badge } from "@/components/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input } from "@/components/ui";
 import { api } from "@/lib/trpc/client";
 
 export default function ReportPlacementPage() {
-  const router = useRouter();
   const [formData, setFormData] = useState({
     companyName: "",
     jobTitle: "",
@@ -78,7 +76,7 @@ export default function ReportPlacementPage() {
             </h2>
             <p className="text-[#6B7280] mb-6">
               Your placement at <strong>{formData.companyName}</strong> has been recorded.
-              We'll remind you to complete your verification at 30 and 90 days.
+              We&apos;ll remind you to complete your verification at 30 and 90 days.
             </p>
 
             <div className="bg-[#FEF3C7] rounded-lg p-4 mb-6">
@@ -210,7 +208,7 @@ export default function ReportPlacementPage() {
                 step="0.1"
               />
               <p className="text-xs text-[#6B7280] mt-1">
-                This helps us track industry trends. It's kept confidential.
+                This helps us track industry trends. It&apos;s kept confidential.
               </p>
             </div>
 

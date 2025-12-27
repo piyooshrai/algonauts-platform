@@ -4,17 +4,14 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Award,
-  Building2,
   Calendar,
   CheckCircle2,
   Clock,
   Loader2,
-  Share2,
   MapPin,
   DollarSign,
   AlertCircle,
   PartyPopper,
-  ChevronRight,
 } from "lucide-react";
 import Link from "next/link";
 import {
@@ -24,7 +21,6 @@ import {
   CardHeader,
   CardTitle,
   Badge,
-  Input,
   Textarea,
 } from "@/components/ui";
 import { api } from "@/lib/trpc/client";
@@ -162,6 +158,7 @@ export default function PlacementsPage() {
         </Card>
       ) : (
         <div className="space-y-4">
+          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           {placements.map((placement: any) => (
             <Card key={placement.id} className="overflow-hidden">
               <CardContent className="p-6">
@@ -349,7 +346,7 @@ export default function PlacementsPage() {
                               variant={!stillEmployed ? "destructive" : "outline"}
                               onClick={() => setStillEmployed(false)}
                             >
-                              No, I've left
+                              No, I&apos;ve left
                             </Button>
                           </div>
                         </div>
@@ -430,7 +427,7 @@ export default function PlacementsPage() {
                 2
               </div>
               <p className="font-medium text-[#1F2937]">30-Day Check</p>
-              <p className="text-[#6B7280]">Confirm you're still employed after 30 days (+75 XP)</p>
+              <p className="text-[#6B7280]">Confirm you&apos;re still employed after 30 days (+75 XP)</p>
             </div>
             <div className="p-4 bg-[#F9FAFB] rounded-lg">
               <div className="w-8 h-8 rounded-full bg-[#D1FAE5] text-[#10B981] flex items-center justify-center font-bold mb-2">

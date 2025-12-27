@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import {
   BarChart3,
   TrendingUp,
-  TrendingDown,
   Users,
   Briefcase,
   CheckCircle2,
@@ -14,7 +13,6 @@ import {
   Award,
   Loader2,
   ArrowUpRight,
-  ArrowDownRight,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, Badge } from "@/components/ui";
 import { api } from "@/lib/trpc/client";
@@ -58,6 +56,7 @@ export default function CollegeAnalyticsPage() {
     averagePackage: 8.5, // LPA
     highestPackage: 24, // LPA
     companiesHiring: 45,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     applicationsSubmitted: topPerformers.reduce((acc: number, s: any) => acc + (s.score || 0), 0),
     weeklyChange: {
       students: 12,
@@ -283,6 +282,7 @@ export default function CollegeAnalyticsPage() {
               </div>
             ) : (
               <div className="space-y-3">
+                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                 {topPerformers.slice(0, 5).map((student: any, index: number) => (
                   <div key={student.userId} className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#F9FAFB]">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
