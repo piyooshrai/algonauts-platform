@@ -23,6 +23,7 @@ export const EventCategory = {
   COMPANY: "company",
   COLLEGE: "college",
   ASSESSMENT: "assessment",
+  ADMIN: "admin",
 } as const;
 
 export type EventCategory = (typeof EventCategory)[keyof typeof EventCategory];
@@ -228,6 +229,40 @@ export const AssessmentEvents = {
   ASSESSMENT_RESULT_VIEW: "ASSESSMENT_RESULT_VIEW",
 } as const;
 
+// Admin Events
+export const AdminEvents = {
+  // User management
+  ADMIN_USER_LIST_VIEWED: "ADMIN_USER_LIST_VIEWED",
+  ADMIN_USER_VIEWED: "ADMIN_USER_VIEWED",
+  ADMIN_USER_SUSPENDED: "ADMIN_USER_SUSPENDED",
+  ADMIN_USER_UNSUSPENDED: "ADMIN_USER_UNSUSPENDED",
+  ADMIN_USER_EMAIL_VERIFIED: "ADMIN_USER_EMAIL_VERIFIED",
+  // Company management
+  ADMIN_COMPANY_VERIFIED: "ADMIN_COMPANY_VERIFIED",
+  ADMIN_COMPANY_REJECTED: "ADMIN_COMPANY_REJECTED",
+  // College management
+  ADMIN_COLLEGE_VERIFIED: "ADMIN_COLLEGE_VERIFIED",
+  ADMIN_COLLEGE_REJECTED: "ADMIN_COLLEGE_REJECTED",
+  // LayersRank management
+  ADMIN_LAYERS_RANK_UPDATED: "ADMIN_LAYERS_RANK_UPDATED",
+  ADMIN_BULK_LAYERS_RANK_UPDATED: "ADMIN_BULK_LAYERS_RANK_UPDATED",
+  // Placement verification
+  ADMIN_PLACEMENT_VERIFIED_30: "ADMIN_PLACEMENT_VERIFIED_30",
+  ADMIN_PLACEMENT_VERIFIED_90: "ADMIN_PLACEMENT_VERIFIED_90",
+  // Metrics
+  ADMIN_METRICS_VIEWED: "ADMIN_METRICS_VIEWED",
+  // Email
+  EMAIL_SENT: "EMAIL_SENT",
+  EMAIL_DELIVERED: "EMAIL_DELIVERED",
+  EMAIL_OPENED: "EMAIL_OPENED",
+  EMAIL_CLICKED: "EMAIL_CLICKED",
+  EMAIL_BOUNCED: "EMAIL_BOUNCED",
+  // Jobs
+  JOB_STARTED: "JOB_STARTED",
+  JOB_COMPLETED: "JOB_COMPLETED",
+  JOB_FAILED: "JOB_FAILED",
+} as const;
+
 // ============================================================================
 // COMBINED EVENT TYPES
 // ============================================================================
@@ -247,6 +282,7 @@ export const EventTypes = {
   ...CompanyEvents,
   ...CollegeEvents,
   ...AssessmentEvents,
+  ...AdminEvents,
 } as const;
 
 export type EventType = (typeof EventTypes)[keyof typeof EventTypes];
@@ -355,6 +391,9 @@ export function getEventCategory(eventType: EventType): EventCategory {
   }
   if (Object.values(AssessmentEvents).includes(eventType as typeof AssessmentEvents[keyof typeof AssessmentEvents])) {
     return EventCategory.ASSESSMENT;
+  }
+  if (Object.values(AdminEvents).includes(eventType as typeof AdminEvents[keyof typeof AdminEvents])) {
+    return EventCategory.ADMIN;
   }
   return EventCategory.AUTH; // fallback
 }

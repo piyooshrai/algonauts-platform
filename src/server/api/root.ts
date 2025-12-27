@@ -23,6 +23,9 @@ import { featureStoreRouter } from "./routers/featureStore";
 import { recommendationsRouter } from "./routers/recommendations";
 import { rewardAttributionRouter } from "./routers/rewardAttribution";
 import { experimentsRouter } from "./routers/experiments";
+// Phase 5: Polish & Launch routers
+import { adminRouter } from "./routers/admin";
+import { jobsRouter } from "./routers/jobs";
 
 /**
  * This is the primary router for the API.
@@ -48,6 +51,9 @@ export const appRouter = createTRPCRouter({
   recommendations: recommendationsRouter,
   rewardAttribution: rewardAttributionRouter,
   experiments: experimentsRouter,
+  // Phase 5: Polish & Launch
+  admin: adminRouter,
+  jobs: jobsRouter,
 });
 
 // Export type definition of API
