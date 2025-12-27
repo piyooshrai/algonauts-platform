@@ -81,7 +81,7 @@ export default function PostOpportunityPage() {
       salaryMax: formData.salaryMax ? parseInt(formData.salaryMax) * 100000 : undefined,
       minExperience: parseInt(formData.experienceMin),
       maxExperience: parseInt(formData.experienceMax),
-      spots: formData.spots ? parseInt(formData.spots) : undefined,
+      maxApplications: formData.spots ? parseInt(formData.spots) : undefined,
       requiredSkills: formData.requiredSkills,
       preferredSkills: formData.niceToHaveSkills,
       expiresAt: formData.applicationDeadline ? new Date(formData.applicationDeadline) : undefined,

@@ -76,9 +76,8 @@ export default function OpportunitiesPage() {
     limit: 20,
   });
 
-  // Fetch invites count
-  const { data: invitesData } = api.invites.getMyInvites.useQuery();
-  const invitesCount = invitesData?.invites?.length || 0;
+  // TODO: Add getMyInvites endpoint to invites router
+  const invitesCount = 0;
 
   const opportunities = opportunitiesData?.opportunities || [];
 
@@ -273,7 +272,7 @@ export default function OpportunitiesPage() {
                             </p>
 
                             <div className="flex flex-wrap gap-2 mt-4">
-                              {opportunity.requiredSkills?.slice(0, 4).map((skill) => (
+                              {opportunity.requiredSkills?.slice(0, 4).map((skill: string) => (
                                 <Badge key={skill} variant="secondary">
                                   {skill}
                                 </Badge>

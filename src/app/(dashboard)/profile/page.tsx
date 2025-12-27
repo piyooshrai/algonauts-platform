@@ -33,7 +33,7 @@ export default function ProfilePage() {
   const { data: profileData, isLoading: profileLoading } = api.profile.get.useQuery();
   const { data: statsData, isLoading: statsLoading } = api.profile.getStats.useQuery();
   const { data: rankingSummary } = api.leaderboards.getUserRankingSummary.useQuery();
-  const { data: badgesData } = api.badges.getMyBadges.useQuery();
+  const { data: badgesData } = api.badges.getAll.useQuery();
   const { data: streakData } = api.streaks.getCurrent.useQuery();
 
   const isLoading = profileLoading || statsLoading;
@@ -76,8 +76,8 @@ export default function ProfilePage() {
     rank: rankingSummary?.rankings?.national?.rank || 0,
     totalUsers: rankingSummary?.rankings?.national?.total || 0,
     percentile: rankingSummary?.rankings?.national?.percentile || 0,
-    xpTotal: profile?.totalXp || rankingSummary?.xpTotal || 0,
-    currentStreak: streakData?.currentCount || profile?.currentStreak || 0,
+    xpTotal: profile?.totalXp || rankingSummary?.totalXp || 0,
+    currentStreak: streakData?.currentStreak || profile?.currentStreak || 0,
   };
 
   return (
@@ -381,16 +381,17 @@ export default function ProfilePage() {
               <CardContent>
                 {recentBadges.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {recentBadges.map((badge) => (
+                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                    {recentBadges.map((badge: any) => (
                       <div
                         key={badge.id}
                         className="flex items-center gap-3 p-3 rounded-lg bg-muted/50"
                       >
-                        <span className="text-2xl">{badge.badge?.icon || "🏆"}</span>
+                        <span className="text-2xl">{badge.icon || "🏆"}</span>
                         <div>
-                          <p className="font-medium">{badge.badge?.name}</p>
+                          <p className="font-medium">{badge.name}</p>
                           <p className="text-sm text-muted-foreground">
-                            {badge.badge?.description}
+                            {badge.description}
                           </p>
                         </div>
                       </div>

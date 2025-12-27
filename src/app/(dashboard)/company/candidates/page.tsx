@@ -64,7 +64,8 @@ export default function CandidatesSearchPage() {
     return matchesSearch && matchesScore;
   });
 
-  const handleSendInvite = async () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleSendInvite = async (candidateId: string) => {
     // In a real implementation, you'd show a modal to select the opportunity
     // For now, we'll just show an alert
     alert("Select an opportunity to send invite. This feature requires opportunity selection modal.");

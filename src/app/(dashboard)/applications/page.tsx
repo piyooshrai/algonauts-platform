@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
@@ -33,7 +34,7 @@ const statusConfig: Record<string, { icon: typeof Clock; color: string; bgColor:
   WITHDRAWN: { icon: XCircle, color: "text-[#6B7280]", bgColor: "bg-[#F3F4F6]", label: "Withdrawn" },
 };
 
-export default function ApplicationsPage() {
+function ApplicationsContent() {
   const searchParams = useSearchParams();
   const [showSuccess, setShowSuccess] = useState(false);
 
@@ -209,6 +210,14 @@ export default function ApplicationsPage() {
         )}
       </div>
     </motion.div>
+  );
+}
+
+export default function ApplicationsPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center min-h-[400px]"><Loader2 className="h-8 w-8 animate-spin text-[#0EA5E9]" /></div>}>
+      <ApplicationsContent />
+    </Suspense>
   );
 }
 
