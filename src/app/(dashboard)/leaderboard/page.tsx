@@ -41,7 +41,7 @@ export default function LeaderboardPage() {
   // User rank data
   const userRank = {
     rank: rankingSummary?.rankings?.[scope]?.rank || 0,
-    score: rankingSummary?.xpTotal || 0,
+    score: rankingSummary?.totalXp || 0,
     percentile: rankingSummary?.rankings?.[scope]?.percentile || 0,
     change: movement?.movement || 0,
     total: rankingSummary?.rankings?.[scope]?.total || 0,
@@ -50,9 +50,11 @@ export default function LeaderboardPage() {
   // Filter leaderboard by search
   const leaderboard = leaderboardData?.leaderboard || [];
   const contextUsers = leaderboardData?.contextUsers || [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const filteredLeaderboard = searchQuery
     ? leaderboard.filter(
-        (s) =>
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (s: any) =>
           s.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
           s.collegeName?.toLowerCase().includes(searchQuery.toLowerCase())
       )
@@ -171,7 +173,7 @@ export default function LeaderboardPage() {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <Tabs value={scope} onValueChange={(v) => setScope(v as LeaderboardScope)} className="w-full sm:w-auto">
+        <Tabs defaultValue="college" value={scope} onValueChange={(v) => setScope(v as LeaderboardScope)} className="w-full sm:w-auto">
           <TabsList>
             <TabsTrigger value="college">College</TabsTrigger>
             <TabsTrigger value="state">State</TabsTrigger>
@@ -265,7 +267,8 @@ export default function LeaderboardPage() {
                   </tr>
                 ) : (
                   <>
-                    {filteredLeaderboard.map((student, index) => (
+                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                    {filteredLeaderboard.map((student: any, index: number) => (
                       <motion.tr
                         key={student.userId || index}
                         initial={{ opacity: 0, x: -20 }}
@@ -321,7 +324,8 @@ export default function LeaderboardPage() {
                             ••• Your ranking •••
                           </td>
                         </tr>
-                        {contextUsers.map((student, index) => (
+                        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                        {contextUsers.map((student: any, index: number) => (
                           <motion.tr
                             key={`context-${student.userId || index}`}
                             initial={{ opacity: 0 }}

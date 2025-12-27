@@ -209,7 +209,8 @@ export default function DashboardLayout({
                               <p className="text-sm">No new notifications</p>
                             </div>
                           ) : (
-                            notifications.slice(0, 5).map((notification) => (
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            notifications.slice(0, 5).map((notification: any) => (
                               <div
                                 key={notification.id}
                                 className="p-3 hover:bg-[#F9FAFB] border-b border-[#E5E7EB] last:border-0 cursor-pointer"

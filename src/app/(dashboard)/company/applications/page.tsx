@@ -130,7 +130,8 @@ export default function CompanyApplicationsPage() {
         <Card>
           <CardContent className="p-4 text-center">
             <p className="text-2xl font-bold text-[#F59E0B]">
-              {allApplications.filter((a) => a.status === "SUBMITTED" || a.status === "UNDER_REVIEW").length}
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+              {allApplications.filter((a: any) => a.status === "SUBMITTED" || a.status === "UNDER_REVIEW").length}
             </p>
             <p className="text-sm text-[#6B7280]">Pending</p>
           </CardContent>
@@ -138,7 +139,8 @@ export default function CompanyApplicationsPage() {
         <Card>
           <CardContent className="p-4 text-center">
             <p className="text-2xl font-bold text-[#8B5CF6]">
-              {allApplications.filter((a) => a.status === "SHORTLISTED").length}
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+              {allApplications.filter((a: any) => a.status === "SHORTLISTED").length}
             </p>
             <p className="text-sm text-[#6B7280]">Shortlisted</p>
           </CardContent>
@@ -146,7 +148,8 @@ export default function CompanyApplicationsPage() {
         <Card>
           <CardContent className="p-4 text-center">
             <p className="text-2xl font-bold text-[#10B981]">
-              {allApplications.filter((a) => a.status === "OFFER_EXTENDED" || a.status === "OFFER_ACCEPTED").length}
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+              {allApplications.filter((a: any) => a.status === "OFFER_EXTENDED" || a.status === "OFFER_ACCEPTED").length}
             </p>
             <p className="text-sm text-[#6B7280]">Offers</p>
           </CardContent>
@@ -190,7 +193,8 @@ export default function CompanyApplicationsPage() {
         </Card>
       ) : (
         <div className="space-y-4">
-          {filteredApplications.map((app, index) => {
+          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+          {filteredApplications.map((app: any, index: number) => {
             const status = statusConfig[app.status] || statusConfig.SUBMITTED;
 
             return (

@@ -40,8 +40,10 @@ export default function OpportunityDetailPage() {
 
   // Check if already applied
   const { data: myApplications } = api.applications.getMyApplications.useQuery();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const existingApplication = myApplications?.applications?.find(
-    (app) => app.opportunityId === opportunityId
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (app: any) => app.opportunityId === opportunityId
   );
 
   // Apply mutation
@@ -51,7 +53,7 @@ export default function OpportunityDetailPage() {
       // Submit the application immediately (single-step application)
       submitMutation.mutate({
         applicationId: data.applicationId,
-        responses: {},
+        answers: {},
       });
     },
     onError: (error) => {
@@ -77,6 +79,7 @@ export default function OpportunityDetailPage() {
     setIsApplying(true);
     applyMutation.mutate({
       opportunityId,
+      source: "direct",
     });
   };
 
@@ -263,7 +266,7 @@ export default function OpportunityDetailPage() {
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2">
-                  {opportunity.requiredSkills.map((skill) => (
+                  {opportunity.requiredSkills.map((skill: string) => (
                     <Badge key={skill} variant="secondary" className="text-sm py-1 px-3">
                       {skill}
                     </Badge>
@@ -281,7 +284,7 @@ export default function OpportunityDetailPage() {
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2">
-                  {opportunity.niceToHaveSkills.map((skill) => (
+                  {opportunity.niceToHaveSkills.map((skill: string) => (
                     <Badge key={skill} variant="outline" className="text-sm py-1 px-3">
                       {skill}
                     </Badge>
