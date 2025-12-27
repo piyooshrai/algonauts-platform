@@ -43,7 +43,7 @@ export default function ForgotPasswordPage() {
         transition={{ duration: 0.4 }}
         className="text-center"
       >
-        <div className="w-16 h-16 rounded-full bg-success-100 dark:bg-success-900/30 flex items-center justify-center mx-auto mb-6">
+        <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-6">
           <CheckCircle2 className="h-8 w-8 text-success-600" />
         </div>
 
