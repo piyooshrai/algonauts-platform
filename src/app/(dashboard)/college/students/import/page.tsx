@@ -25,7 +25,6 @@ interface ImportResult {
 }
 
 export default function CollegeStudentImportPage() {
-  const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
