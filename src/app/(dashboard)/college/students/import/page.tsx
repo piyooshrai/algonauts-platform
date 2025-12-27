@@ -195,10 +195,11 @@ export default function CollegeStudentImportPage() {
                     className="hidden"
                     id="file-upload"
                   />
-                  <label htmlFor="file-upload">
-                    <Button as="span" variant="outline" className="cursor-pointer">
-                      Browse Files
-                    </Button>
+                  <label
+                    htmlFor="file-upload"
+                    className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium border border-[#E5E7EB] rounded-lg bg-white hover:bg-[#F9FAFB] cursor-pointer transition-colors"
+                  >
+                    Browse Files
                   </label>
                 </div>
               )}
