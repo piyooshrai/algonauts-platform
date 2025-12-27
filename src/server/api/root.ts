@@ -18,6 +18,11 @@ import { leaderboardsRouter } from "./routers/leaderboards";
 import { activityFeedRouter } from "./routers/activityFeed";
 import { notificationsRouter } from "./routers/notifications";
 import { celebrationsRouter } from "./routers/celebrations";
+// Phase 4: RL Infrastructure routers
+import { featureStoreRouter } from "./routers/featureStore";
+import { recommendationsRouter } from "./routers/recommendations";
+import { rewardAttributionRouter } from "./routers/rewardAttribution";
+import { experimentsRouter } from "./routers/experiments";
 
 /**
  * This is the primary router for the API.
@@ -38,6 +43,11 @@ export const appRouter = createTRPCRouter({
   activityFeed: activityFeedRouter,
   notifications: notificationsRouter,
   celebrations: celebrationsRouter,
+  // Phase 4: RL Infrastructure
+  featureStore: featureStoreRouter,
+  recommendations: recommendationsRouter,
+  rewardAttribution: rewardAttributionRouter,
+  experiments: experimentsRouter,
 });
 
 // Export type definition of API
