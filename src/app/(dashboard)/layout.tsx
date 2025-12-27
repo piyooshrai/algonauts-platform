@@ -18,16 +18,53 @@ import {
   ChevronDown,
   Menu,
   X,
+  Building2,
+  GraduationCap,
+  Users,
+  BarChart3,
+  PlusCircle,
+  UserSearch,
+  CheckSquare,
+  ShieldCheck,
+  Award,
+  PartyPopper,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/logo";
-import { Avatar } from "@/components/ui";
+import { Avatar, Badge } from "@/components/ui";
+import { api } from "@/lib/trpc/client";
 
-const tabs = [
+// Tabs for different user roles
+const studentTabs = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Opportunities", href: "/opportunities", icon: Briefcase },
   { name: "Applications", href: "/applications", icon: FileText },
   { name: "Leaderboard", href: "/leaderboard", icon: Trophy },
+  { name: "Badges", href: "/badges", icon: Award },
+  { name: "Placements", href: "/placements", icon: PartyPopper },
+];
+
+const companyTabs = [
+  { name: "Dashboard", href: "/company", icon: LayoutDashboard },
+  { name: "Post Opportunity", href: "/company/post", icon: PlusCircle },
+  { name: "Manage", href: "/company/opportunities", icon: Briefcase },
+  { name: "Candidates", href: "/company/candidates", icon: UserSearch },
+  { name: "Applications", href: "/company/applications", icon: FileText },
+];
+
+const collegeTabs = [
+  { name: "Dashboard", href: "/college", icon: LayoutDashboard },
+  { name: "Students", href: "/college/students", icon: Users },
+  { name: "Placements", href: "/college/placements", icon: CheckSquare },
+  { name: "Analytics", href: "/college/analytics", icon: BarChart3 },
+];
+
+const adminTabs = [
+  { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
+  { name: "Users", href: "/admin/users", icon: Users },
+  { name: "Companies", href: "/admin/companies", icon: Building2 },
+  { name: "Colleges", href: "/admin/colleges", icon: GraduationCap },
+  { name: "Verification", href: "/admin/verification", icon: ShieldCheck },
 ];
 
 export default function DashboardLayout({
@@ -40,20 +77,55 @@ export default function DashboardLayout({
   const { data: session } = useSession();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+
+  // Fetch real data
+  const { data: notificationsData } = api.notifications.getAll.useQuery({ unreadOnly: true, limit: 10 }, {
+    refetchInterval: 30000, // Refetch every 30 seconds
+  });
+  const { data: profileData } = api.profile.get.useQuery();
+
+  const unreadCount = notificationsData?.unreadCount || 0;
+  const notifications = notificationsData?.notifications || [];
+
+  // Mark notification as read
+  const markAsReadMutation = api.notifications.markAsRead.useMutation();
+
+  const handleMarkAsRead = (notificationId: string) => {
+    markAsReadMutation.mutate({ notificationId });
+  };
 
   const handleSignOut = async () => {
     await signOut({ redirect: false });
     router.push("/");
   };
 
-  // Get user data from session
+  // Get user data from session and profile
+  const userRole = (session?.user as any)?.role || "STUDENT";
+  const profile = profileData?.profile;
+
   const user = {
     name: session?.user?.name || session?.user?.email?.split("@")[0] || "User",
     email: session?.user?.email || "",
-    college: "Profile incomplete", // TODO: Fetch from profile API
-    graduationYear: 2025,
-    rank: 0,
+    college: profile?.collegeName || "Complete your profile",
+    graduationYear: profile?.graduationYear || new Date().getFullYear() + 1,
+    role: userRole,
   };
+
+  // Select tabs based on user role and current path
+  const getTabs = () => {
+    if (pathname?.startsWith("/admin")) return adminTabs;
+    if (pathname?.startsWith("/company")) return companyTabs;
+    if (pathname?.startsWith("/college")) return collegeTabs;
+
+    // Default based on role
+    if (userRole === "ADMIN") return adminTabs;
+    if (userRole === "COMPANY") return companyTabs;
+    if (userRole === "COLLEGE") return collegeTabs;
+    return studentTabs;
+  };
+
+  const tabs = getTabs();
 
   return (
     <div className="min-h-screen bg-[#F9FAFB]">
@@ -95,10 +167,76 @@ export default function DashboardLayout({
               </button>
 
               {/* Notifications */}
-              <button className="relative p-2 text-[#6B7280] hover:text-[#1F2937] hover:bg-[#F3F4F6] rounded-lg transition-colors">
-                <Bell className="h-5 w-5" />
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#EF4444] rounded-full" />
-              </button>
+              <div className="relative">
+                <button
+                  className="relative p-2 text-[#6B7280] hover:text-[#1F2937] hover:bg-[#F3F4F6] rounded-lg transition-colors"
+                  onClick={() => setNotificationsOpen(!notificationsOpen)}
+                >
+                  <Bell className="h-5 w-5" />
+                  {unreadCount > 0 && (
+                    <span className="absolute top-1 right-1 min-w-[18px] h-[18px] flex items-center justify-center text-[10px] font-bold bg-[#EF4444] text-white rounded-full px-1">
+                      {unreadCount > 99 ? "99+" : unreadCount}
+                    </span>
+                  )}
+                </button>
+
+                {/* Notifications Dropdown */}
+                <AnimatePresence>
+                  {notificationsOpen && (
+                    <>
+                      <div
+                        className="fixed inset-0 z-40"
+                        onClick={() => setNotificationsOpen(false)}
+                      />
+                      <motion.div
+                        initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute right-0 mt-2 w-80 rounded-lg border border-[#E5E7EB] bg-white shadow-lg z-50 max-h-[400px] overflow-hidden"
+                      >
+                        <div className="p-3 border-b border-[#E5E7EB] flex items-center justify-between">
+                          <h3 className="font-semibold text-[#1F2937]">Notifications</h3>
+                          {unreadCount > 0 && (
+                            <Badge variant="info" className="text-xs">{unreadCount} new</Badge>
+                          )}
+                        </div>
+                        <div className="overflow-y-auto max-h-[320px]">
+                          {notifications.length === 0 ? (
+                            <div className="p-8 text-center text-[#6B7280]">
+                              <Bell className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                              <p className="text-sm">No new notifications</p>
+                            </div>
+                          ) : (
+                            notifications.slice(0, 5).map((notification) => (
+                              <div
+                                key={notification.id}
+                                className="p-3 hover:bg-[#F9FAFB] border-b border-[#E5E7EB] last:border-0 cursor-pointer"
+                                onClick={() => {
+                                  handleMarkAsRead(notification.id);
+                                  setNotificationsOpen(false);
+                                }}
+                              >
+                                <p className="text-sm font-medium text-[#1F2937]">{notification.title}</p>
+                                <p className="text-xs text-[#6B7280] mt-0.5">{notification.body}</p>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                        {notifications.length > 0 && (
+                          <Link
+                            href="/notifications"
+                            className="block p-3 text-center text-sm text-[#0EA5E9] hover:bg-[#F9FAFB] border-t border-[#E5E7EB]"
+                            onClick={() => setNotificationsOpen(false)}
+                          >
+                            View all notifications
+                          </Link>
+                        )}
+                      </motion.div>
+                    </>
+                  )}
+                </AnimatePresence>
+              </div>
 
               {/* User menu */}
               <div className="relative">
@@ -128,9 +266,13 @@ export default function DashboardLayout({
                           <p className="font-semibold text-[#1F2937]">{user.name}</p>
                           <p className="text-sm text-[#6B7280]">{user.email}</p>
                           <div className="flex items-center gap-2 mt-2">
-                            <span className="text-xs text-[#6B7280]">{user.college}</span>
-                            <span className="text-xs text-[#6B7280]">•</span>
-                            <span className="text-xs text-[#6B7280]">Class of {user.graduationYear}</span>
+                            <Badge variant="secondary" className="text-xs">{user.role}</Badge>
+                            {userRole === "STUDENT" && (
+                              <>
+                                <span className="text-xs text-[#6B7280]">•</span>
+                                <span className="text-xs text-[#6B7280]">Class of {user.graduationYear}</span>
+                              </>
+                            )}
                           </div>
                         </div>
                         <div className="p-1">
@@ -175,7 +317,7 @@ export default function DashboardLayout({
             <nav className="flex gap-1 -mb-px overflow-x-auto scrollbar-hide">
               {tabs.map((tab) => {
                 const isActive = pathname === tab.href ||
-                  (tab.href !== "/dashboard" && pathname?.startsWith(tab.href));
+                  (tab.href !== "/dashboard" && tab.href !== "/company" && tab.href !== "/college" && tab.href !== "/admin" && pathname?.startsWith(tab.href));
                 return (
                   <Link
                     key={tab.name}
