@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useSession } from "next-auth/react";
 import {
   Trophy,
   Medal,
@@ -29,17 +30,19 @@ const leaderboardData = [
   { rank: 10, prevRank: 9, name: "Ishita Saxena", college: "NSUT Delhi", score: 2534, change: -1, avatar: null },
 ];
 
-const userRank = {
-  rank: 247,
-  prevRank: 292,
-  name: "Rahul Sharma",
-  college: "IIT Delhi",
-  score: 1847,
-  change: 45,
-};
-
 export default function LeaderboardPage() {
+  const { data: session } = useSession();
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Get current user rank from session
+  const userRank = {
+    rank: 0,
+    prevRank: 0,
+    name: session?.user?.name || session?.user?.email?.split("@")[0] || "You",
+    college: "Complete your profile",
+    score: 0,
+    change: 0,
+  };
 
   const getRankIcon = (rank: number) => {
     if (rank === 1) return <Crown className="h-5 w-5 text-amber-500" />;

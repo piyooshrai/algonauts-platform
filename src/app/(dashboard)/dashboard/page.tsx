@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useSession } from "next-auth/react";
 import {
   TrendingUp,
   TrendingDown,
@@ -21,20 +22,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { Progress } from "@/components/ui";
-
-// Mock user data - matches seeded database
-const user = {
-  name: "Rahul Sharma",
-  firstName: "Rahul",
-  college: "IIT Delhi",
-  graduationYear: 2025,
-  rank: 247,
-  rankChange: 12,
-  score: 75,
-  percentile: 92,
-  streak: 7,
-  longestStreak: 14,
-};
 
 // Mock opportunities data
 const opportunities = [
@@ -118,6 +105,21 @@ const itemVariants = {
 };
 
 export default function DashboardPage() {
+  const { data: session } = useSession();
+
+  // Get user data from session with fallbacks
+  const user = {
+    firstName: session?.user?.name?.split(" ")[0] || session?.user?.email?.split("@")[0] || "there",
+    college: "Complete your profile", // TODO: Fetch from profile API
+    graduationYear: 2025,
+    rank: 0,
+    rankChange: 0,
+    score: 0,
+    percentile: 0,
+    streak: 0,
+    longestStreak: 0,
+  };
+
   const completedMissions = missionItems.filter((m) => m.completed).length;
   const totalMissions = missionItems.length;
   const missionProgress = (completedMissions / totalMissions) * 100;
