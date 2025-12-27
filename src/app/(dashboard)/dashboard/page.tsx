@@ -48,7 +48,7 @@ export default function DashboardPage() {
     limit: 3,
   });
   const { data: rankingSummary, isLoading: rankingLoading } = api.leaderboards.getUserRankingSummary.useQuery();
-  const { data: streakData } = api.streaks.get.useQuery({ type: "daily_login" });
+  const { data: streakData } = api.streaks.getCurrent.useQuery();
 
   // Derived data
   const profile = profileStats?.profile;
@@ -68,8 +68,8 @@ export default function DashboardPage() {
     rankChange: 0, // TODO: Track weekly changes
     score: profile?.layersRankOverall || 0,
     percentile: rankingSummary?.rankings?.national?.percentile || 0,
-    streak: streakData?.currentCount || profile?.currentStreak || 0,
-    longestStreak: streakData?.longestCount || profile?.longestStreak || 0,
+    streak: streakData?.currentStreak || profile?.currentStreak || 0,
+    longestStreak: streakData?.longestStreak || profile?.longestStreak || 0,
   };
 
   const isLoading = profileLoading || checklistLoading || opportunitiesLoading || rankingLoading;

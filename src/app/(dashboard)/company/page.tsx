@@ -27,26 +27,26 @@ export default function CompanyDashboardPage() {
   const isLoading = opportunitiesLoading || statsLoading;
 
   const opportunities = opportunitiesData?.opportunities || [];
-  const activeOpportunities = opportunities.filter((o) => o.status === "PUBLISHED");
-  const draftOpportunities = opportunities.filter((o) => o.status === "DRAFT");
+  const activeOpportunities = opportunities.filter((o: any) => o.status === "PUBLISHED");
+  const draftOpportunities = opportunities.filter((o: any) => o.status === "DRAFT");
 
   // Calculate stats
   const stats = {
     activeJobs: activeOpportunities.length,
     totalApplications: applicationStats?.total || 0,
-    newApplications: applicationStats?.pending || 0,
-    shortlisted: applicationStats?.shortlisted || 0,
+    newApplications: applicationStats?.submitted || 0,
+    shortlisted: applicationStats?.interviews || 0,
   };
 
   // Recent applications from all opportunities
   const recentApplications = opportunities
-    .flatMap((opp) =>
+    .flatMap((opp: any) =>
       (opp.applications || []).map((app: any) => ({
         ...app,
         opportunityTitle: opp.title,
       }))
     )
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .slice(0, 5);
 
   if (isLoading) {
@@ -165,7 +165,7 @@ export default function CompanyDashboardPage() {
               </div>
             ) : (
               <div className="space-y-3">
-                {activeOpportunities.slice(0, 4).map((opp) => (
+                {activeOpportunities.slice(0, 4).map((opp: any) => (
                   <Link
                     key={opp.id}
                     href={`/company/opportunities/${opp.id}`}
@@ -263,7 +263,7 @@ export default function CompanyDashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {draftOpportunities.map((opp) => (
+              {draftOpportunities.map((opp: any) => (
                 <div
                   key={opp.id}
                   className="flex items-center justify-between p-3 rounded-lg bg-[#F9FAFB]"

@@ -58,7 +58,7 @@ export default function CollegeAnalyticsPage() {
     averagePackage: 8.5, // LPA
     highestPackage: 24, // LPA
     companiesHiring: 45,
-    applicationsSubmitted: topPerformers.reduce((acc, s) => acc + (s.score || 0), 0),
+    applicationsSubmitted: topPerformers.reduce((acc: number, s: any) => acc + (s.score || 0), 0),
     weeklyChange: {
       students: 12,
       placements: 5,
@@ -283,7 +283,7 @@ export default function CollegeAnalyticsPage() {
               </div>
             ) : (
               <div className="space-y-3">
-                {topPerformers.slice(0, 5).map((student, index) => (
+                {topPerformers.slice(0, 5).map((student: any, index: number) => (
                   <div key={student.userId} className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#F9FAFB]">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
                       index === 0 ? "bg-[#FEF3C7] text-[#F59E0B]" :

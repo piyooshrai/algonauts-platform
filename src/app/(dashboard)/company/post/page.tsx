@@ -78,12 +78,12 @@ export default function PostOpportunityPage() {
       isRemote: formData.isRemote,
       salaryMin: formData.salaryMin ? parseInt(formData.salaryMin) * 100000 : undefined,
       salaryMax: formData.salaryMax ? parseInt(formData.salaryMax) * 100000 : undefined,
-      experienceMin: parseInt(formData.experienceMin),
-      experienceMax: parseInt(formData.experienceMax),
+      minExperience: parseInt(formData.experienceMin),
+      maxExperience: parseInt(formData.experienceMax),
       spots: formData.spots ? parseInt(formData.spots) : undefined,
       requiredSkills: formData.requiredSkills,
-      niceToHaveSkills: formData.niceToHaveSkills,
-      applicationDeadline: formData.applicationDeadline ? new Date(formData.applicationDeadline) : undefined,
+      preferredSkills: formData.niceToHaveSkills,
+      expiresAt: formData.applicationDeadline ? new Date(formData.applicationDeadline) : undefined,
       minLayersRank: formData.minLayersRank ? parseInt(formData.minLayersRank) : undefined,
     });
   };

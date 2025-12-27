@@ -55,9 +55,9 @@ export default function ApplicationsPage() {
   // Calculate stats
   const stats = {
     total: applications.length,
-    underReview: applications.filter((a) => a.status === "UNDER_REVIEW" || a.status === "SUBMITTED").length,
-    shortlisted: applications.filter((a) => a.status === "SHORTLISTED" || a.status === "INTERVIEW_SCHEDULED" || a.status === "OFFER_EXTENDED").length,
-    rejected: applications.filter((a) => a.status === "REJECTED").length,
+    underReview: applications.filter((a: any) => a.status === "UNDER_REVIEW" || a.status === "SUBMITTED").length,
+    shortlisted: applications.filter((a: any) => a.status === "SHORTLISTED" || a.status === "INTERVIEW_SCHEDULED" || a.status === "OFFER_EXTENDED").length,
+    rejected: applications.filter((a: any) => a.status === "REJECTED").length,
   };
 
   if (isLoading) {
@@ -127,7 +127,7 @@ export default function ApplicationsPage() {
 
         {applications.length > 0 ? (
           <div className="divide-y divide-[#E5E7EB]">
-            {applications.map((app) => {
+            {applications.map((app: any) => {
               const status = statusConfig[app.status] || statusConfig.SUBMITTED;
               const StatusIcon = status.icon;
 

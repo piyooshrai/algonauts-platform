@@ -62,7 +62,7 @@ export default function CandidatesSearchPage() {
   const candidates = candidatesData?.leaderboard || [];
 
   // Filter candidates
-  const filteredCandidates = candidates.filter((candidate) => {
+  const filteredCandidates = candidates.filter((candidate: any) => {
     const matchesSearch =
       !debouncedSearch ||
       candidate.name?.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
@@ -149,7 +149,7 @@ export default function CandidatesSearchPage() {
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredCandidates.map((candidate, index) => (
+          {filteredCandidates.map((candidate: any, index: number) => (
             <motion.div
               key={candidate.userId}
               initial={{ opacity: 0, y: 20 }}

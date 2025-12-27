@@ -22,25 +22,25 @@ import { api } from "@/lib/trpc/client";
 
 export default function AdminDashboardPage() {
   // Fetch platform stats
-  const { data: usersData, isLoading: usersLoading } = api.admin.getUsers.useQuery({ limit: 5 });
-  const { data: companiesData, isLoading: companiesLoading } = api.admin.getPendingCompanies.useQuery();
-  const { data: collegesData, isLoading: collegesLoading } = api.admin.getPendingColleges.useQuery();
+  const { data: usersData, isLoading: usersLoading } = api.admin.listUsers.useQuery({ limit: 5 });
+  const { data: companiesData, isLoading: companiesLoading } = api.admin.listCompanies.useQuery({ status: "pending" });
+  const { data: collegesData, isLoading: collegesLoading } = api.admin.listColleges.useQuery({ status: "pending" });
 
   const isLoading = usersLoading || companiesLoading || collegesLoading;
 
   // Platform stats
   const stats = {
-    totalUsers: usersData?.total || 0,
-    totalCompanies: companiesData?.total || 0,
-    totalColleges: collegesData?.total || 0,
-    pendingVerifications: (companiesData?.pending?.length || 0) + (collegesData?.pending?.length || 0),
+    totalUsers: usersData?.pagination?.total || 0,
+    totalCompanies: companiesData?.pagination?.total || 0,
+    totalColleges: collegesData?.pagination?.total || 0,
+    pendingVerifications: (companiesData?.companies?.length || 0) + (collegesData?.colleges?.length || 0),
     totalApplications: 0,
     totalPlacements: 0,
   };
 
   const recentUsers = usersData?.users || [];
-  const pendingCompanies = companiesData?.pending || [];
-  const pendingColleges = collegesData?.pending || [];
+  const pendingCompanies = companiesData?.companies || [];
+  const pendingColleges = collegesData?.colleges || [];
 
   if (isLoading) {
     return (

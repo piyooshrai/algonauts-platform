@@ -124,7 +124,7 @@ export default function AdminVerificationPage() {
       </div>
 
       {/* Tabs */}
-      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "companies" | "colleges")}>
+      <Tabs defaultValue="companies" value={activeTab} onValueChange={(v) => setActiveTab(v as "companies" | "colleges")}>
         <TabsList>
           <TabsTrigger value="companies" className="gap-2">
             <Building2 className="h-4 w-4" />

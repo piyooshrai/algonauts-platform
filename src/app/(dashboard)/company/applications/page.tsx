@@ -51,7 +51,7 @@ export default function CompanyApplicationsPage() {
   const opportunities = opportunitiesData?.opportunities || [];
 
   // Flatten all applications from all opportunities
-  const allApplications = opportunities.flatMap((opp) =>
+  const allApplications = opportunities.flatMap((opp: any) =>
     (opp.applications || []).map((app: any) => ({
       ...app,
       opportunity: {

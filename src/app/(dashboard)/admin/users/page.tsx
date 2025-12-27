@@ -57,7 +57,7 @@ export default function AdminUsersPage() {
   });
 
   const users = data?.users || [];
-  const total = data?.total || 0;
+  const total = data?.pagination?.total || 0;
   const totalPages = Math.ceil(total / 20);
 
   const handleSuspend = (userId: string) => {

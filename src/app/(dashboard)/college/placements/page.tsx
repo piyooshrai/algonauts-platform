@@ -192,7 +192,7 @@ export default function CollegePlacementsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {students.slice(0, 10).map((student, index) => (
+                  {students.slice(0, 10).map((student: any, index: number) => (
                     <motion.tr
                       key={student.userId}
                       initial={{ opacity: 0 }}

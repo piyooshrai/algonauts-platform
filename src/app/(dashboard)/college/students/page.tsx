@@ -47,7 +47,7 @@ export default function CollegeStudentsPage() {
   const students = studentsData?.leaderboard || [];
 
   // Filter students
-  const filteredStudents = students.filter((student) => {
+  const filteredStudents = students.filter((student: any) => {
     const matchesSearch =
       !searchQuery ||
       student.name?.toLowerCase().includes(searchQuery.toLowerCase());
@@ -139,7 +139,7 @@ export default function CollegeStudentsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredStudents.map((student, index) => (
+                  {filteredStudents.map((student: any, index: number) => (
                     <motion.tr
                       key={student.userId}
                       initial={{ opacity: 0 }}

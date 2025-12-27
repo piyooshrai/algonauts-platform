@@ -50,7 +50,7 @@ export default function ManageOpportunitiesPage() {
   const opportunities = data?.opportunities || [];
 
   // Filter opportunities
-  const filteredOpportunities = opportunities.filter((opp) => {
+  const filteredOpportunities = opportunities.filter((opp: any) => {
     const matchesSearch =
       opp.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       opp.description?.toLowerCase().includes(searchQuery.toLowerCase());
@@ -60,7 +60,7 @@ export default function ManageOpportunitiesPage() {
 
   const handleClose = (id: string) => {
     if (confirm("Are you sure you want to close this opportunity?")) {
-      closeMutation.mutate({ opportunityId: id });
+      closeMutation.mutate({ id });
     }
   };
 
@@ -133,7 +133,7 @@ export default function ManageOpportunitiesPage() {
         </Card>
       ) : (
         <div className="space-y-4">
-          {filteredOpportunities.map((opp, index) => {
+          {filteredOpportunities.map((opp: any, index: number) => {
             const status = statusConfig[opp.status] || statusConfig.DRAFT;
             const StatusIcon = status.icon;
 

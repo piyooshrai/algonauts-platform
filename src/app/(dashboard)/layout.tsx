@@ -80,12 +80,12 @@ export default function DashboardLayout({
   const [notificationsOpen, setNotificationsOpen] = useState(false);
 
   // Fetch real data
-  const { data: notificationsData } = api.notifications.getUnread.useQuery(undefined, {
+  const { data: notificationsData } = api.notifications.getAll.useQuery({ unreadOnly: true, limit: 10 }, {
     refetchInterval: 30000, // Refetch every 30 seconds
   });
   const { data: profileData } = api.profile.get.useQuery();
 
-  const unreadCount = notificationsData?.notifications?.length || 0;
+  const unreadCount = notificationsData?.unreadCount || 0;
   const notifications = notificationsData?.notifications || [];
 
   // Mark notification as read

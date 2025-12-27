@@ -8,16 +8,14 @@ import {
   Loader2,
   CheckCircle2,
   XCircle,
-  Clock,
   Globe,
   Users,
   Briefcase,
   ChevronLeft,
   ChevronRight,
   ExternalLink,
-  Filter,
 } from "lucide-react";
-import { Button, Input, Card, CardContent, Badge, Select, Avatar } from "@/components/ui";
+import { Button, Input, Card, CardContent, Badge, Select } from "@/components/ui";
 import { api } from "@/lib/trpc/client";
 
 const statusFilters = [
@@ -117,6 +115,7 @@ export default function AdminCompaniesPage() {
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           {companies.map((company: any) => (
             <motion.div
               key={company.id}
