@@ -506,6 +506,8 @@ export const profileRouter = createTRPCRouter({
           currentStreak: true,
           longestStreak: true,
           layersRankOverall: true,
+          collegeName: true,
+          graduationYear: true,
         },
       }),
       ctx.prisma.application.count({

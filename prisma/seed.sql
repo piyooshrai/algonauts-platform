@@ -34,27 +34,27 @@ INSERT INTO "College" (id, name, "shortName", city, state, tier, type, "isVerifi
 -- ============================================================================
 -- Students
 INSERT INTO "User" (id, email, "emailVerified", "passwordHash", "userType", "isActive", "createdAt", "updatedAt") VALUES
-('user_student_1', 'student@test.com', NOW(), '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'STUDENT', true, NOW(), NOW()),
-('user_student_2', 'student2@test.com', NOW(), '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'STUDENT', true, NOW(), NOW()),
-('user_student_3', 'student3@test.com', NOW(), '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'STUDENT', true, NOW(), NOW()),
-('user_student_4', 'student4@test.com', NOW(), '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'STUDENT', true, NOW(), NOW()),
-('user_student_5', 'student5@test.com', NOW(), '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'STUDENT', true, NOW(), NOW());
+('user_student_1', 'student@test.com', NOW(), '$2b$10$TxTBnXS8Su1.k.RXQGTAW.T9T9HVKy5z8QGsEyH5tWLbAlcdHS4DG', 'STUDENT', true, NOW(), NOW()),
+('user_student_2', 'student2@test.com', NOW(), '$2b$10$TxTBnXS8Su1.k.RXQGTAW.T9T9HVKy5z8QGsEyH5tWLbAlcdHS4DG', 'STUDENT', true, NOW(), NOW()),
+('user_student_3', 'student3@test.com', NOW(), '$2b$10$TxTBnXS8Su1.k.RXQGTAW.T9T9HVKy5z8QGsEyH5tWLbAlcdHS4DG', 'STUDENT', true, NOW(), NOW()),
+('user_student_4', 'student4@test.com', NOW(), '$2b$10$TxTBnXS8Su1.k.RXQGTAW.T9T9HVKy5z8QGsEyH5tWLbAlcdHS4DG', 'STUDENT', true, NOW(), NOW()),
+('user_student_5', 'student5@test.com', NOW(), '$2b$10$TxTBnXS8Su1.k.RXQGTAW.T9T9HVKy5z8QGsEyH5tWLbAlcdHS4DG', 'STUDENT', true, NOW(), NOW());
 
 -- Companies
 INSERT INTO "User" (id, email, "emailVerified", "passwordHash", "userType", "isActive", "createdAt", "updatedAt") VALUES
-('user_company_1', 'company@test.com', NOW(), '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'COMPANY', true, NOW(), NOW()),
-('user_company_2', 'company2@test.com', NOW(), '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'COMPANY', true, NOW(), NOW()),
-('user_company_3', 'company3@test.com', NOW(), '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'COMPANY', true, NOW(), NOW());
+('user_company_1', 'company@test.com', NOW(), '$2b$10$TxTBnXS8Su1.k.RXQGTAW.T9T9HVKy5z8QGsEyH5tWLbAlcdHS4DG', 'COMPANY', true, NOW(), NOW()),
+('user_company_2', 'company2@test.com', NOW(), '$2b$10$TxTBnXS8Su1.k.RXQGTAW.T9T9HVKy5z8QGsEyH5tWLbAlcdHS4DG', 'COMPANY', true, NOW(), NOW()),
+('user_company_3', 'company3@test.com', NOW(), '$2b$10$TxTBnXS8Su1.k.RXQGTAW.T9T9HVKy5z8QGsEyH5tWLbAlcdHS4DG', 'COMPANY', true, NOW(), NOW());
 
 -- College Admins
 INSERT INTO "User" (id, email, "emailVerified", "passwordHash", "userType", "isActive", "createdAt", "updatedAt") VALUES
-('user_college_1', 'college@test.com', NOW(), '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'COLLEGE_ADMIN', true, NOW(), NOW()),
-('user_college_2', 'college2@test.com', NOW(), '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'COLLEGE_ADMIN', true, NOW(), NOW()),
-('user_college_3', 'college3@test.com', NOW(), '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'COLLEGE_ADMIN', true, NOW(), NOW());
+('user_college_1', 'college@test.com', NOW(), '$2b$10$TxTBnXS8Su1.k.RXQGTAW.T9T9HVKy5z8QGsEyH5tWLbAlcdHS4DG', 'COLLEGE_ADMIN', true, NOW(), NOW()),
+('user_college_2', 'college2@test.com', NOW(), '$2b$10$TxTBnXS8Su1.k.RXQGTAW.T9T9HVKy5z8QGsEyH5tWLbAlcdHS4DG', 'COLLEGE_ADMIN', true, NOW(), NOW()),
+('user_college_3', 'college3@test.com', NOW(), '$2b$10$TxTBnXS8Su1.k.RXQGTAW.T9T9HVKy5z8QGsEyH5tWLbAlcdHS4DG', 'COLLEGE_ADMIN', true, NOW(), NOW());
 
 -- Platform Admin
 INSERT INTO "User" (id, email, "emailVerified", "passwordHash", "userType", "isActive", "createdAt", "updatedAt") VALUES
-('user_admin_1', 'admin@test.com', NOW(), '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'PLATFORM_ADMIN', true, NOW(), NOW());
+('user_admin_1', 'admin@test.com', NOW(), '$2b$10$TxTBnXS8Su1.k.RXQGTAW.T9T9HVKy5z8QGsEyH5tWLbAlcdHS4DG', 'PLATFORM_ADMIN', true, NOW(), NOW());
 
 -- ============================================================================
 -- 3. STUDENT PROFILES (5)

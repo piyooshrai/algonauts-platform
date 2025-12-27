@@ -99,7 +99,7 @@ export const leaderboardsRouter = createTRPCRouter({
       // national = no filter
 
       // Determine order field
-      let orderBy: Record<string, string> = { xpTotal: "desc" };
+      let orderBy: Record<string, string> = { totalXp: "desc" };
       if (input.metric === "streak") {
         orderBy = { currentStreak: "desc" };
       } else if (input.metric === "placements") {
@@ -115,7 +115,7 @@ export const leaderboardsRouter = createTRPCRouter({
         take: input.limit,
         select: {
           userId: true,
-          xpTotal: true,
+          totalXp: true,
           currentStreak: true,
           collegeName: true,
           avatarUrl: true,
@@ -137,7 +137,7 @@ export const leaderboardsRouter = createTRPCRouter({
       // Find user's position
       const userProfile = await ctx.prisma.profile.findUnique({
         where: { userId },
-        select: { xpTotal: true, currentStreak: true },
+        select: { totalXp: true, currentStreak: true },
       });
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -145,13 +145,13 @@ export const leaderboardsRouter = createTRPCRouter({
       const userMetricValue =
         input.metric === "streak"
           ? userProfileData?.currentStreak || 0
-          : userProfileData?.xpTotal || 0;
+          : userProfileData?.totalXp || 0;
 
       // Count users with higher score
       const higherCount = await ctx.prisma.profile.count({
         where: {
           ...whereClause,
-          [input.metric === "streak" ? "currentStreak" : "xpTotal"]: {
+          [input.metric === "streak" ? "currentStreak" : "totalXp"]: {
             gt: userMetricValue,
           },
         },
@@ -170,7 +170,7 @@ export const leaderboardsRouter = createTRPCRouter({
           name: p.user?.name,
           avatarUrl: p.avatarUrl,
           collegeName: p.collegeName,
-          score: input.metric === "streak" ? p.currentStreak : p.xpTotal,
+          score: input.metric === "streak" ? p.currentStreak : p.totalXp,
           layersRank: p.layersRankOverall,
           isCurrentUser: p.user?.id === userId,
         };
@@ -194,7 +194,7 @@ export const leaderboardsRouter = createTRPCRouter({
           take: 5,
           select: {
             userId: true,
-            xpTotal: true,
+            totalXp: true,
             currentStreak: true,
             collegeName: true,
             avatarUrl: true,
@@ -215,7 +215,7 @@ export const leaderboardsRouter = createTRPCRouter({
           name: p.user?.name,
           avatarUrl: p.avatarUrl,
           collegeName: p.collegeName,
-          score: input.metric === "streak" ? p.currentStreak : p.xpTotal,
+          score: input.metric === "streak" ? p.currentStreak : p.totalXp,
           layersRank: p.layersRankOverall,
           isCurrentUser: p.user?.id === userId,
         }));
@@ -427,7 +427,7 @@ export const leaderboardsRouter = createTRPCRouter({
     const profile = await ctx.prisma.profile.findUnique({
       where: { userId },
       select: {
-        xpTotal: true,
+        totalXp: true,
         currentStreak: true,
         collegeId: true,
         collegeName: true,
@@ -446,7 +446,7 @@ export const leaderboardsRouter = createTRPCRouter({
         ? ctx.prisma.profile.count({
             where: {
               collegeId: profileData.collegeId,
-              xpTotal: { gt: profileData?.xpTotal || 0 },
+              totalXp: { gt: profileData?.totalXp || 0 },
             },
           })
         : Promise.resolve(-1),
@@ -455,14 +455,14 @@ export const leaderboardsRouter = createTRPCRouter({
         ? ctx.prisma.profile.count({
             where: {
               state: profileData.state,
-              xpTotal: { gt: profileData?.xpTotal || 0 },
+              totalXp: { gt: profileData?.totalXp || 0 },
             },
           })
         : Promise.resolve(-1),
       // National rank
       ctx.prisma.profile.count({
         where: {
-          xpTotal: { gt: profileData?.xpTotal || 0 },
+          totalXp: { gt: profileData?.totalXp || 0 },
         },
       }),
     ]);
@@ -491,7 +491,7 @@ export const leaderboardsRouter = createTRPCRouter({
     });
 
     return {
-      xpTotal: profileData?.xpTotal || 0,
+      totalXp: profileData?.totalXp || 0,
       currentStreak: profileData?.currentStreak || 0,
       layersRank: profileData?.layersRankOverall,
       rankings: {
@@ -579,7 +579,7 @@ export const leaderboardsRouter = createTRPCRouter({
       // Get user's profile
       const profile = await ctx.prisma.profile.findUnique({
         where: { userId },
-        select: { xpTotal: true, collegeId: true, state: true },
+        select: { totalXp: true, collegeId: true, state: true },
       });
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -598,7 +598,7 @@ export const leaderboardsRouter = createTRPCRouter({
       const higherCount = await ctx.prisma.profile.count({
         where: {
           ...whereClause,
-          xpTotal: { gt: profileData?.xpTotal || 0 },
+          totalXp: { gt: profileData?.totalXp || 0 },
         },
       });
       const userRank = higherCount + 1;
@@ -607,13 +607,13 @@ export const leaderboardsRouter = createTRPCRouter({
       const usersAbove = await ctx.prisma.profile.findMany({
         where: {
           ...whereClause,
-          xpTotal: { gt: profileData?.xpTotal || 0 },
+          totalXp: { gt: profileData?.totalXp || 0 },
         },
-        orderBy: { xpTotal: "asc" },
+        orderBy: { totalXp: "asc" },
         take: range,
         select: {
           userId: true,
-          xpTotal: true,
+          totalXp: true,
           avatarUrl: true,
           collegeName: true,
           user: { select: { name: true } },
@@ -624,13 +624,13 @@ export const leaderboardsRouter = createTRPCRouter({
       const usersBelow = await ctx.prisma.profile.findMany({
         where: {
           ...whereClause,
-          xpTotal: { lt: profileData?.xpTotal || 0 },
+          totalXp: { lt: profileData?.totalXp || 0 },
         },
-        orderBy: { xpTotal: "desc" },
+        orderBy: { totalXp: "desc" },
         take: range,
         select: {
           userId: true,
-          xpTotal: true,
+          totalXp: true,
           avatarUrl: true,
           collegeName: true,
           user: { select: { name: true } },
@@ -658,13 +658,13 @@ export const leaderboardsRouter = createTRPCRouter({
           name: u.user?.name,
           avatarUrl: u.avatarUrl,
           collegeName: u.collegeName,
-          xp: u.xpTotal,
-          gap: u.xpTotal - (profileData?.xpTotal || 0),
+          xp: u.totalXp,
+          gap: u.totalXp - (profileData?.totalXp || 0),
         })),
         currentUser: {
           rank: userRank,
           userId,
-          xp: profileData?.xpTotal || 0,
+          xp: profileData?.totalXp || 0,
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         below: usersBelow.map((u: any, index: number) => ({
@@ -673,13 +673,13 @@ export const leaderboardsRouter = createTRPCRouter({
           name: u.user?.name,
           avatarUrl: u.avatarUrl,
           collegeName: u.collegeName,
-          xp: u.xpTotal,
-          gap: (profileData?.xpTotal || 0) - u.xpTotal,
+          xp: u.totalXp,
+          gap: (profileData?.totalXp || 0) - u.totalXp,
         })),
         // Scarcity signal
         catchUpMessage: usersAbove[0]
           ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            `🎯 Just ${(usersAbove[0] as any).xpTotal - (profileData?.xpTotal || 0)} XP to overtake ${(usersAbove[0] as any).user?.name}!`
+            `🎯 Just ${(usersAbove[0] as any).totalXp - (profileData?.totalXp || 0)} XP to overtake ${(usersAbove[0] as any).user?.name}!`
           : "🏆 You're #1!",
       };
     }),
