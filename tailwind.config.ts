@@ -38,6 +38,20 @@ const config: Config = {
           900: "#1e3a8a",
           950: "#172554",
         },
+        // Teal - Primary brand color from Algonauts logo
+        teal: {
+          50: "#f0fdfa",
+          100: "#ccfbf1",
+          200: "#99f6e4",
+          300: "#5eead4",
+          400: "#2dd4bf",
+          500: "#2A9D8F",
+          600: "#238b7e",
+          700: "#1d756a",
+          800: "#175f56",
+          900: "#134e47",
+          950: "#0d3d38",
+        },
         // Success green
         success: {
           50: "#ecfdf5",
@@ -129,8 +143,8 @@ const config: Config = {
         lg: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
         xl: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
         "2xl": "0 25px 50px -12px rgb(0 0 0 / 0.25)",
-        glow: "0 0 20px rgb(37 99 235 / 0.3)",
-        "glow-lg": "0 0 40px rgb(37 99 235 / 0.4)",
+        glow: "0 0 20px rgb(42 157 143 / 0.3)",
+        "glow-lg": "0 0 40px rgb(42 157 143 / 0.4)",
       },
       animation: {
         "fade-in": "fadeIn 0.5s ease-out forwards",

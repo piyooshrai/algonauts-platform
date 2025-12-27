@@ -29,17 +29,17 @@ export function Logo({ size = "md", className, showText = true, showSubtext = tr
           {/* Bottom layer */}
           <path
             d="M20 36L4 26V14L20 4L36 14V26L20 36Z"
-            className="fill-blue-600/20"
+            className="fill-teal-500/20"
           />
           {/* Middle layer */}
           <path
             d="M20 30L8 22V16L20 8L32 16V22L20 30Z"
-            className="fill-blue-600/40"
+            className="fill-teal-500/40"
           />
           {/* Top layer */}
           <path
             d="M20 24L12 19V15L20 10L28 15V19L20 24Z"
-            className="fill-blue-600"
+            className="fill-teal-500"
           />
           {/* Center dot */}
           <circle cx="20" cy="17" r="3" className="fill-white" />
