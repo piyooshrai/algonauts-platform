@@ -3,33 +3,30 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   LayoutDashboard,
   Trophy,
-  ClipboardCheck,
   Briefcase,
+  FileText,
   User,
   Settings,
   LogOut,
-  Menu,
-  X,
   Bell,
   Search,
   ChevronDown,
+  Menu,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/logo";
-import { Avatar, Badge } from "@/components/ui";
-import { RoleSwitcher } from "@/components/role-switcher";
+import { Avatar } from "@/components/ui";
 
-const navigation = [
+const tabs = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Leaderboard", href: "/leaderboard", icon: Trophy },
-  { name: "Assessments", href: "/assessments", icon: ClipboardCheck },
   { name: "Opportunities", href: "/opportunities", icon: Briefcase },
-  { name: "Profile", href: "/profile", icon: User },
-  { name: "Settings", href: "/settings", icon: Settings },
+  { name: "Applications", href: "/applications", icon: FileText },
+  { name: "Leaderboard", href: "/leaderboard", icon: Trophy },
 ];
 
 export default function DashboardLayout({
@@ -39,142 +36,75 @@ export default function DashboardLayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleSignOut = () => {
-    // Clear any auth state and redirect to home
     router.push("/");
   };
 
+  // Mock user data - in production this would come from session/API
+  const user = {
+    name: "Rahul Sharma",
+    email: "student@test.com",
+    college: "IIT Delhi",
+    graduationYear: 2025,
+    rank: 247,
+  };
+
   return (
-    <div className="min-h-screen bg-background">
-      {/* Mobile sidebar overlay */}
-      <AnimatePresence>
-        {sidebarOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-40 bg-black/50 lg:hidden"
-            onClick={() => setSidebarOpen(false)}
-          />
-        )}
-      </AnimatePresence>
-
-      {/* Sidebar */}
-      <aside
-        className={cn(
-          "fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border transform transition-transform duration-200 ease-in-out lg:translate-x-0",
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        )}
-      >
-        <div className="flex flex-col h-full">
-          {/* Logo */}
-          <div className="flex items-center justify-between h-16 px-4 border-b border-border">
-            <Link href="/dashboard">
-              <Logo />
-            </Link>
-            <button
-              className="lg:hidden p-2 text-muted-foreground hover:text-foreground"
-              onClick={() => setSidebarOpen(false)}
-            >
-              <X className="h-5 w-5" />
-            </button>
-          </div>
-
-          {/* Navigation */}
-          <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-            {navigation.map((item) => {
-              const isActive = pathname === item.href;
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={cn(
-                    "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
-                    isActive
-                      ? "bg-primary text-primary-foreground"
-                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                  )}
-                  onClick={() => setSidebarOpen(false)}
-                >
-                  <item.icon className="h-5 w-5" />
-                  {item.name}
-                  {item.name === "Opportunities" && (
-                    <Badge variant="info" className="ml-auto">3</Badge>
-                  )}
-                </Link>
-              );
-            })}
-          </nav>
-
-          {/* User section */}
-          <div className="p-4 border-t border-border">
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-              <Avatar
-                fallback="John Doe"
-                size="sm"
-                status="online"
-              />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">John Doe</p>
-                <p className="text-xs text-muted-foreground truncate">
-                  Rank #247
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </aside>
-
-      {/* Main content */}
-      <div className="lg:pl-64">
-        {/* Top navbar */}
-        <header className="sticky top-0 z-30 h-16 bg-background/80 backdrop-blur-md border-b border-border">
-          <div className="flex items-center justify-between h-full px-4 sm:px-6">
-            {/* Left side */}
+    <div className="min-h-screen bg-[#F9FAFB]">
+      {/* Top Navigation */}
+      <header className="sticky top-0 z-50 bg-white border-b border-[#E5E7EB] shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            {/* Left: Logo */}
             <div className="flex items-center gap-4">
-              <button
-                className="lg:hidden p-2 -ml-2 text-muted-foreground hover:text-foreground"
-                onClick={() => setSidebarOpen(true)}
-              >
-                <Menu className="h-5 w-5" />
-              </button>
+              <Link href="/dashboard" className="flex-shrink-0">
+                <Logo size="sm" showSubtext={false} />
+              </Link>
+            </div>
 
-              {/* Search */}
-              <div className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/50 border border-border w-64">
-                <Search className="h-4 w-4 text-muted-foreground" />
+            {/* Center: Search (hidden on mobile) */}
+            <div className="hidden md:flex flex-1 max-w-md mx-8">
+              <div className="relative w-full">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#6B7280]" />
                 <input
                   type="text"
-                  placeholder="Search..."
-                  className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+                  placeholder="Search opportunities, companies..."
+                  className="w-full pl-10 pr-4 py-2 bg-[#F3F4F6] border border-[#E5E7EB] rounded-lg text-sm text-[#1F2937] placeholder:text-[#6B7280] focus:outline-none focus:ring-2 focus:ring-[#2A9D8F] focus:border-transparent transition-all"
                 />
-                <kbd className="hidden sm:inline-flex h-5 items-center gap-1 rounded border border-border bg-background px-1.5 font-mono text-xs text-muted-foreground">
-                  ⌘K
-                </kbd>
               </div>
             </div>
 
-            {/* Right side */}
+            {/* Right: Notifications & Avatar */}
             <div className="flex items-center gap-3">
-              {/* Role Switcher - Demo */}
-              <RoleSwitcher variant="compact" />
+              {/* Mobile menu button */}
+              <button
+                className="md:hidden p-2 text-[#6B7280] hover:text-[#1F2937] transition-colors"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              >
+                {mobileMenuOpen ? (
+                  <X className="h-5 w-5" />
+                ) : (
+                  <Menu className="h-5 w-5" />
+                )}
+              </button>
 
               {/* Notifications */}
-              <button className="relative p-2 text-muted-foreground hover:text-foreground transition-colors">
+              <button className="relative p-2 text-[#6B7280] hover:text-[#1F2937] hover:bg-[#F3F4F6] rounded-lg transition-colors">
                 <Bell className="h-5 w-5" />
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-error-500 rounded-full" />
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#EF4444] rounded-full" />
               </button>
 
               {/* User menu */}
               <div className="relative">
                 <button
-                  className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-muted transition-colors"
+                  className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-[#F3F4F6] transition-colors"
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
                 >
-                  <Avatar fallback="John Doe" size="sm" />
-                  <ChevronDown className="h-4 w-4 text-muted-foreground hidden sm:block" />
+                  <Avatar fallback={user.name} size="sm" />
+                  <ChevronDown className="h-4 w-4 text-[#6B7280] hidden sm:block" />
                 </button>
 
                 <AnimatePresence>
@@ -185,39 +115,43 @@ export default function DashboardLayout({
                         onClick={() => setUserMenuOpen(false)}
                       />
                       <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
-                        className="absolute right-0 mt-2 w-56 rounded-lg border border-border bg-card shadow-lg z-50"
+                        initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute right-0 mt-2 w-64 rounded-lg border border-[#E5E7EB] bg-white shadow-lg z-50"
                       >
-                        <div className="p-3 border-b border-border">
-                          <p className="font-medium">John Doe</p>
-                          <p className="text-sm text-muted-foreground">
-                            john@example.com
-                          </p>
+                        <div className="p-4 border-b border-[#E5E7EB]">
+                          <p className="font-semibold text-[#1F2937]">{user.name}</p>
+                          <p className="text-sm text-[#6B7280]">{user.email}</p>
+                          <div className="flex items-center gap-2 mt-2">
+                            <span className="text-xs text-[#6B7280]">{user.college}</span>
+                            <span className="text-xs text-[#6B7280]">•</span>
+                            <span className="text-xs text-[#6B7280]">Class of {user.graduationYear}</span>
+                          </div>
                         </div>
                         <div className="p-1">
                           <Link
                             href="/profile"
-                            className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-muted transition-colors"
+                            className="flex items-center gap-3 px-3 py-2.5 text-sm text-[#1F2937] rounded-md hover:bg-[#F3F4F6] transition-colors"
                             onClick={() => setUserMenuOpen(false)}
                           >
-                            <User className="h-4 w-4" />
-                            Profile
+                            <User className="h-4 w-4 text-[#6B7280]" />
+                            View Profile
                           </Link>
                           <Link
                             href="/settings"
-                            className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-muted transition-colors"
+                            className="flex items-center gap-3 px-3 py-2.5 text-sm text-[#1F2937] rounded-md hover:bg-[#F3F4F6] transition-colors"
                             onClick={() => setUserMenuOpen(false)}
                           >
-                            <Settings className="h-4 w-4" />
+                            <Settings className="h-4 w-4 text-[#6B7280]" />
                             Settings
                           </Link>
                         </div>
-                        <div className="p-1 border-t border-border">
+                        <div className="p-1 border-t border-[#E5E7EB]">
                           <button
                             onClick={handleSignOut}
-                            className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-muted transition-colors w-full text-error-600"
+                            className="flex items-center gap-3 px-3 py-2.5 text-sm text-[#EF4444] rounded-md hover:bg-[#FEF2F2] transition-colors w-full"
                           >
                             <LogOut className="h-4 w-4" />
                             Sign out
@@ -230,13 +164,64 @@ export default function DashboardLayout({
               </div>
             </div>
           </div>
-        </header>
+        </div>
 
-        {/* Page content */}
-        <main className="p-4 sm:p-6 lg:p-8">
-          {children}
-        </main>
-      </div>
+        {/* Tab Bar */}
+        <div className="border-t border-[#E5E7EB] bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <nav className="flex gap-1 -mb-px overflow-x-auto scrollbar-hide">
+              {tabs.map((tab) => {
+                const isActive = pathname === tab.href ||
+                  (tab.href !== "/dashboard" && pathname?.startsWith(tab.href));
+                return (
+                  <Link
+                    key={tab.name}
+                    href={tab.href}
+                    className={cn(
+                      "flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap",
+                      isActive
+                        ? "border-[#2A9D8F] text-[#2A9D8F]"
+                        : "border-transparent text-[#6B7280] hover:text-[#1F2937] hover:border-[#E5E7EB]"
+                    )}
+                  >
+                    <tab.icon className="h-4 w-4" />
+                    {tab.name}
+                  </Link>
+                );
+              })}
+            </nav>
+          </div>
+        </div>
+
+        {/* Mobile Menu */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="md:hidden border-t border-[#E5E7EB] bg-white"
+            >
+              <div className="p-4">
+                {/* Mobile Search */}
+                <div className="relative mb-4">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#6B7280]" />
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    className="w-full pl-10 pr-4 py-2 bg-[#F3F4F6] border border-[#E5E7EB] rounded-lg text-sm text-[#1F2937] placeholder:text-[#6B7280] focus:outline-none focus:ring-2 focus:ring-[#2A9D8F]"
+                  />
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </header>
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {children}
+      </main>
     </div>
   );
 }

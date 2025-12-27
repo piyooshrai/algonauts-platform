@@ -4,40 +4,40 @@
 
 @layer base {
   :root {
-    /* Background & Foreground */
-    --background: #fafafa;
-    --foreground: #18181b;
+    /* Background & Foreground - Clean off-white */
+    --background: #F9FAFB;
+    --foreground: #1F2937;
 
     /* Muted */
-    --muted: #f4f4f5;
-    --muted-foreground: #71717a;
+    --muted: #F3F4F6;
+    --muted-foreground: #6B7280;
 
     /* Border & Input */
-    --border: #e4e4e7;
-    --input: #e4e4e7;
-    --ring: #2563eb;
+    --border: #E5E7EB;
+    --input: #E5E7EB;
+    --ring: #2A9D8F;
 
-    /* Primary - Blue */
-    --primary: #2563eb;
+    /* Primary - Teal from Algonauts logo */
+    --primary: #2A9D8F;
     --primary-foreground: #ffffff;
 
     /* Secondary */
-    --secondary: #f4f4f5;
-    --secondary-foreground: #18181b;
+    --secondary: #F3F4F6;
+    --secondary-foreground: #1F2937;
 
     /* Accent */
-    --accent: #f4f4f5;
-    --accent-foreground: #18181b;
+    --accent: #2A9D8F;
+    --accent-foreground: #ffffff;
 
     /* Card */
     --card: #ffffff;
-    --card-foreground: #18181b;
+    --card-foreground: #1F2937;
 
     /* Radius */
     --radius-sm: 6px;
-    --radius-md: 10px;
-    --radius-lg: 16px;
-    --radius-xl: 24px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
   }
 
   .dark {
@@ -105,7 +105,7 @@
 
   /* Selection */
   ::selection {
-    @apply bg-blue-600/20 text-foreground;
+    @apply bg-teal-500/20 text-foreground;
   }
 }
 
@@ -117,7 +117,7 @@
 
   /* Gradient text */
   .gradient-text {
-    @apply bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-teal-600 to-teal-400 bg-clip-text text-transparent;
   }
 
   /* Focus ring */

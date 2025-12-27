@@ -2,346 +2,417 @@
 
 import { motion } from "framer-motion";
 import {
-  ArrowUpRight,
-  Brain,
-  Calendar,
-  Clock,
-  MessageSquare,
-  Layers,
   TrendingUp,
-  Target,
+  TrendingDown,
+  Flame,
+  Trophy,
+  Clock,
+  Users,
+  CheckCircle2,
+  Circle,
+  ArrowRight,
   Building2,
-  ChevronRight,
-  Play,
+  MapPin,
+  Sparkles,
+  GraduationCap,
   Award,
+  ChevronRight,
   Zap,
 } from "lucide-react";
 import Link from "next/link";
-import { Button, Card, CardContent, CardHeader, CardTitle, Badge, Progress } from "@/components/ui";
-import { LayersRank } from "@/components/layers-rank";
+import { Progress } from "@/components/ui";
 
-const upcomingAssessments = [
-  {
-    id: 1,
-    title: "Q4 Technical Assessment",
-    type: "Technical",
-    date: "Dec 15, 2025",
-    time: "10:00 AM",
-    duration: "90 min",
-    icon: Brain,
-    color: "blue",
-  },
-  {
-    id: 2,
-    title: "Behavioral Evaluation",
-    type: "Behavioral",
-    date: "Dec 18, 2025",
-    time: "2:00 PM",
-    duration: "45 min",
-    icon: MessageSquare,
-    color: "purple",
-  },
-  {
-    id: 3,
-    title: "System Design Challenge",
-    type: "Contextual",
-    date: "Dec 22, 2025",
-    time: "11:00 AM",
-    duration: "60 min",
-    icon: Layers,
-    color: "green",
-  },
-];
+// Mock user data - matches seeded database
+const user = {
+  name: "Rahul Sharma",
+  firstName: "Rahul",
+  college: "IIT Delhi",
+  graduationYear: 2025,
+  rank: 247,
+  rankChange: 12,
+  score: 75,
+  percentile: 92,
+  streak: 7,
+  longestStreak: 14,
+};
 
-const recentOpportunities = [
+// Mock opportunities data
+const opportunities = [
   {
-    id: 1,
-    company: "Google",
+    id: "opp_swe_intern_001",
+    company: "TechCorp India",
     role: "Software Engineer Intern",
     location: "Bangalore",
-    salary: "₹80K/month",
-    match: 95,
-    logo: "G",
+    salary: "25K-40K/mo",
+    match: 92,
+    logo: "TC",
+    logoColor: "bg-teal-500",
+    spots: 3,
+    totalSpots: 10,
+    deadline: "2 days left",
+    isHot: true,
   },
   {
-    id: 2,
-    company: "Microsoft",
+    id: "opp_fullstack_001",
+    company: "TechCorp India",
     role: "Full Stack Developer",
-    location: "Hyderabad",
-    salary: "₹18 LPA",
+    location: "Remote",
+    salary: "10-18 LPA",
     match: 88,
-    logo: "M",
+    logo: "TC",
+    logoColor: "bg-teal-500",
+    spots: 5,
+    totalSpots: 8,
+    deadline: "5 days left",
+    isHot: false,
   },
   {
-    id: 3,
-    company: "Stripe",
-    role: "Backend Engineer",
-    location: "Remote",
-    salary: "$120K",
-    match: 82,
-    logo: "S",
+    id: "opp_data_analyst_001",
+    company: "TechCorp India",
+    role: "Data Analyst",
+    location: "Mumbai",
+    salary: "8-12 LPA",
+    match: 76,
+    logo: "TC",
+    logoColor: "bg-teal-500",
+    spots: 2,
+    totalSpots: 5,
+    deadline: "1 week left",
+    isHot: false,
   },
 ];
 
-const skillProgress = [
-  { name: "Data Structures", score: 85, trend: "+5" },
-  { name: "System Design", score: 72, trend: "+12" },
-  { name: "Algorithms", score: 90, trend: "+3" },
-  { name: "Communication", score: 78, trend: "+8" },
+// Mission checklist items
+const missionItems = [
+  { id: 1, label: "Complete your profile", completed: true, xp: 50 },
+  { id: 2, label: "Take technical assessment", completed: true, xp: 100 },
+  { id: 3, label: "Apply to 3 opportunities", completed: false, progress: 1, total: 3, xp: 75 },
+  { id: 4, label: "Get your first shortlist", completed: false, xp: 150 },
 ];
+
+// College pulse data
+const collegePulse = {
+  collegeName: "IIT Delhi",
+  collegeRank: 3,
+  totalStudents: 1247,
+  placedThisWeek: 12,
+  avgPackage: "18.5 LPA",
+  recentPlacements: [
+    { name: "Priya M.", company: "Google", role: "SDE", package: "45 LPA" },
+    { name: "Amit K.", company: "Microsoft", role: "PM", package: "38 LPA" },
+    { name: "Sneha R.", company: "Amazon", role: "SDE", package: "32 LPA" },
+  ],
+};
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
 
 export default function DashboardPage() {
+  const completedMissions = missionItems.filter((m) => m.completed).length;
+  const totalMissions = missionItems.length;
+  const missionProgress = (completedMissions / totalMissions) * 100;
+
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold">Welcome back, John!</h1>
-          <p className="text-muted-foreground">
-            Here&apos;s what&apos;s happening with your profile today.
-          </p>
-        </div>
-        <Link href="/assessments">
-          <Button className="gap-2">
-            <Play className="h-4 w-4" />
-            Take Assessment
-          </Button>
-        </Link>
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* LayersRank Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-        >
-          <Card className="relative overflow-hidden" hover>
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/10 to-transparent rounded-full -mr-16 -mt-16" />
-            <CardContent className="p-6">
-              <LayersRank rank={247} totalUsers={50000} size="sm" />
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        {/* Technical Score */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          <Card hover>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
-                  <Brain className="h-5 w-5 text-blue-600" />
-                </div>
-                <Badge variant="success" className="gap-1">
-                  <TrendingUp className="h-3 w-3" />
-                  +12%
-                </Badge>
-              </div>
-              <p className="text-3xl font-bold font-display">847</p>
-              <p className="text-sm text-muted-foreground">Technical Score</p>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        {/* Assessments Completed */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
-          <Card hover>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="p-2 rounded-lg bg-success-100 dark:bg-success-900/30">
-                  <Target className="h-5 w-5 text-success-600" />
-                </div>
-                <span className="text-xs text-muted-foreground">This quarter</span>
-              </div>
-              <p className="text-3xl font-bold font-display">12</p>
-              <p className="text-sm text-muted-foreground">Assessments Taken</p>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        {/* Company Views */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-        >
-          <Card hover>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="p-2 rounded-lg bg-warning-100 dark:bg-warning-900/30">
-                  <Building2 className="h-5 w-5 text-warning-600" />
-                </div>
-                <Badge variant="warning" className="gap-1">
-                  <Zap className="h-3 w-3" />
-                  Hot
-                </Badge>
-              </div>
-              <p className="text-3xl font-bold font-display">34</p>
-              <p className="text-sm text-muted-foreground">Profile Views</p>
-            </CardContent>
-          </Card>
-        </motion.div>
-      </div>
-
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Upcoming Assessments */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="lg:col-span-2"
-        >
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-muted-foreground" />
-                Upcoming Assessments
-              </CardTitle>
-              <Link href="/assessments">
-                <Button variant="ghost" size="sm">
-                  View all
-                  <ChevronRight className="h-4 w-4 ml-1" />
-                </Button>
-              </Link>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {upcomingAssessments.map((assessment) => (
-                <div
-                  key={assessment.id}
-                  className="flex items-center gap-4 p-4 rounded-lg border border-border hover:bg-muted/50 transition-colors"
-                >
-                  <div
-                    className={`p-3 rounded-lg ${
-                      assessment.color === "blue"
-                        ? "bg-blue-100 dark:bg-blue-900/30"
-                        : assessment.color === "purple"
-                        ? "bg-purple-100 dark:bg-purple-900/30"
-                        : "bg-green-100 dark:bg-green-900/30"
-                    }`}
-                  >
-                    <assessment.icon
-                      className={`h-5 w-5 ${
-                        assessment.color === "blue"
-                          ? "text-blue-600"
-                          : assessment.color === "purple"
-                          ? "text-purple-600"
-                          : "text-green-600"
-                      }`}
-                    />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium truncate">{assessment.title}</p>
-                    <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                      <span className="flex items-center gap-1">
-                        <Calendar className="h-3 w-3" />
-                        {assessment.date}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        {assessment.time}
-                      </span>
-                      <span>{assessment.duration}</span>
-                    </div>
-                  </div>
-                  <Badge variant="outline">{assessment.type}</Badge>
-                  <Button size="sm">Start</Button>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        {/* Skill Progress */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-        >
-          <Card className="h-full">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Award className="h-5 w-5 text-muted-foreground" />
-                Skill Progress
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {skillProgress.map((skill) => (
-                <div key={skill.name} className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="font-medium">{skill.name}</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-muted-foreground">{skill.score}%</span>
-                      <span className="text-success-600 text-xs">{skill.trend}</span>
-                    </div>
-                  </div>
-                  <Progress value={skill.score} size="sm" />
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        </motion.div>
-      </div>
-
-      {/* Opportunities Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.7 }}
-      >
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <Building2 className="h-5 w-5 text-muted-foreground" />
-              Matched Opportunities
-            </CardTitle>
-            <Link href="/opportunities">
-              <Button variant="ghost" size="sm">
-                View all
-                <ChevronRight className="h-4 w-4 ml-1" />
-              </Button>
-            </Link>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {recentOpportunities.map((opportunity) => (
-                <div
-                  key={opportunity.id}
-                  className="p-4 rounded-lg border border-border hover:border-primary/50 hover:shadow-md transition-all cursor-pointer group"
-                >
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 flex items-center justify-center font-bold text-lg">
-                      {opportunity.logo}
-                    </div>
-                    <Badge variant="success">{opportunity.match}% match</Badge>
-                  </div>
-                  <h3 className="font-medium mb-1 group-hover:text-primary transition-colors">
-                    {opportunity.role}
-                  </h3>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    {opportunity.company} · {opportunity.location}
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-success-600">
-                      {opportunity.salary}
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      className="space-y-6"
+    >
+      {/* Two Column Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6">
+        {/* Left Column - Main Content */}
+        <div className="space-y-6">
+          {/* Welcome Header */}
+          <motion.div variants={itemVariants}>
+            <div className="bg-white rounded-lg border border-[#E5E7EB] p-6 shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                  <h1 className="text-2xl font-bold text-[#1F2937]">
+                    Welcome back, {user.firstName}!
+                  </h1>
+                  <p className="text-[#6B7280] mt-1">
+                    <span className="inline-flex items-center gap-1.5">
+                      <GraduationCap className="h-4 w-4" />
+                      {user.college}
                     </span>
-                    <ArrowUpRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                    <span className="mx-2">•</span>
+                    <span>Class of {user.graduationYear}</span>
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#FEF3C7] text-[#B45309] text-sm font-medium rounded-full">
+                    <Flame className="h-4 w-4" />
+                    {user.streak} day streak
+                  </span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Stats Row */}
+          <motion.div variants={itemVariants}>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {/* Rank Card */}
+              <div className="bg-white rounded-lg border border-[#E5E7EB] p-5 shadow-sm">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm font-medium text-[#6B7280]">Your Rank</span>
+                  <div className={`flex items-center gap-1 text-xs font-medium ${
+                    user.rankChange > 0 ? "text-[#10B981]" : "text-[#EF4444]"
+                  }`}>
+                    {user.rankChange > 0 ? (
+                      <TrendingUp className="h-3 w-3" />
+                    ) : (
+                      <TrendingDown className="h-3 w-3" />
+                    )}
+                    {Math.abs(user.rankChange)}
                   </div>
                 </div>
-              ))}
+                <div className="flex items-baseline gap-1">
+                  <span className="text-3xl font-bold text-[#1F2937]">#{user.rank}</span>
+                </div>
+                <p className="text-xs text-[#6B7280] mt-1">of 50,000 students</p>
+              </div>
+
+              {/* Score Card */}
+              <div className="bg-white rounded-lg border border-[#E5E7EB] p-5 shadow-sm">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm font-medium text-[#6B7280]">LayersRank Score</span>
+                  <Trophy className="h-4 w-4 text-[#F59E0B]" />
+                </div>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-3xl font-bold text-[#1F2937]">{user.score}</span>
+                  <span className="text-sm text-[#6B7280]">/ 100</span>
+                </div>
+                <p className="text-xs text-[#10B981] mt-1">Top {100 - user.percentile}% percentile</p>
+              </div>
+
+              {/* Streak Card */}
+              <div className="bg-white rounded-lg border border-[#E5E7EB] p-5 shadow-sm">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm font-medium text-[#6B7280]">Current Streak</span>
+                  <Flame className="h-4 w-4 text-[#F59E0B]" />
+                </div>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-3xl font-bold text-[#1F2937]">{user.streak}</span>
+                  <span className="text-sm text-[#6B7280]">days</span>
+                </div>
+                <p className="text-xs text-[#6B7280] mt-1">Best: {user.longestStreak} days</p>
+              </div>
             </div>
-          </CardContent>
-        </Card>
-      </motion.div>
-    </div>
+          </motion.div>
+
+          {/* Opportunities For You */}
+          <motion.div variants={itemVariants}>
+            <div className="bg-white rounded-lg border border-[#E5E7EB] shadow-sm">
+              <div className="flex items-center justify-between p-5 border-b border-[#E5E7EB]">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-[#2A9D8F]" />
+                  <h2 className="text-lg font-semibold text-[#1F2937]">Opportunities For You</h2>
+                </div>
+                <Link
+                  href="/opportunities"
+                  className="text-sm font-medium text-[#2A9D8F] hover:text-[#238b7e] flex items-center gap-1 transition-colors"
+                >
+                  View all
+                  <ChevronRight className="h-4 w-4" />
+                </Link>
+              </div>
+              <div className="divide-y divide-[#E5E7EB]">
+                {opportunities.map((opp) => (
+                  <Link
+                    key={opp.id}
+                    href={`/opportunities/${opp.id}`}
+                    className="block p-5 hover:bg-[#F9FAFB] transition-colors"
+                  >
+                    <div className="flex gap-4">
+                      {/* Company Logo */}
+                      <div className={`w-12 h-12 rounded-lg ${opp.logoColor} flex items-center justify-center text-white font-bold text-sm flex-shrink-0`}>
+                        {opp.logo}
+                      </div>
+
+                      {/* Content */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <h3 className="font-semibold text-[#1F2937]">{opp.role}</h3>
+                              {opp.isHot && (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-[#FEE2E2] text-[#DC2626] text-xs font-medium rounded-full">
+                                  <Zap className="h-3 w-3" />
+                                  Hot
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-sm text-[#6B7280]">{opp.company}</p>
+                          </div>
+                          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-[#D1FAE5] text-[#059669] text-sm font-semibold rounded-full">
+                            {opp.match}% match
+                          </div>
+                        </div>
+
+                        {/* Meta info */}
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 text-sm text-[#6B7280]">
+                          <span className="flex items-center gap-1">
+                            <MapPin className="h-3.5 w-3.5" />
+                            {opp.location}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Building2 className="h-3.5 w-3.5" />
+                            {opp.salary}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Clock className="h-3.5 w-3.5" />
+                            {opp.deadline}
+                          </span>
+                        </div>
+
+                        {/* Scarcity signal */}
+                        <div className="mt-3">
+                          <div className="flex items-center justify-between text-xs mb-1">
+                            <span className="text-[#6B7280]">
+                              <Users className="h-3 w-3 inline mr-1" />
+                              {opp.spots} spots left
+                            </span>
+                            <span className="text-[#6B7280]">{opp.totalSpots - opp.spots}/{opp.totalSpots} filled</span>
+                          </div>
+                          <div className="h-1.5 bg-[#E5E7EB] rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-[#F59E0B] rounded-full transition-all"
+                              style={{ width: `${((opp.totalSpots - opp.spots) / opp.totalSpots) * 100}%` }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Arrow */}
+                      <ArrowRight className="h-5 w-5 text-[#D1D5DB] flex-shrink-0 mt-1" />
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Right Column - Sidebar */}
+        <div className="space-y-6">
+          {/* Your Mission */}
+          <motion.div variants={itemVariants}>
+            <div className="bg-white rounded-lg border border-[#E5E7EB] shadow-sm">
+              <div className="p-5 border-b border-[#E5E7EB]">
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-lg font-semibold text-[#1F2937]">Your Mission</h2>
+                  <span className="text-sm text-[#6B7280]">{completedMissions}/{totalMissions}</span>
+                </div>
+                <Progress value={missionProgress} size="sm" className="bg-[#E5E7EB]" />
+                <p className="text-xs text-[#6B7280] mt-2">
+                  Complete missions to earn XP and boost your rank
+                </p>
+              </div>
+              <div className="p-3">
+                {missionItems.map((item) => (
+                  <div
+                    key={item.id}
+                    className={`flex items-start gap-3 p-3 rounded-lg ${
+                      item.completed ? "opacity-60" : "hover:bg-[#F9FAFB]"
+                    } transition-colors`}
+                  >
+                    {item.completed ? (
+                      <CheckCircle2 className="h-5 w-5 text-[#10B981] flex-shrink-0 mt-0.5" />
+                    ) : (
+                      <Circle className="h-5 w-5 text-[#D1D5DB] flex-shrink-0 mt-0.5" />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className={`text-sm ${item.completed ? "line-through text-[#9CA3AF]" : "text-[#1F2937]"}`}>
+                        {item.label}
+                      </p>
+                      {item.progress !== undefined && !item.completed && (
+                        <div className="mt-1.5">
+                          <div className="flex items-center justify-between text-xs mb-1">
+                            <span className="text-[#6B7280]">{item.progress}/{item.total}</span>
+                          </div>
+                          <div className="h-1 bg-[#E5E7EB] rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-[#2A9D8F] rounded-full"
+                              style={{ width: `${(item.progress / item.total) * 100}%` }}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    <span className="text-xs font-medium text-[#2A9D8F] flex-shrink-0">
+                      +{item.xp} XP
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+
+          {/* College Pulse */}
+          <motion.div variants={itemVariants}>
+            <div className="bg-white rounded-lg border border-[#E5E7EB] shadow-sm">
+              <div className="p-5 border-b border-[#E5E7EB]">
+                <div className="flex items-center gap-2 mb-1">
+                  <Award className="h-5 w-5 text-[#2A9D8F]" />
+                  <h2 className="text-lg font-semibold text-[#1F2937]">College Pulse</h2>
+                </div>
+                <p className="text-sm text-[#6B7280]">{collegePulse.collegeName}</p>
+              </div>
+
+              {/* Stats */}
+              <div className="grid grid-cols-3 divide-x divide-[#E5E7EB] border-b border-[#E5E7EB]">
+                <div className="p-4 text-center">
+                  <p className="text-2xl font-bold text-[#1F2937]">#{collegePulse.collegeRank}</p>
+                  <p className="text-xs text-[#6B7280]">College Rank</p>
+                </div>
+                <div className="p-4 text-center">
+                  <p className="text-2xl font-bold text-[#10B981]">{collegePulse.placedThisWeek}</p>
+                  <p className="text-xs text-[#6B7280]">Placed (Week)</p>
+                </div>
+                <div className="p-4 text-center">
+                  <p className="text-2xl font-bold text-[#1F2937]">{collegePulse.avgPackage}</p>
+                  <p className="text-xs text-[#6B7280]">Avg Package</p>
+                </div>
+              </div>
+
+              {/* Recent Placements */}
+              <div className="p-4">
+                <p className="text-xs font-medium text-[#6B7280] uppercase tracking-wide mb-3">
+                  Recent Placements
+                </p>
+                <div className="space-y-3">
+                  {collegePulse.recentPlacements.map((placement, idx) => (
+                    <div key={idx} className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-[#F3F4F6] flex items-center justify-center text-xs font-medium text-[#6B7280]">
+                          {placement.name.split(" ").map(n => n[0]).join("")}
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-[#1F2937]">{placement.name}</p>
+                          <p className="text-xs text-[#6B7280]">{placement.company} • {placement.role}</p>
+                        </div>
+                      </div>
+                      <span className="text-sm font-semibold text-[#10B981]">{placement.package}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </motion.div>
   );
 }
