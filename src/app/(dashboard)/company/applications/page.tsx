@@ -64,7 +64,8 @@ export default function CompanyApplicationsPage() {
   // Create opportunity filter options
   const opportunityOptions = [
     { value: "all", label: "All Opportunities" },
-    ...opportunities.map((opp) => ({ value: opp.id, label: opp.title })),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ...opportunities.map((opp: any) => ({ value: opp.id, label: opp.title })),
   ];
 
   // Filter applications
