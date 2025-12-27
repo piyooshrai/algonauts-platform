@@ -12,6 +12,7 @@ import {
   protectedProcedure,
 } from "../trpc/trpc";
 import { logEvent, EventTypes } from "@/lib/events";
+import { sendWelcomeEmail } from "@/lib/email";
 import type { UserType } from "@/lib/db/types";
 
 const SALT_ROUNDS = 12;
@@ -128,6 +129,19 @@ export const authRouter = createTRPCRouter({
         referrerId,
       },
     });
+
+    // Send welcome email (async, don't block on failure)
+    sendWelcomeEmail(user.email, user.email.split("@")[0])
+      .then((result) => {
+        if (result.success) {
+          console.log(`[Email] Welcome email sent to ${user.email}`);
+        } else {
+          console.error(`[Email] Failed to send welcome email to ${user.email}:`, result.error);
+        }
+      })
+      .catch((error) => {
+        console.error(`[Email] Error sending welcome email to ${user.email}:`, error);
+      });
 
     return {
       success: true,
