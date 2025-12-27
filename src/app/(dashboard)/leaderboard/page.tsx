@@ -32,8 +32,8 @@ const leaderboardData = [
 const userRank = {
   rank: 247,
   prevRank: 292,
-  name: "John Doe",
-  college: "MIT",
+  name: "Rahul Sharma",
+  college: "IIT Delhi",
   score: 1847,
   change: 45,
 };
@@ -81,19 +81,19 @@ export default function LeaderboardPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <Card className="bg-gradient-to-r from-blue-600 to-blue-700 text-white border-0">
+        <Card className="bg-white border border-[#E5E7EB] shadow-sm">
           <CardContent className="p-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center text-2xl font-bold">
+                <div className="w-16 h-16 rounded-full bg-[#E0F2FE] flex items-center justify-center text-2xl font-bold text-[#0EA5E9]">
                   #{userRank.rank}
                 </div>
                 <div>
-                  <p className="text-blue-100 text-sm">Your Current Rank</p>
-                  <p className="text-2xl font-bold">#{userRank.rank}</p>
+                  <p className="text-[#6B7280] text-sm">Your Current Rank</p>
+                  <p className="text-2xl font-bold text-[#1F2937]">#{userRank.rank}</p>
                   <div className="flex items-center gap-2 mt-1">
-                    <TrendingUp className="h-4 w-4 text-green-300" />
-                    <span className="text-green-300 text-sm">
+                    <TrendingUp className="h-4 w-4 text-[#10B981]" />
+                    <span className="text-[#10B981] text-sm">
                       Up {userRank.change} positions this week
                     </span>
                   </div>
@@ -101,12 +101,12 @@ export default function LeaderboardPage() {
               </div>
               <div className="flex items-center gap-8">
                 <div className="text-center">
-                  <p className="text-3xl font-bold font-display">{userRank.score}</p>
-                  <p className="text-blue-100 text-sm">Total Score</p>
+                  <p className="text-3xl font-bold font-display text-[#1F2937]">{userRank.score}</p>
+                  <p className="text-[#6B7280] text-sm">Total Score</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-3xl font-bold font-display">Top 1%</p>
-                  <p className="text-blue-100 text-sm">Percentile</p>
+                  <p className="text-3xl font-bold font-display text-[#0EA5E9]">Top 1%</p>
+                  <p className="text-[#6B7280] text-sm">Percentile</p>
                 </div>
               </div>
             </div>
@@ -142,7 +142,7 @@ export default function LeaderboardPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <Card className="text-center p-6 border-slate-300 dark:border-slate-600">
+          <Card className="text-center p-6 border-[#E5E7EB] bg-white shadow-sm">
             <div className="relative inline-block mb-4">
               <Avatar fallback={leaderboardData[1].name} size="xl" />
               <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-gradient-to-br from-slate-300 to-slate-500 flex items-center justify-center text-white font-bold shadow-lg">
@@ -161,7 +161,7 @@ export default function LeaderboardPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <Card className="text-center p-6 border-amber-300 dark:border-amber-600 bg-gradient-to-b from-amber-50 to-transparent dark:from-amber-950/20">
+          <Card className="text-center p-6 border-amber-300 bg-gradient-to-b from-amber-50 to-white shadow-sm">
             <Crown className="h-8 w-8 text-amber-500 mx-auto mb-2" />
             <div className="relative inline-block mb-4">
               <Avatar fallback={leaderboardData[0].name} size="xl" />
@@ -181,7 +181,7 @@ export default function LeaderboardPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
-          <Card className="text-center p-6 border-orange-300 dark:border-orange-600">
+          <Card className="text-center p-6 border-orange-300 bg-white shadow-sm">
             <div className="relative inline-block mb-4">
               <Avatar fallback={leaderboardData[2].name} size="xl" />
               <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white font-bold shadow-lg">

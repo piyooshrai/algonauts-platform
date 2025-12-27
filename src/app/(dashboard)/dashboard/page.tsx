@@ -46,7 +46,7 @@ const opportunities = [
     salary: "25K-40K/mo",
     match: 92,
     logo: "TC",
-    logoColor: "bg-teal-500",
+    logoColor: "bg-sky-500",
     spots: 3,
     totalSpots: 10,
     deadline: "2 days left",
@@ -60,7 +60,7 @@ const opportunities = [
     salary: "10-18 LPA",
     match: 88,
     logo: "TC",
-    logoColor: "bg-teal-500",
+    logoColor: "bg-sky-500",
     spots: 5,
     totalSpots: 8,
     deadline: "5 days left",
@@ -74,7 +74,7 @@ const opportunities = [
     salary: "8-12 LPA",
     match: 76,
     logo: "TC",
-    logoColor: "bg-teal-500",
+    logoColor: "bg-sky-500",
     spots: 2,
     totalSpots: 5,
     deadline: "1 week left",
@@ -217,12 +217,12 @@ export default function DashboardPage() {
             <div className="bg-white rounded-lg border border-[#E5E7EB] shadow-sm">
               <div className="flex items-center justify-between p-5 border-b border-[#E5E7EB]">
                 <div className="flex items-center gap-2">
-                  <Sparkles className="h-5 w-5 text-[#2A9D8F]" />
+                  <Sparkles className="h-5 w-5 text-[#0EA5E9]" />
                   <h2 className="text-lg font-semibold text-[#1F2937]">Opportunities For You</h2>
                 </div>
                 <Link
                   href="/opportunities"
-                  className="text-sm font-medium text-[#2A9D8F] hover:text-[#238b7e] flex items-center gap-1 transition-colors"
+                  className="text-sm font-medium text-[#0EA5E9] hover:text-[#0284c7] flex items-center gap-1 transition-colors"
                 >
                   View all
                   <ChevronRight className="h-4 w-4" />
@@ -256,7 +256,7 @@ export default function DashboardPage() {
                             </div>
                             <p className="text-sm text-[#6B7280]">{opp.company}</p>
                           </div>
-                          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-[#D1FAE5] text-[#059669] text-sm font-semibold rounded-full">
+                          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-[#E0F2FE] text-[#0284c7] text-sm font-semibold rounded-full">
                             {opp.match}% match
                           </div>
                         </div>
@@ -344,14 +344,14 @@ export default function DashboardPage() {
                           </div>
                           <div className="h-1 bg-[#E5E7EB] rounded-full overflow-hidden">
                             <div
-                              className="h-full bg-[#2A9D8F] rounded-full"
+                              className="h-full bg-[#0EA5E9] rounded-full"
                               style={{ width: `${(item.progress / item.total) * 100}%` }}
                             />
                           </div>
                         </div>
                       )}
                     </div>
-                    <span className="text-xs font-medium text-[#2A9D8F] flex-shrink-0">
+                    <span className="text-xs font-medium text-[#0EA5E9] flex-shrink-0">
                       +{item.xp} XP
                     </span>
                   </div>
@@ -365,7 +365,7 @@ export default function DashboardPage() {
             <div className="bg-white rounded-lg border border-[#E5E7EB] shadow-sm">
               <div className="p-5 border-b border-[#E5E7EB]">
                 <div className="flex items-center gap-2 mb-1">
-                  <Award className="h-5 w-5 text-[#2A9D8F]" />
+                  <Award className="h-5 w-5 text-[#0EA5E9]" />
                   <h2 className="text-lg font-semibold text-[#1F2937]">College Pulse</h2>
                 </div>
                 <p className="text-sm text-[#6B7280]">{collegePulse.collegeName}</p>

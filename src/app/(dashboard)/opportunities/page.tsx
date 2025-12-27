@@ -233,7 +233,7 @@ export default function OpportunitiesPage() {
                   {/* Main Content */}
                   <div className="flex-1 p-6">
                     <div className="flex items-start gap-4">
-                      <div className="w-14 h-14 rounded-lg bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 flex items-center justify-center font-bold text-xl flex-shrink-0">
+                      <div className="w-14 h-14 rounded-lg bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center font-bold text-xl flex-shrink-0 text-[#1F2937]">
                         {opportunity.logo}
                       </div>
                       <div className="flex-1 min-w-0">

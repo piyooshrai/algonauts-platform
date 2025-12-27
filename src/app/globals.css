@@ -15,10 +15,10 @@
     /* Border & Input */
     --border: #E5E7EB;
     --input: #E5E7EB;
-    --ring: #2A9D8F;
+    --ring: #0EA5E9;
 
-    /* Primary - Teal from Algonauts logo */
-    --primary: #2A9D8F;
+    /* Primary - Light Blue / Sky Blue */
+    --primary: #0EA5E9;
     --primary-foreground: #ffffff;
 
     /* Secondary */
@@ -26,7 +26,7 @@
     --secondary-foreground: #1F2937;
 
     /* Accent */
-    --accent: #2A9D8F;
+    --accent: #0EA5E9;
     --accent-foreground: #ffffff;
 
     /* Card */
@@ -105,7 +105,7 @@
 
   /* Selection */
   ::selection {
-    @apply bg-teal-500/20 text-foreground;
+    @apply bg-sky-500/20 text-foreground;
   }
 }
 
@@ -117,7 +117,7 @@
 
   /* Gradient text */
   .gradient-text {
-    @apply bg-gradient-to-r from-teal-600 to-teal-400 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-sky-600 to-sky-400 bg-clip-text text-transparent;
   }
 
   /* Focus ring */
