@@ -11,6 +11,13 @@ import { placementsRouter } from "./routers/placements";
 import { opportunitiesRouter } from "./routers/opportunities";
 import { applicationsRouter } from "./routers/applications";
 import { invitesRouter } from "./routers/invites";
+// Phase 3: Game Theory routers
+import { badgesRouter } from "./routers/badges";
+import { streaksRouter } from "./routers/streaks";
+import { leaderboardsRouter } from "./routers/leaderboards";
+import { activityFeedRouter } from "./routers/activityFeed";
+import { notificationsRouter } from "./routers/notifications";
+import { celebrationsRouter } from "./routers/celebrations";
 
 /**
  * This is the primary router for the API.
@@ -24,6 +31,13 @@ export const appRouter = createTRPCRouter({
   opportunities: opportunitiesRouter,
   applications: applicationsRouter,
   invites: invitesRouter,
+  // Phase 3: Game Theory
+  badges: badgesRouter,
+  streaks: streaksRouter,
+  leaderboards: leaderboardsRouter,
+  activityFeed: activityFeedRouter,
+  notifications: notificationsRouter,
+  celebrations: celebrationsRouter,
 });
 
 // Export type definition of API
