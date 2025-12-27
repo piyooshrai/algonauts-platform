@@ -11,7 +11,7 @@ import { EventTypes } from "@/lib/events/types";
 // ============================================================================
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const FROM_EMAIL = process.env.EMAIL_FROM || "Algonauts <noreply@algonauts.in>";
+const FROM_EMAIL = process.env.EMAIL_FROM || "Algonauts <onboarding@resend.dev>";
 const REPLY_TO = process.env.EMAIL_REPLY_TO || "support@algonauts.in";
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://algonauts.in";
 
@@ -59,8 +59,9 @@ export type EmailTemplate =
  */
 export async function sendEmail(options: EmailOptions): Promise<EmailResult> {
   if (!RESEND_API_KEY) {
-    console.log("[Email] Resend API key not configured, skipping email:", options.subject);
-    return { success: true, messageId: "dev-mode-skipped" };
+    console.warn("[Email] RESEND_API_KEY not configured - email not sent:", options.subject);
+    console.warn("[Email] Set RESEND_API_KEY in environment variables to enable email sending");
+    return { success: false, error: "RESEND_API_KEY not configured" };
   }
 
   try {
