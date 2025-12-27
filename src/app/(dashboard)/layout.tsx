@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   LayoutDashboard,
@@ -36,20 +37,22 @@ export default function DashboardLayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
+  const { data: session } = useSession();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const handleSignOut = () => {
+  const handleSignOut = async () => {
+    await signOut({ redirect: false });
     router.push("/");
   };
 
-  // Mock user data - in production this would come from session/API
+  // Get user data from session
   const user = {
-    name: "Rahul Sharma",
-    email: "student@test.com",
-    college: "IIT Delhi",
+    name: session?.user?.name || session?.user?.email?.split("@")[0] || "User",
+    email: session?.user?.email || "",
+    college: "Profile incomplete", // TODO: Fetch from profile API
     graduationYear: 2025,
-    rank: 247,
+    rank: 0,
   };
 
   return (
