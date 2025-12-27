@@ -6,18 +6,14 @@ import {
   Users,
   Building2,
   GraduationCap,
-  TrendingUp,
   CheckCircle2,
   Clock,
   AlertCircle,
   ChevronRight,
   Loader2,
-  BarChart3,
-  FileText,
-  Activity,
 } from "lucide-react";
 import Link from "next/link";
-import { Button, Card, CardContent, CardHeader, CardTitle, Badge, Progress } from "@/components/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Badge } from "@/components/ui";
 import { api } from "@/lib/trpc/client";
 
 export default function AdminDashboardPage() {
