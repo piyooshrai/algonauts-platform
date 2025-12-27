@@ -19,8 +19,8 @@ export function Providers({ children }: ProvidersProps) {
       <TRPCProvider>
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
-          enableSystem
+          defaultTheme="light"
+          forcedTheme="light"
           disableTransitionOnChange
         >
           {children}
