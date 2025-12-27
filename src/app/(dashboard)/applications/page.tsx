@@ -7,7 +7,6 @@ import {
   CheckCircle2,
   XCircle,
   AlertCircle,
-  Building2,
   MapPin,
   Calendar,
   ChevronRight,
