@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
+import { useSession } from "next-auth/react";
 import {
   User,
   Mail,
@@ -13,63 +15,73 @@ import {
   Globe,
   Edit,
   Award,
-  TrendingUp,
-  CheckCircle2,
   Share2,
   Download,
+  Loader2,
+  Flame,
+  CheckCircle2,
+  Trophy,
 } from "lucide-react";
-import { Button, Card, CardContent, CardHeader, CardTitle, Progress, Avatar } from "@/components/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Progress, Avatar, Badge } from "@/components/ui";
 import { LayersRank } from "@/components/layers-rank";
-
-const profileData = {
-  name: "John Doe",
-  title: "Full Stack Developer",
-  email: "john.doe@example.com",
-  phone: "+91 98765 43210",
-  location: "Bangalore, India",
-  bio: "Passionate developer with a keen interest in building scalable applications. Looking for opportunities to work with cutting-edge technologies.",
-  education: {
-    degree: "B.Tech in Computer Science",
-    college: "Indian Institute of Technology, Delhi",
-    year: "2025",
-  },
-  experience: "0-1 years",
-  skills: [
-    { name: "JavaScript", level: 90 },
-    { name: "React", level: 85 },
-    { name: "Node.js", level: 80 },
-    { name: "Python", level: 75 },
-    { name: "TypeScript", level: 85 },
-    { name: "PostgreSQL", level: 70 },
-  ],
-  links: {
-    github: "github.com/johndoe",
-    linkedin: "linkedin.com/in/johndoe",
-    portfolio: "johndoe.dev",
-  },
-  stats: {
-    rank: 247,
-    totalUsers: 50000,
-    assessmentsTaken: 12,
-    profileViews: 34,
-    invitesReceived: 8,
-  },
-  achievements: [
-    { id: 1, title: "Quick Learner", description: "Completed 5 assessments in first month", icon: "🚀" },
-    { id: 2, title: "Top 1%", description: "Achieved top 1% ranking nationally", icon: "🏆" },
-    { id: 3, title: "Code Master", description: "Scored 90%+ in Technical Assessment", icon: "💻" },
-    { id: 4, title: "Rising Star", description: "Improved rank by 500+ positions", icon: "⭐" },
-  ],
-};
-
-const assessmentHistory = [
-  { id: 1, name: "Q3 Technical", date: "Sep 2025", score: 847, maxScore: 1000, percentile: 92 },
-  { id: 2, name: "Q3 Behavioral", date: "Sep 2025", score: 78, maxScore: 100, percentile: 85 },
-  { id: 3, name: "Q2 Technical", date: "Jun 2025", score: 756, maxScore: 1000, percentile: 78 },
-  { id: 4, name: "Q2 Contextual", date: "Jun 2025", score: 134, maxScore: 200, percentile: 67 },
-];
+import { api } from "@/lib/trpc/client";
+import Link from "next/link";
 
 export default function ProfilePage() {
+  const { data: session } = useSession();
+  const [isEditing, setIsEditing] = useState(false);
+
+  // Fetch real profile data
+  const { data: profileData, isLoading: profileLoading } = api.profile.get.useQuery();
+  const { data: statsData, isLoading: statsLoading } = api.profile.getStats.useQuery();
+  const { data: rankingSummary } = api.leaderboards.getUserRankingSummary.useQuery();
+  const { data: badgesData } = api.badges.getMyBadges.useQuery();
+  const { data: streakData } = api.streaks.get.useQuery({ type: "daily_login" });
+
+  const isLoading = profileLoading || statsLoading;
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin text-[#0EA5E9]" />
+      </div>
+    );
+  }
+
+  const profile = profileData?.profile;
+  const stats = statsData?.stats;
+  const badges = badgesData?.badges || [];
+  const recentBadges = badges.slice(0, 4);
+
+  // User data from profile and session
+  const user = {
+    name: session?.user?.name || profile?.user?.name || "User",
+    email: session?.user?.email || profile?.user?.email || "",
+    title: profile?.headline || "Student",
+    phone: profile?.phone || "",
+    location: profile?.city && profile?.state ? `${profile.city}, ${profile.state}` : profile?.city || profile?.state || "",
+    bio: profile?.bio || "Complete your profile to let companies know more about you.",
+    avatarUrl: profile?.avatarUrl,
+    education: {
+      degree: profile?.degree || "Degree",
+      college: profile?.collegeName || "College",
+      year: profile?.graduationYear || new Date().getFullYear() + 1,
+    },
+    experience: profile?.experienceYears ? `${profile.experienceYears} years` : "0-1 years",
+    skills: profile?.skills || [],
+    links: {
+      github: profile?.githubUrl || "",
+      linkedin: profile?.linkedinUrl || "",
+      portfolio: profile?.portfolioUrl || "",
+    },
+    resumeUrl: profile?.resumeUrl,
+    rank: rankingSummary?.rankings?.national?.rank || 0,
+    totalUsers: rankingSummary?.rankings?.national?.total || 0,
+    percentile: rankingSummary?.rankings?.national?.percentile || 0,
+    xpTotal: profile?.totalXp || rankingSummary?.xpTotal || 0,
+    currentStreak: streakData?.currentCount || profile?.currentStreak || 0,
+  };
+
   return (
     <div className="space-y-6">
       {/* Header Actions */}
@@ -78,14 +90,20 @@ export default function ProfilePage() {
           <Share2 className="h-4 w-4" />
           Share Profile
         </Button>
-        <Button variant="outline" size="sm" className="gap-2">
-          <Download className="h-4 w-4" />
-          Download Resume
-        </Button>
-        <Button size="sm" className="gap-2">
-          <Edit className="h-4 w-4" />
-          Edit Profile
-        </Button>
+        {user.resumeUrl && (
+          <a href={user.resumeUrl} target="_blank" rel="noopener noreferrer">
+            <Button variant="outline" size="sm" className="gap-2">
+              <Download className="h-4 w-4" />
+              Download Resume
+            </Button>
+          </a>
+        )}
+        <Link href="/onboarding/student">
+          <Button size="sm" className="gap-2">
+            <Edit className="h-4 w-4" />
+            Edit Profile
+          </Button>
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -99,62 +117,93 @@ export default function ProfilePage() {
             <Card>
               <CardContent className="p-6 text-center">
                 <Avatar
-                  fallback={profileData.name}
+                  fallback={user.name}
+                  src={user.avatarUrl}
                   size="xl"
                   className="mx-auto mb-4 w-24 h-24"
                 />
-                <h1 className="text-xl font-bold">{profileData.name}</h1>
-                <p className="text-muted-foreground">{profileData.title}</p>
+                <h1 className="text-xl font-bold">{user.name}</h1>
+                <p className="text-muted-foreground">{user.title}</p>
+
+                {/* Streak Badge */}
+                {user.currentStreak > 0 && (
+                  <div className="flex justify-center mt-3">
+                    <Badge variant="warning" className="gap-1">
+                      <Flame className="h-3 w-3" />
+                      {user.currentStreak} day streak
+                    </Badge>
+                  </div>
+                )}
 
                 <div className="my-6">
-                  <LayersRank
-                    rank={profileData.stats.rank}
-                    totalUsers={profileData.stats.totalUsers}
-                    size="sm"
-                  />
+                  {user.rank > 0 ? (
+                    <LayersRank
+                      rank={user.rank}
+                      totalUsers={user.totalUsers}
+                      size="sm"
+                    />
+                  ) : (
+                    <div className="text-center p-4 bg-muted/50 rounded-lg">
+                      <Trophy className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                      <p className="text-sm text-muted-foreground">Complete assessments to get ranked</p>
+                    </div>
+                  )}
                 </div>
 
-                <div className="space-y-3 text-sm">
+                <div className="space-y-3 text-sm text-left">
                   <div className="flex items-center gap-3 text-muted-foreground">
-                    <Mail className="h-4 w-4" />
-                    <span>{profileData.email}</span>
+                    <Mail className="h-4 w-4 flex-shrink-0" />
+                    <span className="truncate">{user.email}</span>
                   </div>
-                  <div className="flex items-center gap-3 text-muted-foreground">
-                    <Phone className="h-4 w-4" />
-                    <span>{profileData.phone}</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-muted-foreground">
-                    <MapPin className="h-4 w-4" />
-                    <span>{profileData.location}</span>
-                  </div>
+                  {user.phone && (
+                    <div className="flex items-center gap-3 text-muted-foreground">
+                      <Phone className="h-4 w-4 flex-shrink-0" />
+                      <span>{user.phone}</span>
+                    </div>
+                  )}
+                  {user.location && (
+                    <div className="flex items-center gap-3 text-muted-foreground">
+                      <MapPin className="h-4 w-4 flex-shrink-0" />
+                      <span>{user.location}</span>
+                    </div>
+                  )}
                 </div>
 
-                <div className="flex justify-center gap-4 mt-6">
-                  <a
-                    href={`https://${profileData.links.github}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="p-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
-                  >
-                    <Github className="h-5 w-5" />
-                  </a>
-                  <a
-                    href={`https://${profileData.links.linkedin}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="p-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
-                  >
-                    <Linkedin className="h-5 w-5" />
-                  </a>
-                  <a
-                    href={`https://${profileData.links.portfolio}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="p-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
-                  >
-                    <Globe className="h-5 w-5" />
-                  </a>
-                </div>
+                {/* Social Links */}
+                {(user.links.github || user.links.linkedin || user.links.portfolio) && (
+                  <div className="flex justify-center gap-4 mt-6">
+                    {user.links.github && (
+                      <a
+                        href={user.links.github.startsWith("http") ? user.links.github : `https://${user.links.github}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
+                      >
+                        <Github className="h-5 w-5" />
+                      </a>
+                    )}
+                    {user.links.linkedin && (
+                      <a
+                        href={user.links.linkedin.startsWith("http") ? user.links.linkedin : `https://${user.links.linkedin}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
+                      >
+                        <Linkedin className="h-5 w-5" />
+                      </a>
+                    )}
+                    {user.links.portfolio && (
+                      <a
+                        href={user.links.portfolio.startsWith("http") ? user.links.portfolio : `https://${user.links.portfolio}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
+                      >
+                        <Globe className="h-5 w-5" />
+                      </a>
+                    )}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </motion.div>
@@ -171,21 +220,47 @@ export default function ProfilePage() {
               </CardHeader>
               <CardContent className="grid grid-cols-2 gap-4">
                 <div className="text-center p-3 rounded-lg bg-muted/50">
-                  <p className="text-2xl font-bold font-display">{profileData.stats.assessmentsTaken}</p>
-                  <p className="text-xs text-muted-foreground">Assessments</p>
+                  <p className="text-2xl font-bold font-display">{stats?.applications || 0}</p>
+                  <p className="text-xs text-muted-foreground">Applications</p>
                 </div>
                 <div className="text-center p-3 rounded-lg bg-muted/50">
-                  <p className="text-2xl font-bold font-display">{profileData.stats.profileViews}</p>
-                  <p className="text-xs text-muted-foreground">Profile Views</p>
+                  <p className="text-2xl font-bold font-display">{user.xpTotal}</p>
+                  <p className="text-xs text-muted-foreground">Total XP</p>
                 </div>
                 <div className="text-center p-3 rounded-lg bg-muted/50">
-                  <p className="text-2xl font-bold font-display">{profileData.stats.invitesReceived}</p>
-                  <p className="text-xs text-muted-foreground">Invites</p>
+                  <p className="text-2xl font-bold font-display">{stats?.badges || badges.length}</p>
+                  <p className="text-xs text-muted-foreground">Badges</p>
                 </div>
                 <div className="text-center p-3 rounded-lg bg-muted/50">
-                  <p className="text-2xl font-bold font-display text-success-600">Top 1%</p>
+                  <p className="text-2xl font-bold font-display text-success-600">
+                    {user.percentile > 0 ? `Top ${100 - user.percentile}%` : "-"}
+                  </p>
                   <p className="text-xs text-muted-foreground">Percentile</p>
                 </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Profile Completion */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+          >
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base flex items-center justify-between">
+                  Profile Completion
+                  <span className="text-[#0EA5E9]">{profile?.profileCompletionPct || 0}%</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Progress value={profile?.profileCompletionPct || 0} size="sm" />
+                {(profile?.profileCompletionPct || 0) < 100 && (
+                  <p className="text-xs text-muted-foreground mt-3">
+                    Complete your profile to unlock more opportunities and improve your match score.
+                  </p>
+                )}
               </CardContent>
             </Card>
           </motion.div>
@@ -207,7 +282,7 @@ export default function ProfilePage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">{profileData.bio}</p>
+                <p className="text-muted-foreground whitespace-pre-wrap">{user.bio}</p>
               </CardContent>
             </Card>
           </motion.div>
@@ -227,10 +302,10 @@ export default function ProfilePage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="font-medium">{profileData.education.degree}</p>
-                  <p className="text-muted-foreground">{profileData.education.college}</p>
+                  <p className="font-medium">{user.education.degree}</p>
+                  <p className="text-muted-foreground">{user.education.college}</p>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Expected: {profileData.education.year}
+                    Expected: {user.education.year}
                   </p>
                 </CardContent>
               </Card>
@@ -249,7 +324,7 @@ export default function ProfilePage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="font-medium">{profileData.experience}</p>
+                  <p className="font-medium">{user.experience}</p>
                   <p className="text-muted-foreground">Professional Experience</p>
                 </CardContent>
               </Card>
@@ -270,22 +345,22 @@ export default function ProfilePage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {profileData.skills.map((skill) => (
-                    <div key={skill.name} className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium">{skill.name}</span>
-                        <span className="text-sm text-muted-foreground">{skill.level}%</span>
-                      </div>
-                      <Progress value={skill.level} size="sm" />
-                    </div>
-                  ))}
-                </div>
+                {user.skills.length > 0 ? (
+                  <div className="flex flex-wrap gap-2">
+                    {user.skills.map((skill: string) => (
+                      <Badge key={skill} variant="secondary" className="py-1.5 px-3">
+                        {skill}
+                      </Badge>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground text-sm">No skills added yet. Edit your profile to add skills.</p>
+                )}
               </CardContent>
             </Card>
           </motion.div>
 
-          {/* Achievements */}
+          {/* Badges / Achievements */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -293,33 +368,50 @@ export default function ProfilePage() {
           >
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Award className="h-5 w-5 text-muted-foreground" />
-                  Achievements
-                </CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <Award className="h-5 w-5 text-muted-foreground" />
+                    Badges
+                  </CardTitle>
+                  {badges.length > 4 && (
+                    <Link href="/badges" className="text-sm text-[#0EA5E9] hover:underline">
+                      View all
+                    </Link>
+                  )}
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {profileData.achievements.map((achievement) => (
-                    <div
-                      key={achievement.id}
-                      className="flex items-center gap-3 p-3 rounded-lg bg-muted/50"
-                    >
-                      <span className="text-2xl">{achievement.icon}</span>
-                      <div>
-                        <p className="font-medium">{achievement.title}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {achievement.description}
-                        </p>
+                {recentBadges.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {recentBadges.map((badge) => (
+                      <div
+                        key={badge.id}
+                        className="flex items-center gap-3 p-3 rounded-lg bg-muted/50"
+                      >
+                        <span className="text-2xl">{badge.badge?.icon || "🏆"}</span>
+                        <div>
+                          <p className="font-medium">{badge.badge?.name}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {badge.badge?.description}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <Award className="h-12 w-12 text-muted-foreground/50 mx-auto mb-3" />
+                    <p className="text-muted-foreground">No badges earned yet</p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Complete activities to earn badges and XP
+                    </p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </motion.div>
 
-          {/* Assessment History */}
+          {/* Activity Summary */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -328,40 +420,28 @@ export default function ProfilePage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5 text-muted-foreground" />
-                  Assessment History
+                  <CheckCircle2 className="h-5 w-5 text-muted-foreground" />
+                  Activity Summary
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {assessmentHistory.map((assessment) => (
-                    <div
-                      key={assessment.id}
-                      className="flex items-center justify-between p-4 rounded-lg border border-border"
-                    >
-                      <div className="flex items-center gap-3">
-                        <CheckCircle2 className="h-5 w-5 text-success-500" />
-                        <div>
-                          <p className="font-medium">{assessment.name}</p>
-                          <p className="text-sm text-muted-foreground">{assessment.date}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-6 text-right">
-                        <div>
-                          <p className="font-semibold">
-                            {assessment.score}/{assessment.maxScore}
-                          </p>
-                          <p className="text-xs text-muted-foreground">Score</p>
-                        </div>
-                        <div>
-                          <p className="font-semibold text-success-600">
-                            {assessment.percentile}%
-                          </p>
-                          <p className="text-xs text-muted-foreground">Percentile</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="p-4 rounded-lg border border-border text-center">
+                    <p className="text-2xl font-bold text-[#1F2937]">{stats?.applications || 0}</p>
+                    <p className="text-sm text-muted-foreground">Applications</p>
+                  </div>
+                  <div className="p-4 rounded-lg border border-border text-center">
+                    <p className="text-2xl font-bold text-[#10B981]">{stats?.placements || 0}</p>
+                    <p className="text-sm text-muted-foreground">Placements</p>
+                  </div>
+                  <div className="p-4 rounded-lg border border-border text-center">
+                    <p className="text-2xl font-bold text-[#F59E0B]">{user.currentStreak}</p>
+                    <p className="text-sm text-muted-foreground">Day Streak</p>
+                  </div>
+                  <div className="p-4 rounded-lg border border-border text-center">
+                    <p className="text-2xl font-bold text-[#0EA5E9]">{badges.length}</p>
+                    <p className="text-sm text-muted-foreground">Badges</p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
