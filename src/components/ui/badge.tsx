@@ -16,11 +16,11 @@ const badgeVariants = cva(
         outline:
           "border-border text-foreground",
         success:
-          "border-transparent bg-success-100 text-success-700 dark:bg-success-900/30 dark:text-success-400",
+          "border-transparent bg-success-100 text-success-700",
         warning:
-          "border-transparent bg-warning-100 text-warning-700 dark:bg-warning-900/30 dark:text-warning-400",
+          "border-transparent bg-warning-100 text-warning-700",
         info:
-          "border-transparent bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+          "border-transparent bg-blue-100 text-blue-700",
         // Rank badges
         gold:
           "border-transparent bg-gradient-to-r from-amber-400 to-amber-500 text-white shadow-sm",
