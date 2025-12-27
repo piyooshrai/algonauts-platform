@@ -58,10 +58,10 @@ export default function DashboardLayout({
       <header className="sticky top-0 z-50 bg-white border-b border-[#E5E7EB] shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            {/* Left: Logo */}
+            {/* Left: Logo with Algonauts text */}
             <div className="flex items-center gap-4">
               <Link href="/dashboard" className="flex-shrink-0">
-                <Logo size="sm" showSubtext={false} />
+                <Logo size="sm" showSubtext={false} showText={true} />
               </Link>
             </div>
 
@@ -72,7 +72,7 @@ export default function DashboardLayout({
                 <input
                   type="text"
                   placeholder="Search opportunities, companies..."
-                  className="w-full pl-10 pr-4 py-2 bg-[#F3F4F6] border border-[#E5E7EB] rounded-lg text-sm text-[#1F2937] placeholder:text-[#6B7280] focus:outline-none focus:ring-2 focus:ring-[#2A9D8F] focus:border-transparent transition-all"
+                  className="w-full pl-10 pr-4 py-2 bg-[#F3F4F6] border border-[#E5E7EB] rounded-lg text-sm text-[#1F2937] placeholder:text-[#6B7280] focus:outline-none focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent transition-all"
                 />
               </div>
             </div>
@@ -180,7 +180,7 @@ export default function DashboardLayout({
                     className={cn(
                       "flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap",
                       isActive
-                        ? "border-[#2A9D8F] text-[#2A9D8F]"
+                        ? "border-[#0EA5E9] text-[#0EA5E9]"
                         : "border-transparent text-[#6B7280] hover:text-[#1F2937] hover:border-[#E5E7EB]"
                     )}
                   >
@@ -209,7 +209,7 @@ export default function DashboardLayout({
                   <input
                     type="text"
                     placeholder="Search..."
-                    className="w-full pl-10 pr-4 py-2 bg-[#F3F4F6] border border-[#E5E7EB] rounded-lg text-sm text-[#1F2937] placeholder:text-[#6B7280] focus:outline-none focus:ring-2 focus:ring-[#2A9D8F]"
+                    className="w-full pl-10 pr-4 py-2 bg-[#F3F4F6] border border-[#E5E7EB] rounded-lg text-sm text-[#1F2937] placeholder:text-[#6B7280] focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]"
                   />
                 </div>
               </div>

@@ -25,7 +25,7 @@ const applications = [
     status: "under_review",
     statusLabel: "Under Review",
     logo: "TC",
-    logoColor: "bg-teal-500",
+    logoColor: "bg-sky-500",
   },
   {
     id: "app_002",
@@ -37,7 +37,7 @@ const applications = [
     status: "shortlisted",
     statusLabel: "Shortlisted",
     logo: "TC",
-    logoColor: "bg-teal-500",
+    logoColor: "bg-sky-500",
   },
 ];
 
@@ -91,7 +91,7 @@ export default function ApplicationsPage() {
       <div className="bg-white rounded-lg border border-[#E5E7EB] shadow-sm">
         <div className="p-5 border-b border-[#E5E7EB]">
           <div className="flex items-center gap-2">
-            <FileText className="h-5 w-5 text-[#2A9D8F]" />
+            <FileText className="h-5 w-5 text-[#0EA5E9]" />
             <h2 className="text-lg font-semibold text-[#1F2937]">Applications</h2>
           </div>
         </div>
@@ -153,7 +153,7 @@ export default function ApplicationsPage() {
             <p className="text-[#6B7280] mb-4">Start applying to opportunities to track them here</p>
             <Link
               href="/opportunities"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-[#2A9D8F] text-white text-sm font-medium rounded-lg hover:bg-[#238b7e] transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-[#0EA5E9] text-white text-sm font-medium rounded-lg hover:bg-[#0284c7] transition-colors"
             >
               Browse Opportunities
               <ChevronRight className="h-4 w-4" />

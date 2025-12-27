@@ -85,10 +85,10 @@ export default function Home() {
           >
             <motion.div
               variants={fadeInUp}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800 mb-6"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-sky-50 border border-sky-200 mb-6"
             >
-              <Sparkles className="h-4 w-4 text-blue-600" />
-              <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
+              <Sparkles className="h-4 w-4 text-sky-600" />
+              <span className="text-sm font-medium text-sky-700">
                 The future of fresher hiring is here
               </span>
             </motion.div>
@@ -156,7 +156,7 @@ export default function Home() {
                     <span className="text-xs text-muted-foreground">dashboard.algonauts.io</span>
                   </div>
                 </div>
-                <div className="p-8 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+                <div className="p-8 bg-gradient-to-br from-slate-50 to-slate-100">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {/* LayersRank Card */}
                     <div className="col-span-1 bg-card rounded-lg border border-border p-6 shadow-sm">
@@ -197,7 +197,7 @@ export default function Home() {
                 animate={{ y: [0, -10, 0] }}
                 transition={{ duration: 4, repeat: Infinity }}
               >
-                <div className="p-1.5 rounded bg-success-100 dark:bg-success-900/30">
+                <div className="p-1.5 rounded bg-success-100">
                   <CheckCircle2 className="h-4 w-4 text-success-600" />
                 </div>
                 <span className="text-sm font-medium">Assessment Complete!</span>
@@ -208,8 +208,8 @@ export default function Home() {
                 animate={{ y: [0, 10, 0] }}
                 transition={{ duration: 5, repeat: Infinity }}
               >
-                <div className="p-1.5 rounded bg-blue-100 dark:bg-blue-900/30">
-                  <TrendingUp className="h-4 w-4 text-blue-600" />
+                <div className="p-1.5 rounded bg-sky-100">
+                  <TrendingUp className="h-4 w-4 text-sky-600" />
                 </div>
                 <span className="text-sm font-medium">Rank improved by 45</span>
               </motion.div>
@@ -337,14 +337,14 @@ export default function Home() {
                 className="relative"
               >
                 {index < 3 && (
-                  <div className="hidden md:block absolute top-12 left-1/2 w-full h-0.5 bg-gradient-to-r from-blue-500 to-blue-300" />
+                  <div className="hidden md:block absolute top-12 left-1/2 w-full h-0.5 bg-gradient-to-r from-sky-500 to-sky-300" />
                 )}
                 <div className="relative bg-card border border-border rounded-lg p-6 text-center">
                   <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary text-primary-foreground font-bold mb-4">
                     {item.step}
                   </div>
                   <div className="mb-3 flex justify-center">
-                    <item.icon className="h-8 w-8 text-blue-600" />
+                    <item.icon className="h-8 w-8 text-sky-600" />
                   </div>
                   <h3 className="font-semibold mb-2">{item.title}</h3>
                   <p className="text-sm text-muted-foreground">{item.description}</p>
@@ -364,7 +364,7 @@ export default function Home() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
             >
-              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-950/50 text-sm font-medium text-blue-700 dark:text-blue-300 mb-4">
+              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-50 text-sm font-medium text-sky-700 mb-4">
                 <Building2 className="h-4 w-4" />
                 For Companies
               </span>
@@ -390,7 +390,7 @@ export default function Home() {
                     viewport={{ once: true }}
                     className="flex items-center gap-3"
                   >
-                    <div className="p-2 rounded-lg bg-success-100 dark:bg-success-900/30">
+                    <div className="p-2 rounded-lg bg-success-100">
                       <item.icon className="h-5 w-5 text-success-600" />
                     </div>
                     <span className="text-foreground">{item.text}</span>
@@ -443,7 +443,7 @@ export default function Home() {
                       {["React", "Node.js", "Python", "System Design"].map((skill) => (
                         <span
                           key={skill}
-                          className="px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs"
+                          className="px-2 py-0.5 rounded-full bg-sky-100 text-sky-700 text-xs"
                         >
                           {skill}
                         </span>
@@ -482,7 +482,7 @@ export default function Home() {
                             <span className="text-xs font-medium w-6">{item.score}</span>
                             <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
                               <div
-                                className="h-full bg-blue-500 rounded-full"
+                                className="h-full bg-sky-500 rounded-full"
                                 style={{ width: `${item.percent}%` }}
                               />
                             </div>
@@ -554,7 +554,7 @@ export default function Home() {
                         </div>
                         <div className="flex items-center gap-3">
                           <span className="text-xs text-primary font-medium">{student.rank}</span>
-                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-success-100 dark:bg-success-900/30 text-success-600">{student.status}</span>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-success-100 text-success-600">{student.status}</span>
                         </div>
                       </div>
                     ))}
@@ -568,7 +568,7 @@ export default function Home() {
                     <span className="text-xs font-medium">67%</span>
                   </div>
                   <div className="h-2 bg-muted rounded-full overflow-hidden">
-                    <div className="h-full bg-blue-500 rounded-full" style={{ width: "67%" }} />
+                    <div className="h-full bg-sky-500 rounded-full" style={{ width: "67%" }} />
                   </div>
                 </div>
               </div>
@@ -581,7 +581,7 @@ export default function Home() {
               viewport={{ once: true }}
               className="order-1 lg:order-2"
             >
-              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-50 dark:bg-purple-950/50 text-sm font-medium text-purple-700 dark:text-purple-300 mb-4">
+              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-50 text-sm font-medium text-purple-700 mb-4">
                 <GraduationCap className="h-4 w-4" />
                 For Colleges
               </span>
@@ -607,7 +607,7 @@ export default function Home() {
                     viewport={{ once: true }}
                     className="flex items-center gap-3"
                   >
-                    <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/30">
+                    <div className="p-2 rounded-lg bg-purple-100">
                       <item.icon className="h-5 w-5 text-purple-600" />
                     </div>
                     <span className="text-foreground">{item.text}</span>
@@ -632,14 +632,14 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 to-blue-700 p-8 sm:p-12 text-center"
+            className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-sky-500 to-sky-600 p-8 sm:p-12 text-center"
           >
             <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
             <div className="relative z-10">
               <h2 className="text-display-xs sm:text-display-sm font-bold text-white mb-4">
                 Ready to Prove Your Worth?
               </h2>
-              <p className="text-lg text-blue-100 mb-8 max-w-xl mx-auto">
+              <p className="text-lg text-sky-100 mb-8 max-w-xl mx-auto">
                 Join 50,000+ students and freshers who are building their careers through
                 merit-based rankings.
               </p>
@@ -647,7 +647,7 @@ export default function Home() {
                 <Link href="/signup">
                   <Button
                     size="xl"
-                    className="w-full sm:w-auto bg-white text-blue-600 hover:bg-blue-50 gap-2"
+                    className="w-full sm:w-auto bg-white text-sky-600 hover:bg-sky-50 gap-2"
                   >
                     Create Free Account <ArrowRight className="h-5 w-5" />
                   </Button>

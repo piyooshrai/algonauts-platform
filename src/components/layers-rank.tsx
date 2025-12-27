@@ -36,7 +36,7 @@ export function LayersRank({
 
   const getTier = (rank: number) => {
     if (rank <= 100) return { name: "Elite", color: "from-amber-400 to-amber-600" };
-    if (rank <= 500) return { name: "Diamond", color: "from-cyan-400 to-blue-600" };
+    if (rank <= 500) return { name: "Diamond", color: "from-cyan-400 to-sky-600" };
     if (rank <= 1000) return { name: "Platinum", color: "from-violet-400 to-purple-600" };
     if (rank <= 5000) return { name: "Gold", color: "from-yellow-400 to-orange-500" };
     if (rank <= 10000) return { name: "Silver", color: "from-slate-300 to-slate-500" };
