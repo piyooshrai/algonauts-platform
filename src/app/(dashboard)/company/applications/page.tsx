@@ -69,7 +69,8 @@ export default function CompanyApplicationsPage() {
   ];
 
   // Filter applications
-  const filteredApplications = allApplications.filter((app) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const filteredApplications = allApplications.filter((app: any) => {
     const matchesSearch =
       app.student?.user?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       app.student?.user?.email?.toLowerCase().includes(searchQuery.toLowerCase());
@@ -80,7 +81,8 @@ export default function CompanyApplicationsPage() {
 
   // Sort by date (newest first)
   filteredApplications.sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
 
   // Update status mutation
