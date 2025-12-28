@@ -267,8 +267,6 @@ export const profileRouter = createTRPCRouter({
         graduationYear: updatedProfile.graduationYear,
         resumeUrl: updatedProfile.resumeUrl,
         skills: updatedProfile.skills,
-        linkedinUrl: updatedProfile.linkedinUrl,
-        githubUrl: updatedProfile.githubUrl,
       });
 
       const newStatus = getCompletionStatus(newCompletion);
