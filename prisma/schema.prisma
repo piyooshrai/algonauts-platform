@@ -960,6 +960,14 @@ model Notification {
   actionUrl   String?
   imageUrl    String?
 
+  // Template-based fields
+  templateId  String?
+  ctaText     String?
+  ctaUrl      String?
+  category    String?
+  priority    String?             @default("medium")
+  variables   Json?
+
   // Delivery
   channels    NotificationChannel[]
 
@@ -982,6 +990,8 @@ model Notification {
   @@index([type])
   @@index([isRead])
   @@index([createdAt])
+  @@index([category])
+  @@index([templateId])
 }
 
 // ============================================================================
