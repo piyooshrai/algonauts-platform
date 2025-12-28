@@ -23,6 +23,7 @@ export const EventCategory = {
   COMPANY: "company",
   COLLEGE: "college",
   ASSESSMENT: "assessment",
+  LAUNCHPAD: "launchpad",
   ADMIN: "admin",
 } as const;
 
@@ -229,6 +230,19 @@ export const AssessmentEvents = {
   ASSESSMENT_RESULT_VIEW: "ASSESSMENT_RESULT_VIEW",
 } as const;
 
+// Launchpad Events (Knowledge Sharing)
+export const LaunchpadEvents = {
+  POST_CREATED: "POST_CREATED",
+  POST_VIEWED: "POST_VIEWED",
+  POST_UPVOTED: "POST_UPVOTED",
+  POST_UNVOTED: "POST_UNVOTED",
+  POST_SHARED: "POST_SHARED",
+  POST_DELETED: "POST_DELETED",
+  COMMENT_CREATED: "COMMENT_CREATED",
+  COMMENT_DELETED: "COMMENT_DELETED",
+  LAUNCHPAD_FEED_VIEWED: "LAUNCHPAD_FEED_VIEWED",
+} as const;
+
 // Admin Events
 export const AdminEvents = {
   // User management
@@ -282,6 +296,7 @@ export const EventTypes = {
   ...CompanyEvents,
   ...CollegeEvents,
   ...AssessmentEvents,
+  ...LaunchpadEvents,
   ...AdminEvents,
 } as const;
 
@@ -343,6 +358,12 @@ export const RewardValues: Record<string, number> = {
   PLACEMENT_SHARED: 15,
   BADGE_SHARED: 5,
   REFERRAL_SIGNUP: 20,
+
+  // Launchpad
+  POST_CREATED: 10,
+  POST_UPVOTED: 2,
+  COMMENT_CREATED: 5,
+  POST_SHARED: 3,
 };
 
 // ============================================================================
@@ -391,6 +412,9 @@ export function getEventCategory(eventType: EventType): EventCategory {
   }
   if (Object.values(AssessmentEvents).includes(eventType as typeof AssessmentEvents[keyof typeof AssessmentEvents])) {
     return EventCategory.ASSESSMENT;
+  }
+  if (Object.values(LaunchpadEvents).includes(eventType as typeof LaunchpadEvents[keyof typeof LaunchpadEvents])) {
+    return EventCategory.LAUNCHPAD;
   }
   if (Object.values(AdminEvents).includes(eventType as typeof AdminEvents[keyof typeof AdminEvents])) {
     return EventCategory.ADMIN;
