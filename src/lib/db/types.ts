@@ -6,6 +6,8 @@
 
 export type UserType = "STUDENT" | "COMPANY" | "COLLEGE_ADMIN" | "PLATFORM_ADMIN";
 
+export type VerificationStatus = "PENDING" | "APPROVED" | "REJECTED";
+
 export type Gender = "MALE" | "FEMALE" | "OTHER" | "PREFER_NOT_TO_SAY";
 
 export type ProfileCompletionStatus = "INCOMPLETE" | "BASIC" | "COMPLETE" | "VERIFIED";

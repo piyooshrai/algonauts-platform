@@ -27,9 +27,13 @@ const signupSchema = z.object({
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
       "Password must contain uppercase, lowercase, and a number"
     ),
+  phone: z.string().min(10, "Valid phone number required"),
   userType: z.enum(["STUDENT", "COMPANY", "COLLEGE_ADMIN"]).default("STUDENT"),
   referralCode: z.string().optional(),
   collegeId: z.string().optional(), // Pre-fill college for invite link signups
+  companyName: z.string().optional(), // For company signup
+  collegeName: z.string().optional(), // For college admin signup
+  role: z.string().optional(), // For college admin - their role (placement officer, faculty, etc.)
 });
 
 const changePasswordSchema = z.object({
@@ -75,19 +79,27 @@ export const authRouter = createTRPCRouter({
       }
     }
 
+    // Determine verification status based on user type
+    // STUDENT: APPROVED (instant access)
+    // COMPANY/COLLEGE_ADMIN: PENDING (requires admin approval)
+    const verificationStatus = input.userType === "STUDENT" ? "APPROVED" : "PENDING";
+
     // Create user
     const user = await ctx.prisma.user.create({
       data: {
         email: input.email,
         passwordHash,
+        phone: input.phone,
         userType: input.userType as UserType,
+        verificationStatus: verificationStatus as "PENDING" | "APPROVED" | "REJECTED",
       },
       select: {
         id: true,
         email: true,
         userType: true,
+        verificationStatus: true,
       },
-    }) as { id: string; email: string; userType: UserType };
+    }) as { id: string; email: string; userType: UserType; verificationStatus: string };
 
     // Create profile for students (with college if from invite link)
     if (input.userType === "STUDENT") {
@@ -120,10 +132,44 @@ export const authRouter = createTRPCRouter({
 
     // Create company profile for companies
     if (input.userType === "COMPANY") {
+      if (!input.companyName) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Company name is required for company signup",
+        });
+      }
       await ctx.prisma.companyProfile.create({
         data: {
           userId: user.id,
-          companyName: "", // Will be filled in onboarding
+          companyName: input.companyName,
+        },
+      });
+    }
+
+    // Create college admin record for college admins
+    // Note: College will be created or linked after admin approval
+    if (input.userType === "COLLEGE_ADMIN") {
+      if (!input.collegeName) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "College name is required for college admin signup",
+        });
+      }
+      // Store college name in a pending colleges table or create the college
+      // For now, create the college with a pending status
+      const college = await ctx.prisma.college.create({
+        data: {
+          name: input.collegeName,
+          slug: input.collegeName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),
+          isPartner: false, // Will be set to true after verification
+        },
+      });
+
+      await ctx.prisma.collegeAdmin.create({
+        data: {
+          userId: user.id,
+          collegeId: college.id,
+          role: input.role || "admin",
         },
       });
     }
@@ -172,7 +218,10 @@ export const authRouter = createTRPCRouter({
         id: user.id,
         email: user.email,
         userType: user.userType,
+        verificationStatus: user.verificationStatus,
       },
+      // Inform UI if account is pending approval
+      isPendingApproval: user.verificationStatus === "PENDING",
     };
   }),
 
@@ -192,7 +241,9 @@ export const authRouter = createTRPCRouter({
       select: {
         id: true,
         email: true,
+        phone: true,
         userType: true,
+        verificationStatus: true,
         emailVerified: true,
         createdAt: true,
         profile: {
@@ -385,4 +436,60 @@ export const authRouter = createTRPCRouter({
 
     return { success: true };
   }),
+
+  /**
+   * Get college by email domain (for Path 2 student signup)
+   * Used to verify if student's college email belongs to a registered college
+   */
+  getCollegeByEmailDomain: publicProcedure
+    .input(z.object({ email: z.string().email() }))
+    .query(async ({ ctx, input }) => {
+      // Extract domain from email (e.g., "student@iitd.ac.in" -> "iitd.ac.in")
+      const domain = input.email.split("@")[1]?.toLowerCase();
+
+      if (!domain) {
+        return { found: false, college: null };
+      }
+
+      const domainMapping = await ctx.prisma.collegeEmailDomain.findUnique({
+        where: { domain },
+        select: {
+          college: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              logoUrl: true,
+              isPartner: true,
+            },
+          },
+        },
+      });
+
+      if (!domainMapping) {
+        return { found: false, college: null };
+      }
+
+      return {
+        found: true,
+        college: domainMapping.college,
+      };
+    }),
+
+  /**
+   * Verify email domain is from a known college
+   * Quick check without fetching full college details
+   */
+  verifyCollegeEmailDomain: publicProcedure
+    .input(z.object({ domain: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const domainLower = input.domain.toLowerCase();
+
+      const exists = await ctx.prisma.collegeEmailDomain.findUnique({
+        where: { domain: domainLower },
+        select: { collegeId: true },
+      });
+
+      return { isValid: !!exists };
+    }),
 });
