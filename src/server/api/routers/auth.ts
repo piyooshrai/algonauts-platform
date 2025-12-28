@@ -29,6 +29,7 @@ const signupSchema = z.object({
     ),
   userType: z.enum(["STUDENT", "COMPANY", "COLLEGE_ADMIN"]).default("STUDENT"),
   referralCode: z.string().optional(),
+  collegeId: z.string().optional(), // Pre-fill college for invite link signups
 });
 
 const changePasswordSchema = z.object({
@@ -88,11 +89,31 @@ export const authRouter = createTRPCRouter({
       },
     }) as { id: string; email: string; userType: UserType };
 
-    // Create empty profile for students
+    // Create profile for students (with college if from invite link)
     if (input.userType === "STUDENT") {
+      let collegeName: string | null = null;
+
+      // If collegeId provided (from invite link), fetch college name
+      if (input.collegeId) {
+        const college = await ctx.prisma.college.findUnique({
+          where: { id: input.collegeId },
+          select: { name: true },
+        });
+        collegeName = college?.name || null;
+
+        // Update invite stats for signup tracking
+        await ctx.prisma.collegeInviteStats.upsert({
+          where: { collegeId: input.collegeId },
+          create: { collegeId: input.collegeId, signups: 1 },
+          update: { signups: { increment: 1 } },
+        });
+      }
+
       await ctx.prisma.profile.create({
         data: {
           userId: user.id,
+          collegeId: input.collegeId,
+          collegeName,
         },
       });
     }
@@ -127,6 +148,8 @@ export const authRouter = createTRPCRouter({
         method: "credentials",
         hasReferral: !!referrerId,
         referrerId,
+        collegeId: input.collegeId, // Track college invite link signups
+        fromInviteLink: !!input.collegeId,
       },
     });
 

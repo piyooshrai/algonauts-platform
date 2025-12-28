@@ -425,6 +425,7 @@ model College {
   id                String   @id @default(cuid())
   name              String
   shortName         String?
+  slug              String?  @unique  // URL-friendly identifier for invite links
   universityName    String?
 
   // Location
@@ -458,10 +459,12 @@ model College {
   profiles          Profile[]
   admins            CollegeAdmin[]
   bulkImports       BulkImport[]
+  inviteStats       CollegeInviteStats?
 
   @@index([name])
   @@index([state])
   @@index([overallRank])
+  @@index([slug])
 }
 
 model CollegeAdmin {
@@ -495,6 +498,28 @@ model BulkImport {
   college College @relation(fields: [collegeId], references: [id])
 
   @@index([collegeId])
+}
+
+model CollegeInviteStats {
+  id              String   @id @default(cuid())
+  collegeId       String   @unique
+
+  // Link tracking
+  totalVisits     Int      @default(0)
+  uniqueVisitors  Int      @default(0)
+  signups         Int      @default(0)
+
+  // Daily tracking (JSON array of { date, visits, signups })
+  dailyStats      Json?
+
+  // Source tracking
+  whatsappClicks  Int      @default(0)
+  directCopies    Int      @default(0)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  college College @relation(fields: [collegeId], references: [id])
 }
 
 // ============================================================================
