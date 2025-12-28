@@ -27,6 +27,7 @@ import {
   CheckSquare,
   ShieldCheck,
   ClipboardList,
+  Rocket,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/logo";
@@ -38,6 +39,7 @@ const studentTabs = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Jobs", href: "/opportunities", icon: Briefcase },
   { name: "My Activity", href: "/activity", icon: ClipboardList },
+  { name: "Launchpad", href: "/launchpad", icon: Rocket },
   { name: "Leaderboard", href: "/leaderboard", icon: Trophy },
 ];
 

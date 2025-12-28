@@ -26,6 +26,8 @@ import { experimentsRouter } from "./routers/experiments";
 // Phase 5: Polish & Launch routers
 import { adminRouter } from "./routers/admin";
 import { jobsRouter } from "./routers/jobs";
+// Launchpad (Knowledge Sharing)
+import { postsRouter } from "./routers/posts";
 
 /**
  * This is the primary router for the API.
@@ -54,6 +56,8 @@ export const appRouter = createTRPCRouter({
   // Phase 5: Polish & Launch
   admin: adminRouter,
   jobs: jobsRouter,
+  // Launchpad (Knowledge Sharing)
+  posts: postsRouter,
 });
 
 // Export type definition of API
