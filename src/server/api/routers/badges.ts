@@ -279,7 +279,7 @@ export const badgesRouter = createTRPCRouter({
       const userId = input?.userId || ctx.session.user.id;
 
       // Get user's earned badges
-      const earnedBadges = await ctx.prisma.badge.findMany({
+      const earnedBadges = await ctx.prisma.userBadge.findMany({
         where: { userId },
         select: { badgeId: true, earnedAt: true },
       });
@@ -336,7 +336,7 @@ export const badgesRouter = createTRPCRouter({
    * Get user's earned badges
    */
   getEarned: studentProcedure.query(async ({ ctx }) => {
-    const badges = await ctx.prisma.badge.findMany({
+    const badges = await ctx.prisma.userBadge.findMany({
       where: { userId: ctx.session.user.id },
       orderBy: { earnedAt: "desc" },
     });
@@ -389,7 +389,7 @@ export const badgesRouter = createTRPCRouter({
       const badge = BADGES[badgeKey];
 
       // Check if already earned
-      const existing = await ctx.prisma.badge.findFirst({
+      const existing = await ctx.prisma.userBadge.findFirst({
         where: {
           userId,
           badgeId: badge.id,
@@ -401,13 +401,10 @@ export const badgesRouter = createTRPCRouter({
       }
 
       // Award the badge
-      await ctx.prisma.badge.create({
+      await ctx.prisma.userBadge.create({
         data: {
           userId,
           badgeId: badge.id,
-          badgeName: badge.name,
-          badgeIcon: badge.icon,
-          xpAwarded: badge.xpReward,
         },
       });
 
@@ -482,7 +479,7 @@ export const badgesRouter = createTRPCRouter({
     const streak = (profile as any)?.currentStreak || 0;
 
     // Get already earned badges
-    const earnedBadges = await ctx.prisma.badge.findMany({
+    const earnedBadges = await ctx.prisma.userBadge.findMany({
       where: { userId },
       select: { badgeId: true },
     });
@@ -494,13 +491,10 @@ export const badgesRouter = createTRPCRouter({
       const badge = BADGES[badgeKey];
       if (earnedSet.has(badge.id)) return;
 
-      await ctx.prisma.badge.create({
+      await ctx.prisma.userBadge.create({
         data: {
           userId,
           badgeId: badge.id,
-          badgeName: badge.name,
-          badgeIcon: badge.icon,
-          xpAwarded: badge.xpReward,
         },
       });
 
@@ -649,14 +643,14 @@ export const badgesRouter = createTRPCRouter({
     }))
     .mutation(async ({ ctx, input }) => {
       // Verify badge is earned
-      const badge = await ctx.prisma.badge.findFirst({
+      const userBadge = await ctx.prisma.userBadge.findFirst({
         where: {
           userId: ctx.session.user.id,
           badgeId: input.badgeId,
         },
       });
 
-      if (!badge) {
+      if (!userBadge) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Badge not found or not earned",
@@ -721,7 +715,7 @@ export const badgesRouter = createTRPCRouter({
       limit: z.number().min(1).max(50).default(10),
     }).optional())
     .query(async ({ ctx, input }) => {
-      const badges = await ctx.prisma.badge.findMany({
+      const badges = await ctx.prisma.userBadge.findMany({
         where: input?.badgeId ? { badgeId: input.badgeId } : undefined,
         orderBy: { earnedAt: "desc" },
         take: input?.limit || 10,
@@ -729,13 +723,7 @@ export const badgesRouter = createTRPCRouter({
           user: {
             select: {
               id: true,
-              name: true,
-              profile: {
-                select: {
-                  avatarUrl: true,
-                  collegeName: true,
-                },
-              },
+              email: true,
             },
           },
         },
