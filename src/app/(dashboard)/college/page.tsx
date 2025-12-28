@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import {
   GraduationCap,
@@ -11,12 +12,20 @@ import {
   Loader2,
   BarChart3,
   Upload,
+  Link2,
+  Copy,
+  Check,
+  Share2,
+  Eye,
+  UserPlus,
 } from "lucide-react";
 import Link from "next/link";
 import { Button, Card, CardContent, CardHeader, CardTitle, Progress } from "@/components/ui";
 import { api } from "@/lib/trpc/client";
 
 export default function CollegeDashboardPage() {
+  const [copied, setCopied] = useState(false);
+
   // Fetch college data from real API
   const { data: collegeData, isLoading: collegeLoading } = api.profile.getCollegeProfile.useQuery();
   const { data: statsData, isLoading: statsLoading } = api.college.getDashboardStats.useQuery();
@@ -25,8 +34,29 @@ export default function CollegeDashboardPage() {
     sortBy: "rank",
     sortOrder: "asc",
   });
+  const { data: inviteLinkData } = api.college.getInviteLinkStats.useQuery();
 
   const isLoading = collegeLoading || statsLoading;
+
+  // Get invite link URL
+  const inviteLink = inviteLinkData?.slug
+    ? `${typeof window !== "undefined" ? window.location.origin : ""}/join/${inviteLinkData.slug}`
+    : null;
+
+  const handleCopyLink = async () => {
+    if (!inviteLink) return;
+    await navigator.clipboard.writeText(inviteLink);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleWhatsAppShare = () => {
+    if (!inviteLink) return;
+    const message = encodeURIComponent(
+      `Join me on Algonauts - the platform for verified campus placements!\n\n${inviteLink}`
+    );
+    window.open(`https://wa.me/?text=${message}`, "_blank");
+  };
 
   if (isLoading) {
     return (
@@ -133,6 +163,76 @@ export default function CollegeDashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Invite Link Section */}
+      {inviteLink && (
+        <Card className="border-sky-200 bg-gradient-to-r from-sky-50 to-blue-50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Link2 className="h-5 w-5 text-[#0EA5E9]" />
+              Student Invite Link
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center gap-2">
+              <div className="flex-1 p-3 bg-white rounded-lg border border-sky-200 font-mono text-sm truncate">
+                {inviteLink}
+              </div>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handleCopyLink}
+                className="shrink-0"
+              >
+                {copied ? (
+                  <Check className="h-4 w-4 text-green-600" />
+                ) : (
+                  <Copy className="h-4 w-4" />
+                )}
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handleWhatsAppShare}
+                className="shrink-0 text-green-600 hover:text-green-700 hover:bg-green-50"
+              >
+                <Share2 className="h-4 w-4" />
+              </Button>
+            </div>
+
+            <p className="text-sm text-[#6B7280]">
+              Share this link with students to let them sign up and automatically join your college on Algonauts.
+            </p>
+
+            {/* Invite Stats */}
+            {inviteLinkData?.stats && (
+              <div className="grid grid-cols-3 gap-4 pt-4 border-t border-sky-200">
+                <div className="text-center">
+                  <div className="flex items-center justify-center gap-1 text-[#6B7280] mb-1">
+                    <Eye className="h-4 w-4" />
+                    <span className="text-xs">Visits</span>
+                  </div>
+                  <p className="text-xl font-bold text-[#1F2937]">{inviteLinkData.stats.totalVisits}</p>
+                </div>
+                <div className="text-center">
+                  <div className="flex items-center justify-center gap-1 text-[#6B7280] mb-1">
+                    <UserPlus className="h-4 w-4" />
+                    <span className="text-xs">Signups</span>
+                  </div>
+                  <p className="text-xl font-bold text-[#10B981]">{inviteLinkData.stats.signups}</p>
+                </div>
+                <div className="text-center">
+                  <div className="flex items-center justify-center gap-1 text-[#6B7280] mb-1">
+                    <TrendingUp className="h-4 w-4" />
+                    <span className="text-xs">Conversion</span>
+                  </div>
+                  <p className="text-xl font-bold text-[#8B5CF6]">{inviteLinkData.stats.conversionRate}%</p>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Placement Progress */}

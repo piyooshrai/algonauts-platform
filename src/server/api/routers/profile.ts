@@ -735,6 +735,16 @@ export const profileRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.session.user.id;
 
+      // Generate URL-friendly slug from college name
+      const generateSlug = (name: string): string => {
+        return name
+          .toLowerCase()
+          .replace(/[^a-z0-9\s-]/g, "") // Remove special chars
+          .replace(/\s+/g, "-") // Replace spaces with hyphens
+          .replace(/-+/g, "-") // Replace multiple hyphens with single
+          .slice(0, 50); // Limit length
+      };
+
       // Check if user already has a college admin record
       const collegeAdmin = await ctx.prisma.collegeAdmin.findUnique({
         where: { userId },
@@ -744,12 +754,14 @@ export const profileRouter = createTRPCRouter({
       let college;
 
       if (collegeAdmin?.college) {
-        // Update existing college
+        // Update existing college (preserve existing slug if present)
+        const existingSlug = collegeAdmin.college.slug;
         college = await ctx.prisma.college.update({
           where: { id: collegeAdmin.collegeId },
           data: {
             name: input.collegeName,
             shortName: input.shortName,
+            slug: existingSlug || generateSlug(input.collegeName),
             type: input.type,
             city: input.city,
             state: input.state,
@@ -758,11 +770,23 @@ export const profileRouter = createTRPCRouter({
           },
         });
       } else {
+        // Generate unique slug
+        const baseSlug = generateSlug(input.collegeName);
+        let slug = baseSlug;
+        let counter = 1;
+
+        // Check for existing slugs and make unique if needed
+        while (await ctx.prisma.college.findUnique({ where: { slug } })) {
+          slug = `${baseSlug}-${counter}`;
+          counter++;
+        }
+
         // Create new college and link to admin
         college = await ctx.prisma.college.create({
           data: {
             name: input.collegeName,
             shortName: input.shortName,
+            slug,
             type: input.type,
             city: input.city,
             state: input.state,

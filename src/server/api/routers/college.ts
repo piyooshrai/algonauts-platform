@@ -8,6 +8,7 @@ import { TRPCError } from "@trpc/server";
 import {
   createTRPCRouter,
   collegeAdminProcedure,
+  publicProcedure,
 } from "../trpc/trpc";
 import { logEvent, EventTypes } from "@/lib/events";
 import bcrypt from "bcryptjs";
@@ -497,5 +498,152 @@ export const collegeRouter = createTRPCRouter({
     });
 
     return branches.map((b: { branch: string | null }) => b.branch).filter(Boolean) as string[];
+  }),
+
+  // ============================================================================
+  // INVITE LINK SYSTEM
+  // ============================================================================
+
+  /**
+   * Get college by slug (public - for invite link page)
+   */
+  getBySlug: publicProcedure
+    .input(z.object({ slug: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const college = await ctx.prisma.college.findUnique({
+        where: { slug: input.slug },
+        select: {
+          id: true,
+          name: true,
+          shortName: true,
+          city: true,
+          state: true,
+          logoUrl: true,
+          _count: {
+            select: { profiles: true },
+          },
+        },
+      });
+
+      if (!college) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "College not found",
+        });
+      }
+
+      return {
+        id: college.id,
+        name: college.name,
+        shortName: college.shortName,
+        city: college.city,
+        state: college.state,
+        logoUrl: college.logoUrl,
+        studentCount: college._count.profiles,
+      };
+    }),
+
+  /**
+   * Record a visit to the invite link (public)
+   */
+  recordInviteVisit: publicProcedure
+    .input(z.object({
+      slug: z.string(),
+      source: z.enum(["direct", "whatsapp", "copy"]).optional(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const college = await ctx.prisma.college.findUnique({
+        where: { slug: input.slug },
+        select: { id: true },
+      });
+
+      if (!college) {
+        return { success: false };
+      }
+
+      // Upsert invite stats
+      await ctx.prisma.collegeInviteStats.upsert({
+        where: { collegeId: college.id },
+        create: {
+          collegeId: college.id,
+          totalVisits: 1,
+          uniqueVisitors: 1,
+          whatsappClicks: input.source === "whatsapp" ? 1 : 0,
+          directCopies: input.source === "copy" ? 1 : 0,
+        },
+        update: {
+          totalVisits: { increment: 1 },
+          uniqueVisitors: { increment: 1 }, // Simplified - ideally track by IP/session
+          whatsappClicks: input.source === "whatsapp" ? { increment: 1 } : undefined,
+          directCopies: input.source === "copy" ? { increment: 1 } : undefined,
+        },
+      });
+
+      return { success: true };
+    }),
+
+  /**
+   * Record a signup from invite link (public)
+   */
+  recordInviteSignup: publicProcedure
+    .input(z.object({ collegeId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.prisma.collegeInviteStats.upsert({
+        where: { collegeId: input.collegeId },
+        create: {
+          collegeId: input.collegeId,
+          signups: 1,
+        },
+        update: {
+          signups: { increment: 1 },
+        },
+      });
+
+      return { success: true };
+    }),
+
+  /**
+   * Get invite link stats for college admin
+   */
+  getInviteLinkStats: collegeAdminProcedure.query(async ({ ctx }) => {
+    const collegeId = await getCollegeId(ctx);
+
+    const college = await ctx.prisma.college.findUnique({
+      where: { id: collegeId },
+      select: {
+        slug: true,
+        name: true,
+        inviteStats: true,
+      },
+    });
+
+    if (!college?.slug) {
+      return {
+        slug: null,
+        stats: null,
+        message: "Invite link not generated yet. Update your college profile to generate one.",
+      };
+    }
+
+    return {
+      slug: college.slug,
+      stats: college.inviteStats ? {
+        totalVisits: college.inviteStats.totalVisits,
+        uniqueVisitors: college.inviteStats.uniqueVisitors,
+        signups: college.inviteStats.signups,
+        conversionRate: college.inviteStats.totalVisits > 0
+          ? Math.round((college.inviteStats.signups / college.inviteStats.totalVisits) * 100)
+          : 0,
+        whatsappClicks: college.inviteStats.whatsappClicks,
+        directCopies: college.inviteStats.directCopies,
+      } : {
+        totalVisits: 0,
+        uniqueVisitors: 0,
+        signups: 0,
+        conversionRate: 0,
+        whatsappClicks: 0,
+        directCopies: 0,
+      },
+    };
   }),
 });
