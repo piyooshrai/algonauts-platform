@@ -308,64 +308,6 @@ export const applicationsRouter = createTRPCRouter({
     }),
 
   /**
-   * Withdraw an application
-   */
-  withdraw: studentProcedure
-    .input(z.object({ applicationId: z.string() }))
-    .mutation(async ({ ctx, input }) => {
-      const userId = ctx.session.user.id;
-
-      const application = await ctx.prisma.application.findUnique({
-        where: { id: input.applicationId },
-        select: {
-          userId: true,
-          status: true,
-          opportunityId: true,
-        },
-      });
-
-      if (!application || application.userId !== userId) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Application not found",
-        });
-      }
-
-      if (!["DRAFT", "SUBMITTED", "UNDER_REVIEW"].includes(application.status)) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Cannot withdraw application at this stage",
-        });
-      }
-
-      await ctx.prisma.application.update({
-        where: { id: input.applicationId },
-        data: { status: "WITHDRAWN" },
-      });
-
-      // Decrement application count if was submitted
-      if (application.status !== "DRAFT") {
-        await ctx.prisma.opportunity.update({
-          where: { id: application.opportunityId },
-          data: { applicationCount: { decrement: 1 } },
-        });
-      }
-
-      // Log event
-      await logEvent(EventTypes.APPLICATION_WITHDRAW, {
-        userId,
-        userType: ctx.session.user.userType,
-        entityType: "application",
-        entityId: input.applicationId,
-        metadata: {
-          previousStatus: application.status,
-        },
-      });
-
-      return { success: true };
-    }),
-
-  /**
    * Get user's applications
    */
   getMyApplications: studentProcedure
