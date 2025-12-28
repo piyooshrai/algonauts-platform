@@ -20,7 +20,7 @@ import {
   protectedProcedure,
   studentProcedure,
 } from "../trpc/trpc";
-import { logEvent, EventTypes } from "@/lib/events";
+import { logEvent, queueEvent, EventTypes } from "@/lib/events";
 
 // ============================================================================
 // BADGE DEFINITIONS - THE COLLECTION
@@ -289,8 +289,8 @@ export const badgesRouter = createTRPCRouter({
         earnedBadges.map((b: any) => [b.badgeId, b.earnedAt])
       );
 
-      // Log badge gallery view
-      await logEvent(EventTypes.BADGE_GALLERY_VIEWED, {
+      // Log badge gallery view (non-blocking)
+      queueEvent(EventTypes.BADGE_GALLERY_VIEWED, {
         userId: ctx.session.user.id,
         userType: ctx.session.user.userType,
         entityType: "badges",
@@ -341,8 +341,8 @@ export const badgesRouter = createTRPCRouter({
       orderBy: { earnedAt: "desc" },
     });
 
-    // Log view
-    await logEvent(EventTypes.BADGES_VIEWED, {
+    // Log view (non-blocking)
+    queueEvent(EventTypes.BADGES_VIEWED, {
       userId: ctx.session.user.id,
       userType: ctx.session.user.userType,
       entityType: "badges",
@@ -447,42 +447,45 @@ export const badgesRouter = createTRPCRouter({
     const userId = ctx.session.user.id;
     const awardedBadges: string[] = [];
 
-    // Get user's current state
-    const profile = await ctx.prisma.profile.findUnique({
-      where: { userId },
-    });
-
-    const applicationCount = await ctx.prisma.application.count({
-      where: { userId, status: "SUBMITTED" },
-    });
-
-    const placementCount = await ctx.prisma.placement.count({
-      where: { userId },
-    });
-
-    const verified30Count = await ctx.prisma.placement.count({
-      where: { userId, verification30CompletedAt: { not: null } },
-    });
-
-    const verified90Count = await ctx.prisma.placement.count({
-      where: { userId, verification90CompletedAt: { not: null } },
-    });
-
-    const referralCount = await ctx.prisma.invite.count({
-      where: {
-        referredByUserId: userId,
-        status: "ACCEPTED",
-      },
-    });
+    // Get user's current state in parallel
+    const [
+      profile,
+      applicationCount,
+      placementCount,
+      verified30Count,
+      verified90Count,
+      referralCount,
+      earnedBadges,
+    ] = await Promise.all([
+      ctx.prisma.profile.findUnique({
+        where: { userId },
+      }),
+      ctx.prisma.application.count({
+        where: { userId, status: "SUBMITTED" },
+      }),
+      ctx.prisma.placement.count({
+        where: { userId },
+      }),
+      ctx.prisma.placement.count({
+        where: { userId, verification30CompletedAt: { not: null } },
+      }),
+      ctx.prisma.placement.count({
+        where: { userId, verification90CompletedAt: { not: null } },
+      }),
+      ctx.prisma.invite.count({
+        where: {
+          referredByUserId: userId,
+          status: "ACCEPTED",
+        },
+      }),
+      ctx.prisma.userBadge.findMany({
+        where: { userId },
+        select: { badgeId: true },
+      }),
+    ]);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const streak = (profile as any)?.currentStreak || 0;
-
-    // Get already earned badges
-    const earnedBadges = await ctx.prisma.userBadge.findMany({
-      where: { userId },
-      select: { badgeId: true },
-    });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const earnedSet = new Set(earnedBadges.map((b: any) => b.badgeId));
 
@@ -572,21 +575,21 @@ export const badgesRouter = createTRPCRouter({
   getProgress: studentProcedure.query(async ({ ctx }) => {
     const userId = ctx.session.user.id;
 
-    // Get user's current stats
-    const applicationCount = await ctx.prisma.application.count({
-      where: { userId, status: "SUBMITTED" },
-    });
-
-    const profile = await ctx.prisma.profile.findUnique({
-      where: { userId },
-    });
-
-    const referralCount = await ctx.prisma.invite.count({
-      where: {
-        referredByUserId: userId,
-        status: "ACCEPTED",
-      },
-    });
+    // Get user's current stats in parallel
+    const [applicationCount, profile, referralCount] = await Promise.all([
+      ctx.prisma.application.count({
+        where: { userId, status: "SUBMITTED" },
+      }),
+      ctx.prisma.profile.findUnique({
+        where: { userId },
+      }),
+      ctx.prisma.invite.count({
+        where: {
+          referredByUserId: userId,
+          status: "ACCEPTED",
+        },
+      }),
+    ]);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const streak = (profile as any)?.currentStreak || 0;
@@ -729,8 +732,8 @@ export const badgesRouter = createTRPCRouter({
         },
       });
 
-      // Log view
-      await logEvent(EventTypes.BADGE_EARNERS_VIEWED, {
+      // Log view (non-blocking)
+      queueEvent(EventTypes.BADGE_EARNERS_VIEWED, {
         userId: ctx.session.user.id,
         userType: ctx.session.user.userType,
         entityType: "badges",

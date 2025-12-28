@@ -19,7 +19,7 @@ import {
   protectedProcedure,
   studentProcedure,
 } from "../trpc/trpc";
-import { logEvent, EventTypes } from "@/lib/events";
+import { queueEvent, EventTypes } from "@/lib/events";
 
 // ============================================================================
 // SCHEMAS
@@ -79,10 +79,10 @@ export const leaderboardsRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const userId = ctx.session.user.id;
 
-      // Get user's profile for filtering
+      // Get user's profile for filtering and metrics in one query
       const profile = await ctx.prisma.profile.findUnique({
         where: { userId },
-        select: { collegeId: true, collegeName: true, state: true },
+        select: { collegeId: true, collegeName: true, state: true, totalXp: true, currentStreak: true },
       });
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -108,56 +108,50 @@ export const leaderboardsRouter = createTRPCRouter({
         // Need to count applications separately
       }
 
-      // Get leaderboard data
-      const profiles = await ctx.prisma.profile.findMany({
-        where: whereClause,
-        orderBy,
-        take: input.limit,
-        select: {
-          userId: true,
-          totalXp: true,
-          currentStreak: true,
-          collegeName: true,
-          avatarUrl: true,
-          layersRankOverall: true,
-          displayName: true,
-          firstName: true,
-          lastName: true,
-          user: {
-            select: {
-              id: true,
-            },
-          },
-        },
-      });
-
-      // Get total count for percentile calculation
-      const totalCount = await ctx.prisma.profile.count({
-        where: whereClause,
-      });
-
-      // Find user's position
-      const userProfile = await ctx.prisma.profile.findUnique({
-        where: { userId },
-        select: { totalXp: true, currentStreak: true },
-      });
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const userProfileData = userProfile as any;
+      // User's metric value for rank calculation
       const userMetricValue =
         input.metric === "streak"
-          ? userProfileData?.currentStreak || 0
-          : userProfileData?.totalXp || 0;
+          ? profileData?.currentStreak || 0
+          : profileData?.totalXp || 0;
 
-      // Count users with higher score
-      const higherCount = await ctx.prisma.profile.count({
-        where: {
-          ...whereClause,
-          [input.metric === "streak" ? "currentStreak" : "totalXp"]: {
-            gt: userMetricValue,
+      // Run all queries in parallel
+      const [profiles, totalCount, higherCount] = await Promise.all([
+        // Get leaderboard data
+        ctx.prisma.profile.findMany({
+          where: whereClause,
+          orderBy,
+          take: input.limit,
+          select: {
+            userId: true,
+            totalXp: true,
+            currentStreak: true,
+            collegeName: true,
+            avatarUrl: true,
+            layersRankOverall: true,
+            displayName: true,
+            firstName: true,
+            lastName: true,
+            user: {
+              select: {
+                id: true,
+              },
+            },
           },
-        },
-      });
+        }),
+        // Get total count for percentile calculation
+        ctx.prisma.profile.count({
+          where: whereClause,
+        }),
+        // Count users with higher score
+        ctx.prisma.profile.count({
+          where: {
+            ...whereClause,
+            [input.metric === "streak" ? "currentStreak" : "totalXp"]: {
+              gt: userMetricValue,
+            },
+          },
+        }),
+      ]);
 
       const userRank = higherCount + 1;
       const percentile = calculatePercentile(userRank, totalCount);
@@ -232,8 +226,8 @@ export const leaderboardsRouter = createTRPCRouter({
           ? leaderboard[top10Threshold - 1].score - userMetricValue + 1
           : 0;
 
-      // Log leaderboard view
-      await logEvent(EventTypes.LEADERBOARD_VIEWED, {
+      // Log leaderboard view (non-blocking)
+      queueEvent(EventTypes.LEADERBOARD_VIEWED, {
         userId,
         userType: ctx.session.user.userType,
         entityType: "leaderboard",
@@ -364,8 +358,8 @@ export const leaderboardsRouter = createTRPCRouter({
         };
       }
 
-      // Log view
-      await logEvent(EventTypes.COLLEGE_LEADERBOARD_VIEWED, {
+      // Log view (non-blocking)
+      queueEvent(EventTypes.COLLEGE_LEADERBOARD_VIEWED, {
         userId,
         userType: ctx.session.user.userType,
         entityType: "college_leaderboard",
@@ -482,8 +476,8 @@ export const leaderboardsRouter = createTRPCRouter({
       ctx.prisma.profile.count(),
     ]);
 
-    // Log view
-    await logEvent(EventTypes.RANKING_SUMMARY_VIEWED, {
+    // Log view (non-blocking)
+    queueEvent(EventTypes.RANKING_SUMMARY_VIEWED, {
       userId,
       userType: ctx.session.user.userType,
       entityType: "ranking",
@@ -598,55 +592,56 @@ export const leaderboardsRouter = createTRPCRouter({
         whereClause = { state: profileData.state };
       }
 
-      // Get user's rank
-      const higherCount = await ctx.prisma.profile.count({
-        where: {
-          ...whereClause,
-          totalXp: { gt: profileData?.totalXp || 0 },
-        },
-      });
+      // Get user's rank and nearby users in parallel
+      const [higherCount, usersAbove, usersBelow] = await Promise.all([
+        // Get user's rank
+        ctx.prisma.profile.count({
+          where: {
+            ...whereClause,
+            totalXp: { gt: profileData?.totalXp || 0 },
+          },
+        }),
+        // Get users above
+        ctx.prisma.profile.findMany({
+          where: {
+            ...whereClause,
+            totalXp: { gt: profileData?.totalXp || 0 },
+          },
+          orderBy: { totalXp: "asc" },
+          take: range,
+          select: {
+            userId: true,
+            totalXp: true,
+            avatarUrl: true,
+            collegeName: true,
+            displayName: true,
+            firstName: true,
+            lastName: true,
+          },
+        }),
+        // Get users below
+        ctx.prisma.profile.findMany({
+          where: {
+            ...whereClause,
+            totalXp: { lt: profileData?.totalXp || 0 },
+          },
+          orderBy: { totalXp: "desc" },
+          take: range,
+          select: {
+            userId: true,
+            totalXp: true,
+            avatarUrl: true,
+            collegeName: true,
+            displayName: true,
+            firstName: true,
+            lastName: true,
+          },
+        }),
+      ]);
       const userRank = higherCount + 1;
 
-      // Get users above
-      const usersAbove = await ctx.prisma.profile.findMany({
-        where: {
-          ...whereClause,
-          totalXp: { gt: profileData?.totalXp || 0 },
-        },
-        orderBy: { totalXp: "asc" },
-        take: range,
-        select: {
-          userId: true,
-          totalXp: true,
-          avatarUrl: true,
-          collegeName: true,
-          displayName: true,
-          firstName: true,
-          lastName: true,
-        },
-      });
-
-      // Get users below
-      const usersBelow = await ctx.prisma.profile.findMany({
-        where: {
-          ...whereClause,
-          totalXp: { lt: profileData?.totalXp || 0 },
-        },
-        orderBy: { totalXp: "desc" },
-        take: range,
-        select: {
-          userId: true,
-          totalXp: true,
-          avatarUrl: true,
-          collegeName: true,
-          displayName: true,
-          firstName: true,
-          lastName: true,
-        },
-      });
-
-      // Log view
-      await logEvent(EventTypes.NEARBY_COMPETITORS_VIEWED, {
+      // Log view (non-blocking)
+      queueEvent(EventTypes.NEARBY_COMPETITORS_VIEWED, {
         userId,
         userType: ctx.session.user.userType,
         entityType: "leaderboard",
