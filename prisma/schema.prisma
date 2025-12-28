@@ -157,7 +157,7 @@ model User {
   phone         String?
   phoneVerified DateTime?
   userType      UserType  @default(STUDENT)
-  verificationStatus VerificationStatus? @default(APPROVED) // PENDING for company/college signups, nullable for existing users
+  // verificationStatus VerificationStatus? @default(APPROVED) // TODO: Uncomment after adding column to DB
   isActive      Boolean   @default(true)
   lastLoginAt   DateTime?
   createdAt     DateTime  @default(now())

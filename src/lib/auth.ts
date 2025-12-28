@@ -76,7 +76,6 @@ export const authOptions: NextAuthOptions = {
             email: true,
             passwordHash: true,
             userType: true,
-            verificationStatus: true,
             isActive: true,
             profile: {
               select: {
@@ -91,7 +90,6 @@ export const authOptions: NextAuthOptions = {
           email: string;
           passwordHash: string | null;
           userType: UserType;
-          verificationStatus: VerificationStatus | null;
           isActive: boolean;
           profile: { firstName: string | null; lastName: string | null; avatarUrl: string | null } | null;
         } | null;
@@ -132,7 +130,7 @@ export const authOptions: NextAuthOptions = {
           id: user.id,
           email: user.email,
           userType: user.userType,
-          verificationStatus: user.verificationStatus ?? "APPROVED",
+          verificationStatus: "APPROVED" as VerificationStatus, // TODO: Read from DB once column is added
           name: user.profile
             ? `${user.profile.firstName ?? ""} ${user.profile.lastName ?? ""}`.trim()
             : null,
