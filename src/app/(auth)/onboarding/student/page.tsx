@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -69,7 +69,7 @@ const graduationYears = [
   { value: "graduated", label: "Already Graduated" },
 ];
 
-export default function StudentOnboardingPage() {
+function StudentOnboardingContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [currentStep, setCurrentStep] = useState(0);
@@ -659,5 +659,17 @@ export default function StudentOnboardingPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function StudentOnboardingPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    }>
+      <StudentOnboardingContent />
+    </Suspense>
   );
 }

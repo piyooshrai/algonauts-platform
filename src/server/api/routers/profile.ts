@@ -30,8 +30,6 @@ interface ProfileData {
   graduationYear: number | null;
   resumeUrl: string | null;
   skills: string[];
-  linkedinUrl: string | null;
-  githubUrl: string | null;
 }
 
 const PROFILE_WEIGHTS = {
@@ -45,8 +43,6 @@ const PROFILE_WEIGHTS = {
   graduationYear: 5,
   resumeUrl: 15,
   skills: 10, // At least 3 skills
-  linkedinUrl: 5,
-  githubUrl: 5,
 };
 
 function calculateProfileCompletion(profile: ProfileData): number {
@@ -62,10 +58,8 @@ function calculateProfileCompletion(profile: ProfileData): number {
   if (profile.graduationYear) score += PROFILE_WEIGHTS.graduationYear;
   if (profile.resumeUrl) score += PROFILE_WEIGHTS.resumeUrl;
   if (profile.skills.length >= 3) score += PROFILE_WEIGHTS.skills;
-  if (profile.linkedinUrl) score += PROFILE_WEIGHTS.linkedinUrl;
-  if (profile.githubUrl) score += PROFILE_WEIGHTS.githubUrl;
 
-  return Math.min(score, 100);
+  return Math.min(score, 90);
 }
 
 function getCompletionStatus(percentage: number): "INCOMPLETE" | "BASIC" | "COMPLETE" | "VERIFIED" {
@@ -606,20 +600,8 @@ export const profileRouter = createTRPCRouter({
           completed: profile.skills.length >= 3,
           points: 10,
         },
-        {
-          id: "linkedin",
-          label: "Connect LinkedIn",
-          completed: !!profile.linkedinUrl,
-          points: 5,
-        },
-        {
-          id: "github",
-          label: "Connect GitHub",
-          completed: !!profile.githubUrl,
-          points: 5,
-        },
       ],
-      totalPoints: 100,
+      totalPoints: 90,
       earnedPoints: calculateProfileCompletion(profile),
     };
   }),
