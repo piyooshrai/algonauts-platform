@@ -1,17 +1,15 @@
 /**
  * NextAuth Configuration
- * Handles authentication with credentials and OAuth providers
+ * Handles authentication with credentials (email/password only)
  */
 
 import { type NextAuthOptions } from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import CredentialsProvider from "next-auth/providers/credentials";
-import GoogleProvider from "next-auth/providers/google";
-import LinkedInProvider from "next-auth/providers/linkedin";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/server/db";
 import { logEvent, EventTypes } from "@/lib/events";
-import type { UserType } from "@/lib/db/types";
+import type { UserType, VerificationStatus } from "@/lib/db/types";
 
 declare module "next-auth" {
   interface Session {
@@ -19,6 +17,7 @@ declare module "next-auth" {
       id: string;
       email: string;
       userType: UserType;
+      verificationStatus: VerificationStatus;
       name?: string | null;
       image?: string | null;
     };
@@ -28,6 +27,7 @@ declare module "next-auth" {
     id: string;
     email: string;
     userType: UserType;
+    verificationStatus: VerificationStatus;
     name?: string | null;
     image?: string | null;
   }
@@ -38,6 +38,7 @@ declare module "next-auth/jwt" {
     id: string;
     email: string;
     userType: UserType;
+    verificationStatus: VerificationStatus;
   }
 }
 
@@ -75,6 +76,7 @@ export const authOptions: NextAuthOptions = {
             email: true,
             passwordHash: true,
             userType: true,
+            verificationStatus: true,
             isActive: true,
             profile: {
               select: {
@@ -89,6 +91,7 @@ export const authOptions: NextAuthOptions = {
           email: string;
           passwordHash: string | null;
           userType: UserType;
+          verificationStatus: VerificationStatus;
           isActive: boolean;
           profile: { firstName: string | null; lastName: string | null; avatarUrl: string | null } | null;
         } | null;
@@ -129,6 +132,7 @@ export const authOptions: NextAuthOptions = {
           id: user.id,
           email: user.email,
           userType: user.userType,
+          verificationStatus: user.verificationStatus,
           name: user.profile
             ? `${user.profile.firstName ?? ""} ${user.profile.lastName ?? ""}`.trim()
             : null,
@@ -136,93 +140,20 @@ export const authOptions: NextAuthOptions = {
         };
       },
     }),
-
-    // Google OAuth (optional)
-    ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
-      ? [
-          GoogleProvider({
-            clientId: process.env.GOOGLE_CLIENT_ID,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-            allowDangerousEmailAccountLinking: true,
-          }),
-        ]
-      : []),
-
-    // LinkedIn OAuth (optional)
-    ...(process.env.LINKEDIN_CLIENT_ID && process.env.LINKEDIN_CLIENT_SECRET
-      ? [
-          LinkedInProvider({
-            clientId: process.env.LINKEDIN_CLIENT_ID,
-            clientSecret: process.env.LINKEDIN_CLIENT_SECRET,
-            authorization: {
-              params: { scope: "openid profile email" },
-            },
-          }),
-        ]
-      : []),
   ],
 
   callbacks: {
-    async signIn({ user, account }) {
-      // For OAuth providers, ensure user exists in our system
-      if (account?.provider !== "credentials") {
-        const existingUser = await prisma.user.findUnique({
-          where: { email: user.email! },
-        }) as { id: string; userType: UserType } | null;
-
-        if (existingUser) {
-          // Update last login
-          await prisma.user.update({
-            where: { id: existingUser.id },
-            data: { lastLoginAt: new Date() },
-          });
-
-          // Log login event
-          await logEvent(EventTypes.USER_LOGIN, {
-            userId: existingUser.id,
-            userType: existingUser.userType,
-            metadata: {
-              method: account?.provider,
-            },
-          });
-        } else {
-          // Log signup event for new OAuth users
-          // The adapter will create the user
-          // We'll log after JWT callback where we have the user ID
-        }
-      }
-
+    async signIn() {
+      // Credentials-only authentication, always allow
       return true;
     },
 
-    async jwt({ token, user, account }) {
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
         token.email = user.email!;
         token.userType = user.userType ?? "STUDENT";
-      }
-
-      // For new OAuth users, log signup event
-      if (account && account.provider !== "credentials" && user) {
-        const existingUser = await prisma.user.findUnique({
-          where: { id: user.id },
-          select: { createdAt: true },
-        }) as { createdAt: Date } | null;
-
-        // If user was just created (within last 10 seconds), log signup
-        if (existingUser) {
-          const timeSinceCreation =
-            Date.now() - existingUser.createdAt.getTime();
-          if (timeSinceCreation < 10000) {
-            await logEvent(EventTypes.USER_SIGNUP, {
-              userId: user.id,
-              userType: token.userType,
-              metadata: {
-                method: account.provider,
-              },
-            });
-          }
-        }
+        token.verificationStatus = user.verificationStatus ?? "APPROVED";
       }
 
       return token;
@@ -233,6 +164,7 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.id;
         session.user.email = token.email;
         session.user.userType = token.userType;
+        session.user.verificationStatus = token.verificationStatus;
       }
       return session;
     },

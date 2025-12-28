@@ -23,6 +23,12 @@ enum UserType {
   PLATFORM_ADMIN
 }
 
+enum VerificationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 enum Gender {
   MALE
   FEMALE
@@ -151,6 +157,7 @@ model User {
   phone         String?
   phoneVerified DateTime?
   userType      UserType  @default(STUDENT)
+  verificationStatus VerificationStatus @default(APPROVED) // PENDING for company/college signups
   isActive      Boolean   @default(true)
   lastLoginAt   DateTime?
   createdAt     DateTime  @default(now())
@@ -460,11 +467,25 @@ model College {
   admins            CollegeAdmin[]
   bulkImports       BulkImport[]
   inviteStats       CollegeInviteStats?
+  emailDomains      CollegeEmailDomain[]
 
   @@index([name])
   @@index([state])
   @@index([overallRank])
   @@index([slug])
+}
+
+// Email domains that map to colleges for student signup verification
+model CollegeEmailDomain {
+  id        String   @id @default(cuid())
+  domain    String   @unique  // e.g., "iitd.ac.in", "bits-pilani.ac.in"
+  collegeId String
+
+  createdAt DateTime @default(now())
+
+  college   College  @relation(fields: [collegeId], references: [id])
+
+  @@index([domain])
 }
 
 model CollegeAdmin {
