@@ -19,6 +19,7 @@ import {
 import { Button, Input, Select, Progress } from "@/components/ui";
 import { Logo } from "@/components/logo";
 import { cn } from "@/lib/utils";
+import { api } from "@/lib/trpc/client";
 
 const steps = [
   { id: "basic", title: "Basic Info", icon: User },
@@ -179,14 +180,38 @@ export default function StudentOnboardingPage() {
     }
   };
 
+  // Profile update mutation
+  const updateProfileMutation = api.profile.update.useMutation({
+    onSuccess: () => {
+      router.push("/dashboard");
+    },
+    onError: (error) => {
+      console.error("Failed to save profile:", error);
+      setErrors({ submit: error.message || "Failed to save profile. Please try again." });
+      setIsLoading(false);
+    },
+  });
+
   const handleComplete = async () => {
     setIsLoading(true);
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    // Parse graduation year
+    const gradYear = formData.graduationYear === "graduated"
+      ? new Date().getFullYear()
+      : parseInt(formData.graduationYear);
 
-    // TODO: Save onboarding data
-    router.push("/dashboard");
+    // Save profile data via tRPC
+    updateProfileMutation.mutate({
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      collegeName: formData.college,
+      degree: degreeOptions.find(d => d.value === formData.degree)?.label || formData.degree,
+      branch: majorOptions.find(m => m.value === formData.major)?.label || formData.major,
+      graduationYear: gradYear,
+      skills: formData.skills,
+      // Note: Resume upload would need a separate file upload endpoint
+      // For now, we save the other fields
+    });
   };
 
   const renderStep = () => {

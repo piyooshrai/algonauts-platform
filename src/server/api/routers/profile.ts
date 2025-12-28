@@ -9,6 +9,8 @@ import { TRPCError } from "@trpc/server";
 import {
   createTRPCRouter,
   studentProcedure,
+  companyProcedure,
+  collegeAdminProcedure,
   publicProcedure,
 } from "../trpc/trpc";
 import { logEvent, EventTypes, logGamificationEvent } from "@/lib/events";
@@ -620,5 +622,210 @@ export const profileRouter = createTRPCRouter({
       totalPoints: 100,
       earnedPoints: calculateProfileCompletion(profile),
     };
+  }),
+
+  // ============================================================================
+  // COMPANY PROFILE OPERATIONS
+  // ============================================================================
+
+  /**
+   * Update company profile (for company onboarding)
+   */
+  updateCompanyProfile: companyProcedure
+    .input(
+      z.object({
+        companyName: z.string().min(1).max(200),
+        industry: z.string().optional(),
+        companySize: z.string().optional(),
+        website: z.string().url().optional().nullable(),
+        contactName: z.string().optional(),
+        contactEmail: z.string().email().optional(),
+        contactPhone: z.string().optional(),
+        description: z.string().optional(),
+        headquarters: z.string().optional(),
+        logoUrl: z.string().url().optional().nullable(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+
+      const companyProfile = await ctx.prisma.companyProfile.findUnique({
+        where: { userId },
+      });
+
+      if (!companyProfile) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Company profile not found",
+        });
+      }
+
+      const updatedProfile = await ctx.prisma.companyProfile.update({
+        where: { userId },
+        data: {
+          companyName: input.companyName,
+          industry: input.industry,
+          companySize: input.companySize,
+          website: input.website,
+          contactName: input.contactName,
+          contactEmail: input.contactEmail,
+          contactPhone: input.contactPhone,
+          description: input.description,
+          headquarters: input.headquarters,
+          logoUrl: input.logoUrl,
+        },
+      });
+
+      // Log company profile update
+      await logEvent(EventTypes.PROFILE_UPDATE, {
+        userId,
+        userType: ctx.session.user.userType,
+        metadata: {
+          entityType: "company",
+          fieldsUpdated: Object.keys(input),
+        },
+      });
+
+      return { success: true, profile: updatedProfile };
+    }),
+
+  /**
+   * Get company profile
+   */
+  getCompanyProfile: companyProcedure.query(async ({ ctx }) => {
+    const companyProfile = await ctx.prisma.companyProfile.findUnique({
+      where: { userId: ctx.session.user.id },
+      include: {
+        opportunities: {
+          take: 5,
+          orderBy: { createdAt: "desc" },
+        },
+      },
+    });
+
+    if (!companyProfile) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Company profile not found",
+      });
+    }
+
+    return { profile: companyProfile };
+  }),
+
+  // ============================================================================
+  // COLLEGE ADMIN OPERATIONS
+  // ============================================================================
+
+  /**
+   * Create or update college (for college onboarding)
+   */
+  setupCollege: collegeAdminProcedure
+    .input(
+      z.object({
+        collegeName: z.string().min(1).max(200),
+        shortName: z.string().max(50).optional(),
+        type: z.string().optional(),
+        city: z.string().optional(),
+        state: z.string().optional(),
+        website: z.string().url().optional().nullable(),
+        establishedYear: z.number().min(1800).max(2030).optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+
+      // Check if user already has a college admin record
+      const collegeAdmin = await ctx.prisma.collegeAdmin.findUnique({
+        where: { userId },
+        include: { college: true },
+      });
+
+      let college;
+
+      if (collegeAdmin?.college) {
+        // Update existing college
+        college = await ctx.prisma.college.update({
+          where: { id: collegeAdmin.collegeId },
+          data: {
+            name: input.collegeName,
+            shortName: input.shortName,
+            type: input.type,
+            city: input.city,
+            state: input.state,
+            website: input.website,
+            establishedYear: input.establishedYear,
+          },
+        });
+      } else {
+        // Create new college and link to admin
+        college = await ctx.prisma.college.create({
+          data: {
+            name: input.collegeName,
+            shortName: input.shortName,
+            type: input.type,
+            city: input.city,
+            state: input.state,
+            website: input.website,
+            establishedYear: input.establishedYear,
+          },
+        });
+
+        // Create or update college admin record
+        if (collegeAdmin) {
+          await ctx.prisma.collegeAdmin.update({
+            where: { userId },
+            data: { collegeId: college.id },
+          });
+        } else {
+          await ctx.prisma.collegeAdmin.create({
+            data: {
+              userId,
+              collegeId: college.id,
+              role: "admin",
+            },
+          });
+        }
+      }
+
+      // Log college setup
+      await logEvent(EventTypes.PROFILE_UPDATE, {
+        userId,
+        userType: ctx.session.user.userType,
+        metadata: {
+          entityType: "college",
+          collegeId: college.id,
+          fieldsUpdated: Object.keys(input),
+        },
+      });
+
+      return { success: true, college };
+    }),
+
+  /**
+   * Get college profile for admin
+   */
+  getCollegeProfile: collegeAdminProcedure.query(async ({ ctx }) => {
+    const collegeAdmin = await ctx.prisma.collegeAdmin.findUnique({
+      where: { userId: ctx.session.user.id },
+      include: {
+        college: {
+          include: {
+            profiles: {
+              select: { id: true },
+            },
+          },
+        },
+      },
+    });
+
+    if (!collegeAdmin?.college) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "College not found. Please complete onboarding.",
+      });
+    }
+
+    return { college: collegeAdmin.college, role: collegeAdmin.role };
   }),
 });

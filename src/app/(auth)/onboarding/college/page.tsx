@@ -16,6 +16,7 @@ import {
 import { Button, Input, Select } from "@/components/ui";
 import { Logo } from "@/components/logo";
 import { cn } from "@/lib/utils";
+import { api } from "@/lib/trpc/client";
 
 const stateOptions = [
   { value: "andhra_pradesh", label: "Andhra Pradesh" },
@@ -119,6 +120,18 @@ export default function CollegeOnboardingPage() {
     }
   };
 
+  // College setup mutation
+  const setupCollegeMutation = api.profile.setupCollege.useMutation({
+    onSuccess: () => {
+      router.push("/admin/college");
+    },
+    onError: (error) => {
+      console.error("Failed to save college profile:", error);
+      setErrors({ submit: error.message || "Failed to save college. Please try again." });
+      setIsLoading(false);
+    },
+  });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -126,11 +139,14 @@ export default function CollegeOnboardingPage() {
 
     setIsLoading(true);
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    // TODO: Save onboarding data
-    router.push("/admin/college");
+    // Save college data via tRPC
+    setupCollegeMutation.mutate({
+      collegeName: formData.collegeName,
+      type: collegeTypeOptions.find(t => t.value === formData.collegeType)?.label || formData.collegeType,
+      city: formData.city,
+      state: stateOptions.find(s => s.value === formData.state)?.label || formData.state,
+      // Logo upload would need a separate file upload endpoint
+    });
   };
 
   return (
