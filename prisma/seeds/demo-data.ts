@@ -220,10 +220,9 @@ async function seedCompanies() {
       create: {
         userId: user.id,
         companyName: company.name,
-        shortName: company.short,
         industry: company.domain,
-        size: company.size,
-        location: `${company.city}, India`,
+        companySize: company.size,
+        headquarters: `${company.city}, India`,
         website: `https://www.${slug}.com`,
         description: `${company.name} is a leading ${company.domain} company headquartered in ${company.city}.`,
         isVerified: true,
