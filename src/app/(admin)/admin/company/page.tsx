@@ -12,6 +12,7 @@ import {
   CheckCircle2,
   XCircle,
   AlertCircle,
+  Loader2,
 } from "lucide-react";
 import { StatCard } from "@/components";
 import {
@@ -22,40 +23,76 @@ import {
   CardDescription,
   Badge,
   Progress,
-  Avatar,
 } from "@/components/ui";
-
-// Mock data
-const recentInvitations = [
-  { id: 1, candidateId: "C-2458", rank: 45, college: "IIT Delhi", status: "accepted", sentAt: "2024-01-15" },
-  { id: 2, candidateId: "C-1892", rank: 67, college: "IIT Bombay", status: "pending", sentAt: "2024-01-14" },
-  { id: 3, candidateId: "C-3215", rank: 89, college: "NIT Trichy", status: "pending", sentAt: "2024-01-14" },
-  { id: 4, candidateId: "C-2876", rank: 112, college: "IIT Madras", status: "declined", sentAt: "2024-01-13" },
-  { id: 5, candidateId: "C-1654", rank: 34, college: "BITS Pilani", status: "accepted", sentAt: "2024-01-12" },
-];
-
-const upcomingInterviews = [
-  { id: 1, candidate: "Priya S.", role: "Software Engineer", date: "2024-01-20", time: "10:00 AM" },
-  { id: 2, candidate: "Rahul V.", role: "Data Analyst", date: "2024-01-20", time: "2:00 PM" },
-  { id: 3, candidate: "Ananya P.", role: "Product Manager", date: "2024-01-21", time: "11:00 AM" },
-];
-
-const hiringPipeline = [
-  { stage: "Invitations Sent", count: 156, color: "bg-blue-500" },
-  { stage: "Accepted", count: 89, color: "bg-purple-500" },
-  { stage: "Interviewed", count: 45, color: "bg-amber-500" },
-  { stage: "Offers Made", count: 23, color: "bg-green-500" },
-  { stage: "Hired", count: 18, color: "bg-primary" },
-];
-
-const topMatchingCandidates = [
-  { id: 1, rank: 23, college: "Tier 1", technical: 92, behavioral: 88, match: 95 },
-  { id: 2, rank: 45, college: "Tier 1", technical: 89, behavioral: 91, match: 92 },
-  { id: 3, rank: 67, college: "Tier 1", technical: 87, behavioral: 85, match: 88 },
-  { id: 4, rank: 89, college: "Tier 2", technical: 85, behavioral: 82, match: 84 },
-];
+import { api } from "@/lib/trpc/client";
 
 export default function CompanyDashboard() {
+  // Fetch invite stats
+  const { data: inviteStats, isLoading: statsLoading } = api.invites.getStats.useQuery();
+
+  // Fetch sent invites
+  const { data: sentInvites, isLoading: invitesLoading } = api.invites.getSent.useQuery({});
+
+  // Fetch top candidates from leaderboard
+  const { data: leaderboardData } = api.leaderboards.getStudentLeaderboard.useQuery({
+    scope: "national",
+    metric: "xp",
+    limit: 4,
+  });
+
+  const isLoading = statsLoading || invitesLoading;
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  // Process invite data
+  const recentInvitations = (sentInvites || []).slice(0, 5).map((invite: {
+    id: string;
+    user: { id: string; profile: { firstName?: string | null; lastName?: string | null; collegeName?: string | null; layersRankOverall?: number | null } | null };
+    status: string;
+    createdAt: Date;
+  }) => ({
+    id: invite.id,
+    candidateId: `C-${invite.user.id.slice(0, 4)}`,
+    rank: invite.user.profile?.layersRankOverall || 0,
+    college: invite.user.profile?.collegeName || "Unknown",
+    status: invite.status.toLowerCase(),
+    sentAt: invite.createdAt,
+  }));
+
+  // Hiring pipeline from stats
+  const stats = inviteStats?.byStatus || { pending: 0, viewed: 0, accepted: 0, declined: 0, expired: 0 };
+  const totalInvites = stats.pending + stats.viewed + stats.accepted + stats.declined + stats.expired;
+
+  const hiringPipeline = [
+    { stage: "Invitations Sent", count: totalInvites, color: "bg-blue-500" },
+    { stage: "Viewed", count: stats.viewed + stats.accepted + stats.declined, color: "bg-purple-500" },
+    { stage: "Accepted", count: stats.accepted, color: "bg-amber-500" },
+    { stage: "Pending", count: stats.pending, color: "bg-gray-500" },
+  ];
+
+  // Top candidates from leaderboard
+  const topMatchingCandidates = (leaderboardData?.leaderboard || []).map((student: {
+    userId: string;
+    rank: number;
+    name: string;
+    collegeName?: string | null;
+    score: number;
+  }, idx: number) => ({
+    id: idx + 1,
+    rank: student.rank,
+    college: student.collegeName?.includes("IIT") || student.collegeName?.includes("NIT") ? "Tier 1" : "Tier 2",
+    name: student.name,
+    match: Math.max(70, 100 - (student.rank * 2)),
+    // Derived scores based on rank (since we don't have real skill data)
+    technical: Math.max(60, 95 - (student.rank * 3)),
+    behavioral: Math.max(65, 90 - (student.rank * 2)),
+  }));
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "accepted":
@@ -115,30 +152,27 @@ export default function CompanyDashboard() {
       >
         <StatCard
           title="Active Invitations"
-          value="156"
+          value={String(totalInvites)}
           icon={Mail}
-          change={{ value: 23, positive: true }}
-          description="Total sent this month"
+          description={`${stats.pending} pending responses`}
         />
         <StatCard
           title="Response Rate"
-          value="57%"
+          value={`${inviteStats?.viewRate || 0}%`}
           icon={TrendingUp}
-          change={{ value: 8, positive: true }}
-          description="Above industry avg"
+          description="Viewed or responded"
         />
         <StatCard
-          title="Interviews Scheduled"
-          value="12"
+          title="Acceptance Rate"
+          value={`${inviteStats?.acceptanceRate || 0}%`}
           icon={Calendar}
-          description="This week"
+          description={`${stats.accepted} accepted`}
         />
         <StatCard
-          title="Hires Made"
-          value="18"
+          title="Invites Remaining"
+          value={String(inviteStats?.remaining || 0)}
           icon={UserCheck}
-          change={{ value: 3, positive: true }}
-          description="This quarter"
+          description={`${inviteStats?.usedTotal || 0} used total`}
         />
       </motion.div>
 
@@ -185,22 +219,18 @@ export default function CompanyDashboard() {
                 {/* Conversion Rates */}
                 <div className="pt-4 border-t border-border">
                   <h4 className="text-sm font-medium mb-3">Conversion Rates</h4>
-                  <div className="grid grid-cols-4 gap-4 text-center">
+                  <div className="grid grid-cols-3 gap-4 text-center">
                     <div>
-                      <p className="text-lg font-semibold text-success-600">57%</p>
+                      <p className="text-lg font-semibold text-success-600">{inviteStats?.viewRate || 0}%</p>
+                      <p className="text-xs text-muted-foreground">View Rate</p>
+                    </div>
+                    <div>
+                      <p className="text-lg font-semibold text-primary">{inviteStats?.acceptanceRate || 0}%</p>
                       <p className="text-xs text-muted-foreground">Accept Rate</p>
                     </div>
                     <div>
-                      <p className="text-lg font-semibold">51%</p>
-                      <p className="text-xs text-muted-foreground">Interview Rate</p>
-                    </div>
-                    <div>
-                      <p className="text-lg font-semibold">51%</p>
-                      <p className="text-xs text-muted-foreground">Offer Rate</p>
-                    </div>
-                    <div>
-                      <p className="text-lg font-semibold text-primary">78%</p>
-                      <p className="text-xs text-muted-foreground">Hire Rate</p>
+                      <p className="text-lg font-semibold">{stats.declined}</p>
+                      <p className="text-xs text-muted-foreground">Declined</p>
                     </div>
                   </div>
                 </div>
@@ -233,31 +263,17 @@ export default function CompanyDashboard() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {upcomingInterviews.map((interview) => (
-                  <div
-                    key={interview.id}
-                    className="flex items-center gap-4 p-3 rounded-lg bg-muted/50"
-                  >
-                    <Avatar fallback={interview.candidate} size="sm" />
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium">{interview.candidate}</p>
-                      <p className="text-sm text-muted-foreground">{interview.role}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-medium">
-                        {new Date(interview.date).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                        })}
-                      </p>
-                      <p className="text-xs text-muted-foreground">{interview.time}</p>
-                    </div>
+                {stats.accepted > 0 ? (
+                  <div className="text-center py-6">
+                    <p className="text-2xl font-bold text-primary">{stats.accepted}</p>
+                    <p className="text-sm text-muted-foreground">candidates accepted invites</p>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Schedule interviews with accepted candidates
+                    </p>
                   </div>
-                ))}
-
-                {upcomingInterviews.length === 0 && (
+                ) : (
                   <p className="text-center text-muted-foreground py-8">
-                    No upcoming interviews scheduled
+                    No accepted invitations yet. Send invites to candidates to get started.
                   </p>
                 )}
               </div>
@@ -290,7 +306,7 @@ export default function CompanyDashboard() {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {recentInvitations.map((invite) => (
+                {recentInvitations.map((invite: { id: string; candidateId: string; rank: number; college: string; status: string; sentAt: Date }) => (
                   <div
                     key={invite.id}
                     className="flex items-center gap-4 p-3 rounded-lg hover:bg-muted/50 transition-colors"
@@ -340,7 +356,7 @@ export default function CompanyDashboard() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {topMatchingCandidates.map((candidate, idx) => (
+                {topMatchingCandidates.map((candidate: { id: number; rank: number; college: string; name: string; match: number; technical: number; behavioral: number }, idx: number) => (
                   <div
                     key={candidate.id}
                     className="p-4 rounded-lg border border-border hover:border-primary/50 transition-colors cursor-pointer"

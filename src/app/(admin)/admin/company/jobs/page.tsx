@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import {
   Briefcase,
@@ -18,6 +18,7 @@ import {
   Brain,
   Heart,
   Copy,
+  Loader2,
 } from "lucide-react";
 import {
   Card,
@@ -29,6 +30,7 @@ import {
   Select,
   Modal,
 } from "@/components/ui";
+import { api } from "@/lib/trpc/client";
 
 interface JobPosting {
   id: string;
@@ -54,86 +56,6 @@ interface JobPosting {
   createdAt: string;
 }
 
-// Mock job postings
-const mockJobPostings: JobPosting[] = [
-  {
-    id: "JOB-001",
-    title: "Software Engineer",
-    description: "Join our engineering team to build scalable web applications using modern technologies.",
-    location: "Bangalore, India",
-    locationType: "hybrid",
-    compensation: { min: 1200000, max: 1800000, currency: "INR" },
-    requirements: {
-      minRank: 500,
-      minTechnical: 75,
-      minBehavioral: 70,
-      graduationYears: [2024, 2025],
-      skills: ["JavaScript", "React", "Node.js"],
-    },
-    matchingCandidates: 234,
-    applicants: 45,
-    status: "active",
-    createdAt: "2024-01-10",
-  },
-  {
-    id: "JOB-002",
-    title: "Data Analyst",
-    description: "Analyze large datasets to derive actionable insights for business decisions.",
-    location: "Mumbai, India",
-    locationType: "onsite",
-    compensation: { min: 800000, max: 1200000, currency: "INR" },
-    requirements: {
-      minRank: 300,
-      minTechnical: 80,
-      minBehavioral: 65,
-      graduationYears: [2024, 2025],
-      skills: ["Python", "SQL", "Machine Learning"],
-    },
-    matchingCandidates: 156,
-    applicants: 28,
-    status: "active",
-    createdAt: "2024-01-08",
-  },
-  {
-    id: "JOB-003",
-    title: "Product Manager",
-    description: "Lead product development from ideation to launch, working with cross-functional teams.",
-    location: "Remote",
-    locationType: "remote",
-    compensation: { min: 1500000, max: 2500000, currency: "INR" },
-    requirements: {
-      minRank: 200,
-      minTechnical: 70,
-      minBehavioral: 85,
-      graduationYears: [2023, 2024],
-      skills: ["Product Strategy", "Data Analysis"],
-    },
-    matchingCandidates: 89,
-    applicants: 12,
-    status: "paused",
-    createdAt: "2024-01-05",
-  },
-  {
-    id: "JOB-004",
-    title: "DevOps Engineer",
-    description: "Build and maintain CI/CD pipelines, infrastructure automation, and cloud deployments.",
-    location: "Delhi NCR, India",
-    locationType: "hybrid",
-    compensation: { min: 1000000, max: 1600000, currency: "INR" },
-    requirements: {
-      minRank: 400,
-      minTechnical: 80,
-      minBehavioral: 70,
-      graduationYears: [2024, 2025],
-      skills: ["AWS", "Docker", "Kubernetes"],
-    },
-    matchingCandidates: 112,
-    applicants: 19,
-    status: "closed",
-    createdAt: "2024-01-01",
-  },
-];
-
 const locationTypeOptions = [
   { value: "remote", label: "Remote" },
   { value: "hybrid", label: "Hybrid" },
@@ -141,7 +63,6 @@ const locationTypeOptions = [
 ];
 
 export default function JobPostingsPage() {
-  const [jobs, setJobs] = useState(mockJobPostings);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedJob, setSelectedJob] = useState<JobPosting | null>(null);
   const [newJob, setNewJob] = useState<{
@@ -168,6 +89,50 @@ export default function JobPostingsPage() {
     skills: "",
   });
 
+  // Fetch opportunities from API
+  const { data: opportunitiesData, isLoading, refetch } = api.opportunities.getMyOpportunities.useQuery();
+
+  // Transform API data to component format
+  const jobs: JobPosting[] = useMemo(() => {
+    if (!opportunitiesData) return [];
+
+    return opportunitiesData.map((opp: {
+      id: string;
+      title: string;
+      description?: string | null;
+      location?: string | null;
+      workplaceType?: string | null;
+      salaryMin?: number | null;
+      salaryMax?: number | null;
+      status: string;
+      createdAt: Date;
+      skills?: string[];
+      _count?: { applications: number; invites: number };
+    }) => ({
+      id: opp.id,
+      title: opp.title,
+      description: opp.description || "",
+      location: opp.location || "Not specified",
+      locationType: (opp.workplaceType?.toLowerCase() || "hybrid") as "remote" | "hybrid" | "onsite",
+      compensation: {
+        min: opp.salaryMin || 0,
+        max: opp.salaryMax || 0,
+        currency: "INR",
+      },
+      requirements: {
+        minRank: 500,
+        minTechnical: 70,
+        minBehavioral: 70,
+        graduationYears: [2024, 2025],
+        skills: opp.skills || [],
+      },
+      matchingCandidates: Math.floor(Math.random() * 200) + 50, // Placeholder
+      applicants: opp._count?.applications || 0,
+      status: opp.status.toLowerCase() as "active" | "paused" | "closed",
+      createdAt: new Date(opp.createdAt).toISOString().split("T")[0],
+    }));
+  }, [opportunitiesData]);
+
   const formatCurrency = (amount: number, currency: string) => {
     if (currency === "INR") {
       if (amount >= 100000) {
@@ -189,58 +154,27 @@ export default function JobPostingsPage() {
     }
   };
 
+  // TODO: Implement with proper mutation when API supports it
   const toggleJobStatus = (jobId: string) => {
-    setJobs(jobs.map(job => {
-      if (job.id === jobId) {
-        return {
-          ...job,
-          status: job.status === "active" ? "paused" : "active"
-        };
-      }
-      return job;
-    }));
+    console.log("Toggle status for job:", jobId);
+    // This would require an updateOpportunity mutation
+    refetch();
   };
 
   const handleCreateJob = () => {
-    const job: JobPosting = {
-      id: `JOB-${String(jobs.length + 1).padStart(3, "0")}`,
-      title: newJob.title,
-      description: newJob.description,
-      location: newJob.location,
-      locationType: newJob.locationType,
-      compensation: {
-        min: parseInt(newJob.compensationMin) || 0,
-        max: parseInt(newJob.compensationMax) || 0,
-        currency: "INR",
-      },
-      requirements: {
-        minRank: parseInt(newJob.minRank) || 500,
-        minTechnical: parseInt(newJob.minTechnical) || 70,
-        minBehavioral: parseInt(newJob.minBehavioral) || 70,
-        graduationYears: [2024, 2025],
-        skills: newJob.skills.split(",").map(s => s.trim()).filter(Boolean),
-      },
-      matchingCandidates: Math.floor(Math.random() * 200) + 50,
-      applicants: 0,
-      status: "active",
-      createdAt: new Date().toISOString().split("T")[0],
-    };
-
-    setJobs([job, ...jobs]);
-    setShowCreateModal(false);
-    setNewJob({
-      title: "",
-      description: "",
-      location: "",
-      locationType: "hybrid",
-      compensationMin: "",
-      compensationMax: "",
-      minRank: "",
-      minTechnical: "70",
-      minBehavioral: "70",
-      skills: "",
-    });
+    // TODO: Implement with proper createOpportunity mutation
+    console.log("Creating job:", newJob);
+    // For now, redirect to the dedicated post page
+    window.location.href = "/company/post";
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   const activeJobs = jobs.filter(j => j.status === "active").length;
   const totalMatching = jobs.reduce((sum, j) => sum + j.matchingCandidates, 0);

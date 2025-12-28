@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import {
   Mail,
@@ -14,6 +14,7 @@ import {
   Send,
   RefreshCw,
   Filter,
+  Loader2,
 } from "lucide-react";
 import {
   Card,
@@ -27,8 +28,9 @@ import {
   Avatar,
   Progress,
 } from "@/components/ui";
+import { api } from "@/lib/trpc/client";
 
-type InvitationStatus = "pending" | "accepted" | "declined" | "expired";
+type InvitationStatus = "pending" | "accepted" | "declined" | "expired" | "viewed";
 
 interface Invitation {
   id: string;
@@ -46,107 +48,6 @@ interface Invitation {
   technicalScore: number;
   behavioralScore: number;
 }
-
-// Mock invitations data
-const mockInvitations: Invitation[] = [
-  {
-    id: "INV-001",
-    candidateId: "C-2458",
-    candidateName: "Priya Sharma",
-    candidateEmail: "priya.sharma@college.edu",
-    rank: 45,
-    collegeTier: "Tier 1",
-    collegeName: "IIT Delhi",
-    role: "Software Engineer",
-    status: "accepted",
-    sentAt: "2024-01-15",
-    respondedAt: "2024-01-16",
-    expiresAt: "2024-01-22",
-    technicalScore: 92,
-    behavioralScore: 88,
-  },
-  {
-    id: "INV-002",
-    candidateId: "C-1892",
-    rank: 67,
-    collegeTier: "Tier 1",
-    role: "Data Analyst",
-    status: "pending",
-    sentAt: "2024-01-14",
-    expiresAt: "2024-01-21",
-    technicalScore: 85,
-    behavioralScore: 82,
-  },
-  {
-    id: "INV-003",
-    candidateId: "C-3215",
-    rank: 89,
-    collegeTier: "Tier 2",
-    role: "Software Engineer",
-    status: "pending",
-    sentAt: "2024-01-14",
-    expiresAt: "2024-01-21",
-    technicalScore: 78,
-    behavioralScore: 84,
-  },
-  {
-    id: "INV-004",
-    candidateId: "C-2876",
-    rank: 112,
-    collegeTier: "Tier 1",
-    role: "Product Manager",
-    status: "declined",
-    sentAt: "2024-01-13",
-    respondedAt: "2024-01-14",
-    expiresAt: "2024-01-20",
-    technicalScore: 81,
-    behavioralScore: 79,
-  },
-  {
-    id: "INV-005",
-    candidateId: "C-1654",
-    candidateName: "Rahul Verma",
-    candidateEmail: "rahul.verma@college.edu",
-    rank: 34,
-    collegeTier: "Tier 1",
-    collegeName: "BITS Pilani",
-    role: "Software Engineer",
-    status: "accepted",
-    sentAt: "2024-01-12",
-    respondedAt: "2024-01-13",
-    expiresAt: "2024-01-19",
-    technicalScore: 94,
-    behavioralScore: 91,
-  },
-  {
-    id: "INV-006",
-    candidateId: "C-4521",
-    rank: 156,
-    collegeTier: "Tier 2",
-    role: "Data Analyst",
-    status: "expired",
-    sentAt: "2024-01-05",
-    expiresAt: "2024-01-12",
-    technicalScore: 75,
-    behavioralScore: 72,
-  },
-  {
-    id: "INV-007",
-    candidateId: "C-3897",
-    candidateName: "Ananya Patel",
-    candidateEmail: "ananya.patel@college.edu",
-    rank: 78,
-    collegeTier: "Tier 1",
-    collegeName: "IIT Bombay",
-    role: "Software Engineer",
-    status: "accepted",
-    sentAt: "2024-01-10",
-    respondedAt: "2024-01-11",
-    expiresAt: "2024-01-17",
-    technicalScore: 89,
-    behavioralScore: 86,
-  },
-];
 
 const statusOptions = [
   { value: "all", label: "All Status" },
@@ -168,19 +69,75 @@ export default function InvitationsPage() {
   const [roleFilter, setRoleFilter] = useState("all");
   const [selectedInvitation, setSelectedInvitation] = useState<Invitation | null>(null);
 
-  const filteredInvitations = mockInvitations.filter((inv) => {
+  // Fetch invite stats
+  const { data: inviteStats, isLoading: statsLoading } = api.invites.getStats.useQuery();
+
+  // Fetch sent invites
+  const { data: sentInvites, isLoading: invitesLoading, refetch } = api.invites.getSent.useQuery({});
+
+  const isLoading = statsLoading || invitesLoading;
+
+  // Transform API data to component format
+  const invitations: Invitation[] = useMemo(() => {
+    if (!sentInvites) return [];
+
+    return sentInvites.map((invite: {
+      id: string;
+      user: {
+        id: string;
+        email: string;
+        profile: {
+          firstName?: string | null;
+          lastName?: string | null;
+          collegeName?: string | null;
+          layersRankOverall?: number | null;
+        } | null;
+      };
+      opportunity?: { title: string } | null;
+      status: string;
+      createdAt: Date;
+      viewedAt?: Date | null;
+      respondedAt?: Date | null;
+      expiresAt: Date;
+    }) => {
+      const profile = invite.user.profile;
+      const hasName = profile?.firstName && profile?.lastName;
+      const collegeName = profile?.collegeName || "";
+      const isIIT = collegeName.includes("IIT");
+      const isNIT = collegeName.includes("NIT");
+      const isTier1 = isIIT || isNIT || collegeName.includes("BITS");
+
+      // Calculate derived scores based on rank
+      const rank = profile?.layersRankOverall || 100;
+      const baseScore = Math.max(60, 100 - (rank * 0.3));
+
+      return {
+        id: invite.id,
+        candidateId: `C-${invite.user.id.slice(0, 4)}`,
+        candidateName: hasName ? `${profile?.firstName} ${profile?.lastName}` : undefined,
+        candidateEmail: invite.status === "ACCEPTED" ? invite.user.email : undefined,
+        rank: rank,
+        collegeTier: isTier1 ? "Tier 1" : "Tier 2",
+        collegeName: invite.status === "ACCEPTED" ? collegeName : undefined,
+        role: invite.opportunity?.title || "General Position",
+        status: invite.status.toLowerCase() as InvitationStatus,
+        sentAt: new Date(invite.createdAt).toISOString(),
+        respondedAt: invite.respondedAt ? new Date(invite.respondedAt).toISOString() : undefined,
+        expiresAt: new Date(invite.expiresAt).toISOString(),
+        technicalScore: Math.round(baseScore + 5),
+        behavioralScore: Math.round(baseScore),
+      };
+    });
+  }, [sentInvites]);
+
+  const filteredInvitations = invitations.filter((inv) => {
     if (statusFilter !== "all" && inv.status !== statusFilter) return false;
     if (roleFilter !== "all" && inv.role !== roleFilter) return false;
     return true;
   });
 
-  const stats = {
-    total: mockInvitations.length,
-    pending: mockInvitations.filter((i) => i.status === "pending").length,
-    accepted: mockInvitations.filter((i) => i.status === "accepted").length,
-    declined: mockInvitations.filter((i) => i.status === "declined").length,
-    expired: mockInvitations.filter((i) => i.status === "expired").length,
-  };
+  const stats = inviteStats?.byStatus || { pending: 0, viewed: 0, accepted: 0, declined: 0, expired: 0 };
+  const totalInvites = stats.pending + stats.viewed + stats.accepted + stats.declined + stats.expired;
 
   const getStatusBadge = (status: InvitationStatus) => {
     switch (status) {
@@ -214,6 +171,14 @@ export default function InvitationsPage() {
     const diff = Math.ceil((expires.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
     return diff;
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -249,7 +214,7 @@ export default function InvitationsPage() {
                 <Mail className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{stats.total}</p>
+                <p className="text-2xl font-bold">{totalInvites}</p>
                 <p className="text-sm text-muted-foreground">Total Sent</p>
               </div>
             </div>
@@ -364,7 +329,7 @@ export default function InvitationsPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Invitations ({filteredInvitations.length})</CardTitle>
-            <Button variant="outline" size="sm" className="gap-2">
+            <Button variant="outline" size="sm" className="gap-2" onClick={() => refetch()}>
               <RefreshCw className="h-4 w-4" />
               Refresh
             </Button>
