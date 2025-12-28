@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import {
   TrendingUp,
   TrendingDown,
@@ -25,6 +26,19 @@ import Link from "next/link";
 import { Progress } from "@/components/ui";
 import { api } from "@/lib/trpc/client";
 
+// Map mission item IDs to their edit URLs
+const missionEditUrls: Record<string, string> = {
+  name: "/onboarding/student?step=0&focus=name",
+  avatar: "/onboarding/student?step=0&focus=avatar",
+  bio: "/onboarding/student?step=0&focus=bio",
+  location: "/onboarding/student?step=0&focus=location",
+  education: "/onboarding/student?step=1",
+  resume: "/onboarding/student?step=3",
+  skills: "/onboarding/student?step=2",
+  linkedin: "/onboarding/student?step=0&focus=linkedin",
+  github: "/onboarding/student?step=0&focus=github",
+};
+
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
@@ -40,6 +54,7 @@ const itemVariants = {
 
 export default function DashboardPage() {
   const { data: session } = useSession();
+  const router = useRouter();
 
   // Fetch real data from tRPC
   const { data: profileStats, isLoading: profileLoading } = api.profile.getStats.useQuery();
@@ -304,10 +319,18 @@ export default function DashboardPage() {
                   <p className="text-sm text-[#6B7280] text-center py-4">Loading missions...</p>
                 ) : (
                   missionItems.map((item) => (
-                    <div
+                    <button
                       key={item.id}
-                      className={`flex items-start gap-3 p-3 rounded-lg ${
-                        item.completed ? "opacity-60" : "hover:bg-[#F9FAFB]"
+                      onClick={() => {
+                        if (!item.completed && missionEditUrls[item.id]) {
+                          router.push(missionEditUrls[item.id]);
+                        }
+                      }}
+                      disabled={item.completed}
+                      className={`w-full flex items-start gap-3 p-3 rounded-lg text-left ${
+                        item.completed
+                          ? "opacity-60 cursor-default"
+                          : "hover:bg-[#F9FAFB] cursor-pointer"
                       } transition-colors`}
                     >
                       {item.completed ? (
@@ -323,7 +346,7 @@ export default function DashboardPage() {
                       <span className="text-xs font-medium text-[#0EA5E9] flex-shrink-0">
                         +{item.points} XP
                       </span>
-                    </div>
+                    </button>
                   ))
                 )}
               </div>

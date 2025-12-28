@@ -1,8 +1,9 @@
 /**
- * Email Integration with Resend
+ * Email Integration with Amazon SES
  * Phase 5: Polish & Launch
  */
 
+import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
 import { logEvent } from "@/lib/events";
 import { EventTypes } from "@/lib/events/types";
 
@@ -10,10 +11,33 @@ import { EventTypes } from "@/lib/events/types";
 // CONFIGURATION
 // ============================================================================
 
-const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const FROM_EMAIL = process.env.EMAIL_FROM || "Algonauts <onboarding@resend.dev>";
+const AWS_REGION = process.env.AWS_SES_REGION || "ap-south-1";
+const AWS_ACCESS_KEY_ID = process.env.AWS_ACCESS_KEY_ID;
+const AWS_SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY;
+const FROM_EMAIL = process.env.EMAIL_FROM || "Algonauts <noreply@algonauts.in>";
 const REPLY_TO = process.env.EMAIL_REPLY_TO || "support@algonauts.in";
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://algonauts.in";
+
+// Create SES client
+let sesClient: SESClient | null = null;
+
+function getSESClient(): SESClient | null {
+  if (!AWS_ACCESS_KEY_ID || !AWS_SECRET_ACCESS_KEY) {
+    return null;
+  }
+
+  if (!sesClient) {
+    sesClient = new SESClient({
+      region: AWS_REGION,
+      credentials: {
+        accessKeyId: AWS_ACCESS_KEY_ID,
+        secretAccessKey: AWS_SECRET_ACCESS_KEY,
+      },
+    });
+  }
+
+  return sesClient;
+}
 
 // ============================================================================
 // TYPES
@@ -55,44 +79,54 @@ export type EmailTemplate =
 // ============================================================================
 
 /**
- * Send email via Resend
+ * Send email via Amazon SES
  */
 export async function sendEmail(options: EmailOptions): Promise<EmailResult> {
-  if (!RESEND_API_KEY) {
-    console.warn("[Email] RESEND_API_KEY not configured - email not sent:", options.subject);
-    console.warn("[Email] Set RESEND_API_KEY in environment variables to enable email sending");
-    return { success: false, error: "RESEND_API_KEY not configured" };
+  const client = getSESClient();
+
+  if (!client) {
+    console.warn("[Email] AWS SES not configured - email not sent:", options.subject);
+    console.warn("[Email] Set AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, and AWS_SES_REGION to enable email sending");
+    return { success: false, error: "AWS SES not configured" };
   }
 
   try {
-    const response = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${RESEND_API_KEY}`,
-        "Content-Type": "application/json",
+    const toAddresses = Array.isArray(options.to) ? options.to : [options.to];
+
+    const command = new SendEmailCommand({
+      Source: FROM_EMAIL,
+      Destination: {
+        ToAddresses: toAddresses,
       },
-      body: JSON.stringify({
-        from: FROM_EMAIL,
-        to: Array.isArray(options.to) ? options.to : [options.to],
-        subject: options.subject,
-        html: options.html,
-        text: options.text,
-        reply_to: options.replyTo || REPLY_TO,
-        tags: options.tags ? Object.entries(options.tags).map(([name, value]) => ({ name, value })) : undefined,
-      }),
+      Message: {
+        Subject: {
+          Charset: "UTF-8",
+          Data: options.subject,
+        },
+        Body: {
+          Html: {
+            Charset: "UTF-8",
+            Data: options.html,
+          },
+          ...(options.text && {
+            Text: {
+              Charset: "UTF-8",
+              Data: options.text,
+            },
+          }),
+        },
+      },
+      ReplyToAddresses: [options.replyTo || REPLY_TO],
+      Tags: options.tags
+        ? Object.entries(options.tags).map(([Name, Value]) => ({ Name, Value }))
+        : undefined,
     });
 
-    if (!response.ok) {
-      const error = await response.text();
-      console.error("[Email] Resend error:", error);
-      return { success: false, error };
-    }
-
-    const data = await response.json();
+    const response = await client.send(command);
 
     await logEvent(EventTypes.EMAIL_SENT, {
       entityType: "email",
-      entityId: data.id,
+      entityId: response.MessageId || "unknown",
       metadata: {
         to: options.to,
         subject: options.subject,
@@ -100,7 +134,7 @@ export async function sendEmail(options: EmailOptions): Promise<EmailResult> {
       },
     });
 
-    return { success: true, messageId: data.id };
+    return { success: true, messageId: response.MessageId };
   } catch (error) {
     console.error("[Email] Send error:", error);
     return { success: false, error: String(error) };

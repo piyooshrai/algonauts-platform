@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useRef } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowRight,
@@ -71,8 +71,10 @@ const graduationYears = [
 
 export default function StudentOnboardingPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [currentStep, setCurrentStep] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const focusRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     // Basic Info
     firstName: "",
@@ -90,6 +92,32 @@ export default function StudentOnboardingPage() {
     resume: null as File | null,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [focusField, setFocusField] = useState<string | null>(null);
+
+  // Handle query params for deep linking from dashboard
+  useEffect(() => {
+    const stepParam = searchParams.get("step");
+    const focusParam = searchParams.get("focus");
+
+    if (stepParam) {
+      const stepNum = parseInt(stepParam, 10);
+      if (!isNaN(stepNum) && stepNum >= 0 && stepNum < steps.length) {
+        setCurrentStep(stepNum);
+      }
+    }
+
+    if (focusParam) {
+      setFocusField(focusParam);
+    }
+  }, [searchParams]);
+
+  // Focus the relevant field when focusField changes
+  useEffect(() => {
+    if (focusField && focusRef.current) {
+      focusRef.current.focus();
+      focusRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, [focusField, currentStep]);
 
   const progress = ((currentStep + 1) / steps.length) * 100;
 
@@ -194,24 +222,52 @@ export default function StudentOnboardingPage() {
 
   const handleComplete = async () => {
     setIsLoading(true);
+    setErrors({});
 
-    // Parse graduation year
-    const gradYear = formData.graduationYear === "graduated"
-      ? new Date().getFullYear()
-      : parseInt(formData.graduationYear);
+    try {
+      // Upload resume if provided
+      let resumeUrl: string | undefined;
+      if (formData.resume) {
+        const uploadFormData = new FormData();
+        uploadFormData.append("file", formData.resume);
 
-    // Save profile data via tRPC
-    updateProfileMutation.mutate({
-      firstName: formData.firstName,
-      lastName: formData.lastName,
-      collegeName: formData.college,
-      degree: degreeOptions.find(d => d.value === formData.degree)?.label || formData.degree,
-      branch: majorOptions.find(m => m.value === formData.major)?.label || formData.major,
-      graduationYear: gradYear,
-      skills: formData.skills,
-      // Note: Resume upload would need a separate file upload endpoint
-      // For now, we save the other fields
-    });
+        const uploadResponse = await fetch("/api/upload/resume", {
+          method: "POST",
+          body: uploadFormData,
+        });
+
+        if (!uploadResponse.ok) {
+          const errorData = await uploadResponse.json();
+          throw new Error(errorData.error || "Failed to upload resume");
+        }
+
+        const uploadResult = await uploadResponse.json();
+        resumeUrl = uploadResult.url;
+      }
+
+      // Parse graduation year
+      const gradYear = formData.graduationYear === "graduated"
+        ? new Date().getFullYear()
+        : parseInt(formData.graduationYear);
+
+      // Save profile data via tRPC
+      updateProfileMutation.mutate({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        collegeName: formData.college,
+        degree: degreeOptions.find(d => d.value === formData.degree)?.label || formData.degree,
+        branch: majorOptions.find(m => m.value === formData.major)?.label || formData.major,
+        graduationYear: gradYear,
+        skills: formData.skills,
+        ...(resumeUrl && { resumeUrl }),
+      });
+    } catch (error) {
+      console.error("Error completing onboarding:", error);
+      setErrors({
+        submit: error instanceof Error ? error.message : "Failed to complete onboarding. Please try again."
+      });
+      setIsLoading(false);
+    }
   };
 
   const renderStep = () => {

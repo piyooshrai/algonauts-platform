@@ -664,4 +664,81 @@ export const applicationsRouter = createTRPCRouter({
       conversionRate: submitted > 0 ? ((offers / submitted) * 100).toFixed(1) : "0",
     };
   }),
+
+  /**
+   * Withdraw an application
+   * Only allowed for DRAFT, SUBMITTED, or UNDER_REVIEW status
+   */
+  withdraw: studentProcedure
+    .input(z.object({ applicationId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+
+      // Get the application
+      const application = await ctx.prisma.application.findUnique({
+        where: { id: input.applicationId },
+        select: {
+          id: true,
+          userId: true,
+          status: true,
+          opportunityId: true,
+          opportunity: {
+            select: {
+              title: true,
+              company: {
+                select: { companyName: true },
+              },
+            },
+          },
+        },
+      });
+
+      if (!application) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Application not found",
+        });
+      }
+
+      // Verify ownership
+      if (application.userId !== userId) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You can only withdraw your own applications",
+        });
+      }
+
+      // Check if status allows withdrawal
+      const withdrawableStatuses = ["DRAFT", "SUBMITTED", "UNDER_REVIEW"];
+      if (!withdrawableStatuses.includes(application.status)) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: `Cannot withdraw application with status: ${application.status}`,
+        });
+      }
+
+      // Update status to WITHDRAWN
+      await ctx.prisma.application.update({
+        where: { id: input.applicationId },
+        data: {
+          status: "WITHDRAWN",
+          withdrawnAt: new Date(),
+        },
+      });
+
+      // Log the event
+      await logEvent(EventTypes.APPLICATION_WITHDRAW, {
+        userId,
+        source: EventSource.DIRECT,
+        metadata: {
+          applicationId: input.applicationId,
+          opportunityId: application.opportunityId,
+          opportunityTitle: application.opportunity.title,
+          companyName: application.opportunity.company?.companyName,
+          previousStatus: application.status,
+        },
+      });
+
+      return { success: true };
+    }),
 });
