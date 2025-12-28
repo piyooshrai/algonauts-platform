@@ -10,9 +10,8 @@ import {
   MapPin,
   GraduationCap,
   Briefcase,
-  Github,
-  Linkedin,
   Globe,
+  Linkedin,
   Edit,
   Award,
   Share2,
@@ -75,8 +74,6 @@ export default function ProfilePage() {
     experience: profile?.experienceYears ? `${profile.experienceYears} years` : "0-1 years",
     skills: profile?.skills || [],
     links: {
-      github: profile?.githubUrl || "",
-      linkedin: profile?.linkedinUrl || "",
       portfolio: profile?.portfolioUrl || "",
     },
     resumeUrl: profile?.resumeUrl,
@@ -179,39 +176,17 @@ export default function ProfilePage() {
                   )}
                 </div>
 
-                {/* Social Links */}
-                {(user.links.github || user.links.linkedin || user.links.portfolio) && (
+                {/* Portfolio Link */}
+                {user.links.portfolio && (
                   <div className="flex justify-center gap-4 mt-6">
-                    {user.links.github && (
-                      <a
-                        href={user.links.github.startsWith("http") ? user.links.github : `https://${user.links.github}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
-                      >
-                        <Github className="h-5 w-5" />
-                      </a>
-                    )}
-                    {user.links.linkedin && (
-                      <a
-                        href={user.links.linkedin.startsWith("http") ? user.links.linkedin : `https://${user.links.linkedin}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
-                      >
-                        <Linkedin className="h-5 w-5" />
-                      </a>
-                    )}
-                    {user.links.portfolio && (
-                      <a
-                        href={user.links.portfolio.startsWith("http") ? user.links.portfolio : `https://${user.links.portfolio}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
-                      >
-                        <Globe className="h-5 w-5" />
-                      </a>
-                    )}
+                    <a
+                      href={user.links.portfolio.startsWith("http") ? user.links.portfolio : `https://${user.links.portfolio}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
+                    >
+                      <Globe className="h-5 w-5" />
+                    </a>
                   </div>
                 )}
               </CardContent>

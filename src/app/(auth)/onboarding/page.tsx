@@ -53,8 +53,6 @@ export default function OnboardingPage() {
     // Profile
     phone: "",
     location: "",
-    linkedIn: "",
-    github: "",
     // Education
     college: "",
     degree: "",
@@ -136,26 +134,6 @@ export default function OnboardingPage() {
                   placeholder="Bangalore, India"
                   value={formData.location}
                   onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">LinkedIn Profile</label>
-                <Input
-                  type="url"
-                  placeholder="linkedin.com/in/yourname"
-                  value={formData.linkedIn}
-                  onChange={(e) => setFormData({ ...formData, linkedIn: e.target.value })}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">GitHub Profile</label>
-                <Input
-                  type="url"
-                  placeholder="github.com/yourname"
-                  value={formData.github}
-                  onChange={(e) => setFormData({ ...formData, github: e.target.value })}
                 />
               </div>
             </div>

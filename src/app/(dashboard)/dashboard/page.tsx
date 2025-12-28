@@ -35,8 +35,6 @@ const missionEditUrls: Record<string, string> = {
   education: "/onboarding/student?step=1",
   resume: "/onboarding/student?step=3",
   skills: "/onboarding/student?step=2",
-  linkedin: "/onboarding/student?step=0&focus=linkedin",
-  github: "/onboarding/student?step=0&focus=github",
 };
 
 const containerVariants = {
