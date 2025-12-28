@@ -207,8 +207,7 @@ async function seedCompanies() {
       where: { email: `hr@${slug}.demo` },
       create: {
         email: `hr@${slug}.demo`,
-        password: hashedPassword,
-        name: `HR at ${company.name}`,
+        passwordHash: hashedPassword,
         userType: "COMPANY",
         emailVerified: new Date(),
       },
@@ -301,8 +300,7 @@ async function seedColleges() {
       where: { email: `admin@${slug}.demo` },
       create: {
         email: `admin@${slug}.demo`,
-        password: hashedPassword,
-        name: `Placement Officer at ${college.shortName}`,
+        passwordHash: hashedPassword,
         userType: "COLLEGE_ADMIN",
         emailVerified: new Date(),
       },
@@ -348,8 +346,7 @@ async function seedStudents() {
         const user = await prisma.user.create({
           data: {
             email,
-            password: hashedPassword,
-            name: `${firstName} ${lastName}`,
+            passwordHash: hashedPassword,
             userType: "STUDENT",
             emailVerified: new Date(),
           },
