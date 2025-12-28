@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { XCircle, ArrowLeft, Mail, LogOut, RefreshCw } from "lucide-react";
+import { XCircle, Mail, LogOut, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui";
 import { Logo } from "@/components/logo";
 import { signOut, useSession } from "next-auth/react";
