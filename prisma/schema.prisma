@@ -682,6 +682,7 @@ model Placement {
 
   @@index([userId])
   @@index([status])
+  @@index([verification30CompletedAt])
   @@index([verification90CompletedAt])
   @@index([startDate])
 }
