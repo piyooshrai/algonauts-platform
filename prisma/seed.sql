@@ -194,53 +194,44 @@ INSERT INTO "Placement" (id, "userId", "applicationId", "companyName", "jobTitle
 ('placement_2', 'user_student_5', 'app_8', 'GlobalSoft', 'DevOps Engineer', 'Hyderabad', NOW() - INTERVAL '20 days', 1800000, 'VERIFICATION_30_PENDING', 'SELF_REPORTED', NOW() - INTERVAL '10 days', NULL, NULL, 'college_iit_delhi', 50, NOW() - INTERVAL '20 days', NOW());
 
 -- ============================================================================
--- 9. BADGES
+-- 9. BADGES (not needed - badges are defined in code)
 -- ============================================================================
-INSERT INTO "Badge" (id, name, slug, description, category, rarity, requirement, "xpReward", "isActive", "displayOrder", "createdAt") VALUES
-('badge_first_app', 'First Application', 'first-application', 'Submitted your first job application', 'MILESTONE', 'COMMON', '{"type": "applications", "count": 1}'::jsonb, 25, true, 1, NOW()),
-('badge_5_apps', 'Application Spree', 'application-spree', 'Submitted 5 job applications', 'MILESTONE', 'UNCOMMON', '{"type": "applications", "count": 5}'::jsonb, 50, true, 2, NOW()),
-('badge_profile_complete', 'Profile Pro', 'profile-pro', 'Completed your profile 100%', 'ACHIEVEMENT', 'COMMON', '{"type": "profile_completion", "value": 100}'::jsonb, 100, true, 3, NOW()),
-('badge_streak_7', 'Week Warrior', 'week-warrior', 'Maintained a 7-day login streak', 'STREAK', 'UNCOMMON', '{"type": "streak", "count": 7}'::jsonb, 75, true, 4, NOW()),
-('badge_streak_30', 'Monthly Master', 'monthly-master', 'Maintained a 30-day login streak', 'STREAK', 'RARE', '{"type": "streak", "count": 30}'::jsonb, 200, true, 5, NOW()),
-('badge_first_placement', 'Placed!', 'first-placement', 'Got your first job placement', 'ACHIEVEMENT', 'EPIC', '{"type": "placement", "count": 1}'::jsonb, 500, true, 6, NOW()),
-('badge_verified_90', 'Verified Professional', 'verified-professional', 'Completed 90-day placement verification', 'ACHIEVEMENT', 'LEGENDARY', '{"type": "verification_90", "count": 1}'::jsonb, 1000, true, 7, NOW()),
-('badge_top_10', 'Top 10%', 'top-10-percent', 'Reached top 10% on the leaderboard', 'ACHIEVEMENT', 'RARE', '{"type": "leaderboard_rank", "percentile": 10}'::jsonb, 150, true, 8, NOW()),
-('badge_skill_master', 'Skill Master', 'skill-master', 'Added 10+ verified skills to profile', 'SKILL', 'UNCOMMON', '{"type": "skills", "count": 10}'::jsonb, 75, true, 9, NOW()),
-('badge_early_bird', 'Early Bird', 'early-bird', 'Applied within 24 hours of opportunity posting', 'SPECIAL', 'UNCOMMON', '{"type": "early_application", "hours": 24}'::jsonb, 50, true, 10, NOW());
+-- Badge definitions are in src/server/api/routers/badges.ts BADGES constant
+-- We only need to insert UserBadge records with matching IDs
 
 -- ============================================================================
--- 10. USER BADGES
+-- 10. USER BADGES (using IDs from BADGES constant in code)
 -- ============================================================================
 INSERT INTO "UserBadge" (id, "userId", "badgeId", "earnedAt", "isDisplayed") VALUES
 -- Rahul's badges
-('ub_1', 'user_student_1', 'badge_first_app', NOW() - INTERVAL '30 days', true),
-('ub_2', 'user_student_1', 'badge_profile_complete', NOW() - INTERVAL '25 days', true),
-('ub_3', 'user_student_1', 'badge_streak_7', NOW() - INTERVAL '20 days', true),
+('ub_1', 'user_student_1', 'first_application', NOW() - INTERVAL '30 days', true),
+('ub_2', 'user_student_1', 'complete_profile', NOW() - INTERVAL '25 days', true),
+('ub_3', 'user_student_1', 'streak_7', NOW() - INTERVAL '20 days', true),
 
 -- Priya's badges (she has the most)
-('ub_4', 'user_student_2', 'badge_first_app', NOW() - INTERVAL '60 days', true),
-('ub_5', 'user_student_2', 'badge_5_apps', NOW() - INTERVAL '45 days', true),
-('ub_6', 'user_student_2', 'badge_profile_complete', NOW() - INTERVAL '55 days', true),
-('ub_7', 'user_student_2', 'badge_streak_7', NOW() - INTERVAL '40 days', true),
-('ub_8', 'user_student_2', 'badge_streak_30', NOW() - INTERVAL '10 days', true),
-('ub_9', 'user_student_2', 'badge_first_placement', NOW() - INTERVAL '35 days', true),
-('ub_10', 'user_student_2', 'badge_top_10', NOW() - INTERVAL '20 days', true),
+('ub_4', 'user_student_2', 'first_application', NOW() - INTERVAL '60 days', true),
+('ub_5', 'user_student_2', 'ten_applications', NOW() - INTERVAL '45 days', true),
+('ub_6', 'user_student_2', 'complete_profile', NOW() - INTERVAL '55 days', true),
+('ub_7', 'user_student_2', 'streak_7', NOW() - INTERVAL '40 days', true),
+('ub_8', 'user_student_2', 'streak_30', NOW() - INTERVAL '10 days', true),
+('ub_9', 'user_student_2', 'first_placement', NOW() - INTERVAL '35 days', true),
+('ub_10', 'user_student_2', 'top_10_percent_skill', NOW() - INTERVAL '20 days', true),
 
 -- Amit's badges
-('ub_11', 'user_student_3', 'badge_first_app', NOW() - INTERVAL '15 days', true),
-('ub_12', 'user_student_3', 'badge_profile_complete', NOW() - INTERVAL '20 days', true),
+('ub_11', 'user_student_3', 'first_application', NOW() - INTERVAL '15 days', true),
+('ub_12', 'user_student_3', 'complete_profile', NOW() - INTERVAL '20 days', true),
 
 -- Sneha's badges
-('ub_13', 'user_student_4', 'badge_first_app', NOW() - INTERVAL '20 days', true),
-('ub_14', 'user_student_4', 'badge_profile_complete', NOW() - INTERVAL '22 days', true),
-('ub_15', 'user_student_4', 'badge_skill_master', NOW() - INTERVAL '18 days', true),
+('ub_13', 'user_student_4', 'first_application', NOW() - INTERVAL '20 days', true),
+('ub_14', 'user_student_4', 'complete_profile', NOW() - INTERVAL '22 days', true),
+('ub_15', 'user_student_4', 'resume_uploaded', NOW() - INTERVAL '18 days', true),
 
 -- Vikram's badges
-('ub_16', 'user_student_5', 'badge_first_app', NOW() - INTERVAL '40 days', true),
-('ub_17', 'user_student_5', 'badge_5_apps', NOW() - INTERVAL '30 days', true),
-('ub_18', 'user_student_5', 'badge_profile_complete', NOW() - INTERVAL '35 days', true),
-('ub_19', 'user_student_5', 'badge_streak_7', NOW() - INTERVAL '25 days', true),
-('ub_20', 'user_student_5', 'badge_first_placement', NOW() - INTERVAL '20 days', true);
+('ub_16', 'user_student_5', 'first_application', NOW() - INTERVAL '40 days', true),
+('ub_17', 'user_student_5', 'ten_applications', NOW() - INTERVAL '30 days', true),
+('ub_18', 'user_student_5', 'complete_profile', NOW() - INTERVAL '35 days', true),
+('ub_19', 'user_student_5', 'streak_7', NOW() - INTERVAL '25 days', true),
+('ub_20', 'user_student_5', 'first_placement', NOW() - INTERVAL '20 days', true);
 
 -- ============================================================================
 -- 11. STREAKS
