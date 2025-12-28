@@ -16,6 +16,7 @@ import {
 import { Button, Input, Select } from "@/components/ui";
 import { Logo } from "@/components/logo";
 import { cn } from "@/lib/utils";
+import { api } from "@/lib/trpc/client";
 
 const industryOptions = [
   { value: "technology", label: "Technology" },
@@ -100,6 +101,18 @@ export default function CompanyOnboardingPage() {
     }
   };
 
+  // Company profile update mutation
+  const updateCompanyMutation = api.profile.updateCompanyProfile.useMutation({
+    onSuccess: () => {
+      router.push("/admin/company");
+    },
+    onError: (error) => {
+      console.error("Failed to save company profile:", error);
+      setErrors({ submit: error.message || "Failed to save profile. Please try again." });
+      setIsLoading(false);
+    },
+  });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -107,11 +120,17 @@ export default function CompanyOnboardingPage() {
 
     setIsLoading(true);
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    // TODO: Save onboarding data
-    router.push("/admin/company");
+    // Save company profile data via tRPC
+    updateCompanyMutation.mutate({
+      companyName: formData.companyName,
+      industry: industryOptions.find(i => i.value === formData.industry)?.label || formData.industry,
+      companySize: formData.companySize,
+      website: formData.website || null,
+      contactName: formData.contactName,
+      contactEmail: formData.contactEmail,
+      contactPhone: formData.contactPhone,
+      // Logo upload would need a separate file upload endpoint
+    });
   };
 
   return (

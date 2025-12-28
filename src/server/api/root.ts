@@ -28,6 +28,8 @@ import { adminRouter } from "./routers/admin";
 import { jobsRouter } from "./routers/jobs";
 // Launchpad (Knowledge Sharing)
 import { postsRouter } from "./routers/posts";
+// College Admin
+import { collegeRouter } from "./routers/college";
 
 /**
  * This is the primary router for the API.
@@ -58,6 +60,8 @@ export const appRouter = createTRPCRouter({
   jobs: jobsRouter,
   // Launchpad (Knowledge Sharing)
   posts: postsRouter,
+  // College Admin
+  college: collegeRouter,
 });
 
 // Export type definition of API

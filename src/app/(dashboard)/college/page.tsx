@@ -17,34 +17,16 @@ import { Button, Card, CardContent, CardHeader, CardTitle, Progress } from "@/co
 import { api } from "@/lib/trpc/client";
 
 export default function CollegeDashboardPage() {
-  // Fetch college data
-  const { data: profileData, isLoading: profileLoading } = api.profile.get.useQuery();
-  const { data: statsData, isLoading: statsLoading } = api.placements.getVerificationStats.useQuery();
+  // Fetch college data from real API
+  const { data: collegeData, isLoading: collegeLoading } = api.profile.getCollegeProfile.useQuery();
+  const { data: statsData, isLoading: statsLoading } = api.college.getDashboardStats.useQuery();
+  const { data: studentsData } = api.college.getStudents.useQuery({
+    limit: 5,
+    sortBy: "rank",
+    sortOrder: "asc",
+  });
 
-  const isLoading = profileLoading || statsLoading;
-
-  // Stats from verification data
-  const stats = {
-    totalStudents: 150,
-    activeStudents: 120,
-    placedStudents: statsData?.total || 0,
-    placementRate: statsData?.retention90Rate || 0,
-    averagePackage: 8.5,
-    highestPackage: 24,
-    topCompanies: ["Google", "Microsoft", "Amazon"],
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const collegeProfile = (profileData?.profile as any)?.college || {
-    collegeName: "Your College",
-  };
-
-  // Top performing students - would come from API
-  const topStudents = [
-    { name: "Student 1", score: 95, rank: 12 },
-    { name: "Student 2", score: 92, rank: 28 },
-    { name: "Student 3", score: 89, rank: 45 },
-  ];
+  const isLoading = collegeLoading || statsLoading;
 
   if (isLoading) {
     return (
@@ -53,6 +35,20 @@ export default function CollegeDashboardPage() {
       </div>
     );
   }
+
+  const college = collegeData?.college;
+  const stats = statsData || {
+    totalStudents: 0,
+    activeStudents: 0,
+    placedStudents: 0,
+    placementRate: 0,
+    averagePackage: 0,
+    highestPackage: 0,
+    topCompanies: [],
+    recentApplications: 0,
+  };
+
+  const topStudents = studentsData?.students?.slice(0, 5) || [];
 
   return (
     <motion.div
@@ -67,7 +63,7 @@ export default function CollegeDashboardPage() {
             <GraduationCap className="h-6 w-6 text-[#0EA5E9]" />
             College Dashboard
           </h1>
-          <p className="text-[#6B7280] mt-1">{collegeProfile.collegeName}</p>
+          <p className="text-[#6B7280] mt-1">{college?.name || "Your College"}</p>
         </div>
         <Link href="/college/students/import">
           <Button className="gap-2">
@@ -127,7 +123,7 @@ export default function CollegeDashboardPage() {
               <div>
                 <p className="text-sm text-[#6B7280]">Avg Package</p>
                 <p className="text-3xl font-bold text-[#F59E0B] mt-1">
-                  {stats.averagePackage ? `${(stats.averagePackage / 100000).toFixed(1)}L` : "-"}
+                  {stats.averagePackage > 0 ? `${stats.averagePackage}L` : "-"}
                 </p>
               </div>
               <div className="w-12 h-12 rounded-full bg-[#FEF3C7] flex items-center justify-center">
@@ -161,7 +157,7 @@ export default function CollegeDashboardPage() {
             <div className="grid grid-cols-2 gap-4 pt-4 border-t border-[#E5E7EB]">
               <div className="text-center p-4 bg-[#F9FAFB] rounded-lg">
                 <p className="text-2xl font-bold text-[#1F2937]">
-                  {stats.highestPackage ? `${(stats.highestPackage / 100000).toFixed(0)}L` : "-"}
+                  {stats.highestPackage > 0 ? `${stats.highestPackage}L` : "-"}
                 </p>
                 <p className="text-sm text-[#6B7280]">Highest Package</p>
               </div>
@@ -170,6 +166,19 @@ export default function CollegeDashboardPage() {
                 <p className="text-sm text-[#6B7280]">Active on Platform</p>
               </div>
             </div>
+
+            {stats.topCompanies.length > 0 && (
+              <div className="pt-4 border-t border-[#E5E7EB]">
+                <p className="text-sm font-medium mb-2">Top Hiring Companies</p>
+                <div className="flex flex-wrap gap-2">
+                  {stats.topCompanies.map((company: string, i: number) => (
+                    <span key={i} className="px-3 py-1 bg-[#E0F2FE] text-[#0369A1] rounded-full text-sm">
+                      {company}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <Link href="/college/analytics">
               <Button variant="outline" className="w-full gap-2">
@@ -205,9 +214,9 @@ export default function CollegeDashboardPage() {
               </div>
             ) : (
               <div className="space-y-3">
-                {topStudents.map((student, index) => (
+                {topStudents.map((student: { id: string; name: string; branch?: string | null; rank?: number | null }, index: number) => (
                   <div
-                    key={index}
+                    key={student.id}
                     className="flex items-center justify-between p-3 rounded-lg hover:bg-[#F9FAFB] transition-colors"
                   >
                     <div className="flex items-center gap-3">
@@ -222,12 +231,12 @@ export default function CollegeDashboardPage() {
                       </div>
                       <div>
                         <p className="font-medium text-[#1F2937]">{student.name}</p>
-                        <p className="text-xs text-[#6B7280]">National Rank #{student.rank}</p>
+                        <p className="text-xs text-[#6B7280]">{student.branch || "N/A"}</p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold text-[#0EA5E9]">{student.score}</p>
-                      <p className="text-xs text-[#6B7280]">Score</p>
+                      <p className="font-semibold text-[#0EA5E9]">{student.rank || "-"}</p>
+                      <p className="text-xs text-[#6B7280]">Rank</p>
                     </div>
                   </div>
                 ))}
@@ -251,11 +260,11 @@ export default function CollegeDashboardPage() {
                 <p className="text-sm text-[#6B7280] mt-1">View and manage your student roster</p>
               </div>
             </Link>
-            <Link href="/college/placements">
+            <Link href="/college/students/import">
               <div className="p-4 rounded-lg border border-[#E5E7EB] hover:border-[#10B981] hover:bg-[#F9FAFB] transition-colors cursor-pointer">
-                <CheckSquare className="h-8 w-8 text-[#10B981] mb-3" />
-                <h3 className="font-semibold text-[#1F2937]">Track Placements</h3>
-                <p className="text-sm text-[#6B7280] mt-1">Monitor student placement status</p>
+                <Upload className="h-8 w-8 text-[#10B981] mb-3" />
+                <h3 className="font-semibold text-[#1F2937]">Import Students</h3>
+                <p className="text-sm text-[#6B7280] mt-1">Bulk import from CSV/Excel</p>
               </div>
             </Link>
             <Link href="/college/analytics">

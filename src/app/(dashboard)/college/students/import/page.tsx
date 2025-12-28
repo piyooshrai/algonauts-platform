@@ -16,12 +16,63 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { Button, Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
+import { api } from "@/lib/trpc/client";
 
 interface ImportResult {
   total: number;
   success: number;
   failed: number;
-  errors: { row: number; message: string }[];
+  errors: { row: number; email: string; message: string }[];
+}
+
+interface ParsedStudent {
+  email: string;
+  firstName: string;
+  lastName: string;
+  branch?: string;
+  graduationYear?: number;
+  phone?: string;
+}
+
+function parseCSV(text: string): ParsedStudent[] {
+  const lines = text.trim().split("\n");
+  if (lines.length < 2) return [];
+
+  // Parse headers (case-insensitive)
+  const headers = lines[0].split(",").map(h => h.trim().toLowerCase());
+
+  const students: ParsedStudent[] = [];
+
+  for (let i = 1; i < lines.length; i++) {
+    const values = lines[i].split(",").map(v => v.trim());
+    if (values.length < 2) continue; // Skip empty/invalid rows
+
+    const row: Record<string, string> = {};
+    headers.forEach((header, index) => {
+      row[header] = values[index] || "";
+    });
+
+    // Map various possible header names
+    const email = row["email"] || row["e-mail"] || row["email address"] || "";
+    const firstName = row["firstname"] || row["first name"] || row["first_name"] || row["name"]?.split(" ")[0] || "";
+    const lastName = row["lastname"] || row["last name"] || row["last_name"] || row["name"]?.split(" ").slice(1).join(" ") || "";
+    const branch = row["branch"] || row["department"] || row["dept"] || "";
+    const yearStr = row["year"] || row["graduation year"] || row["graduationyear"] || row["graduation_year"] || "";
+    const phone = row["phone"] || row["mobile"] || row["contact"] || "";
+
+    if (email && firstName) {
+      students.push({
+        email,
+        firstName,
+        lastName: lastName || firstName.charAt(0), // Fallback
+        branch: branch || undefined,
+        graduationYear: yearStr ? parseInt(yearStr) : undefined,
+        phone: phone || undefined,
+      });
+    }
+  }
+
+  return students;
 }
 
 export default function CollegeStudentImportPage() {
@@ -29,6 +80,24 @@ export default function CollegeStudentImportPage() {
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [result, setResult] = useState<ImportResult | null>(null);
+  const [parseError, setParseError] = useState<string | null>(null);
+
+  // Bulk import mutation
+  const bulkImportMutation = api.college.bulkImport.useMutation({
+    onSuccess: (data) => {
+      setResult({
+        total: data.success + data.failed,
+        success: data.success,
+        failed: data.failed,
+        errors: data.errors.map((e, i) => ({ row: i + 2, email: e.email, message: e.error })),
+      });
+      setIsUploading(false);
+    },
+    onError: (error) => {
+      setParseError(error.message);
+      setIsUploading(false);
+    },
+  });
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -47,6 +116,7 @@ export default function CollegeStudentImportPage() {
     const droppedFile = e.dataTransfer.files[0];
     if (droppedFile && (droppedFile.type === "text/csv" || droppedFile.name.endsWith(".csv"))) {
       setFile(droppedFile);
+      setParseError(null);
     }
   }, []);
 
@@ -54,6 +124,7 @@ export default function CollegeStudentImportPage() {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
       setFile(selectedFile);
+      setParseError(null);
     }
   };
 
@@ -61,24 +132,34 @@ export default function CollegeStudentImportPage() {
     if (!file) return;
 
     setIsUploading(true);
+    setParseError(null);
 
-    // Simulate upload and processing
-    // In production, this would be an API call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    try {
+      // Read and parse CSV file
+      const text = await file.text();
+      const students = parseCSV(text);
 
-    // Simulate result
-    setResult({
-      total: 50,
-      success: 47,
-      failed: 3,
-      errors: [
-        { row: 12, message: "Invalid email format" },
-        { row: 28, message: "Missing required field: Name" },
-        { row: 45, message: "Duplicate email address" },
-      ],
-    });
+      if (students.length === 0) {
+        setParseError("No valid student records found in CSV. Please check the format.");
+        setIsUploading(false);
+        return;
+      }
 
-    setIsUploading(false);
+      if (students.length > 500) {
+        setParseError("Maximum 500 students per import. Please split your file.");
+        setIsUploading(false);
+        return;
+      }
+
+      // Call the bulk import API
+      bulkImportMutation.mutate({
+        students,
+        sendInviteEmail: true,
+      });
+    } catch {
+      setParseError("Failed to parse CSV file. Please check the format.");
+      setIsUploading(false);
+    }
   };
 
   const handleDownloadTemplate = () => {
@@ -135,6 +216,16 @@ export default function CollegeStudentImportPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Parse Error */}
+      {parseError && (
+        <Card className="border-red-200 bg-red-50">
+          <CardContent className="p-4 flex items-center gap-3">
+            <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0" />
+            <p className="text-red-700">{parseError}</p>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Upload Area */}
       {!result && (
@@ -258,7 +349,7 @@ export default function CollegeStudentImportPage() {
               {result.errors.length > 0 && (
                 <div className="mt-6">
                   <p className="font-medium text-[#1F2937] mb-3">Errors:</p>
-                  <div className="space-y-2">
+                  <div className="space-y-2 max-h-48 overflow-y-auto">
                     {result.errors.map((error, index) => (
                       <div
                         key={index}
@@ -266,7 +357,7 @@ export default function CollegeStudentImportPage() {
                       >
                         <XCircle className="h-4 w-4 text-[#EF4444] flex-shrink-0" />
                         <span className="text-[#1F2937]">
-                          <strong>Row {error.row}:</strong> {error.message}
+                          <strong>{error.email}:</strong> {error.message}
                         </span>
                       </div>
                     ))}

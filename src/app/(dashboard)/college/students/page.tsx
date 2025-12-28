@@ -7,8 +7,11 @@ import {
   Search,
   Upload,
   ChevronRight,
+  ChevronLeft,
   Loader2,
   CheckCircle2,
+  XCircle,
+  Award,
 } from "lucide-react";
 import Link from "next/link";
 import { Button, Input, Card, CardContent, Badge, Select, Avatar } from "@/components/ui";
@@ -21,35 +24,34 @@ const statusFilters = [
   { value: "inactive", label: "Inactive" },
 ];
 
-const yearFilters = [
-  { value: "all", label: "All Years" },
-  { value: "2025", label: "2025" },
-  { value: "2024", label: "2024" },
-  { value: "2026", label: "2026" },
-];
-
 export default function CollegeStudentsPage() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [yearFilter, setYearFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive" | "placed">("all");
+  const [branchFilter, setBranchFilter] = useState("");
+  const [page, setPage] = useState(1);
 
-  // Fetch students from college
-  const { data: studentsData, isLoading } = api.leaderboards.getStudentLeaderboard.useQuery({
-    scope: "college",
-    metric: "xp",
-    limit: 100,
+  // Fetch branches for filter dropdown
+  const { data: branches } = api.college.getBranches.useQuery();
+
+  // Fetch students from college using proper API
+  const { data: studentsData, isLoading } = api.college.getStudents.useQuery({
+    page,
+    limit: 20,
+    search: searchQuery || undefined,
+    branch: branchFilter || undefined,
+    status: statusFilter,
+    sortBy: "rank",
+    sortOrder: "asc",
   });
 
-  const students = studentsData?.leaderboard || [];
+  const students = studentsData?.students || [];
+  const pagination = studentsData?.pagination || { page: 1, limit: 20, total: 0, totalPages: 1 };
 
-  // Filter students
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const filteredStudents = students.filter((student: any) => {
-    const matchesSearch =
-      !searchQuery ||
-      student.name?.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesSearch;
-  });
+  // Create branch options for select
+  const branchOptions = [
+    { value: "", label: "All Branches" },
+    ...(branches?.map((b: string) => ({ value: b, label: b })) || []),
+  ];
 
   if (isLoading) {
     return (
@@ -72,7 +74,7 @@ export default function CollegeStudentsPage() {
             <Users className="h-6 w-6 text-[#0EA5E9]" />
             Student Roster
           </h1>
-          <p className="text-[#6B7280] mt-1">{students.length} students enrolled</p>
+          <p className="text-[#6B7280] mt-1">{pagination.total} students enrolled</p>
         </div>
         <Link href="/college/students/import">
           <Button className="gap-2">
@@ -87,25 +89,34 @@ export default function CollegeStudentsPage() {
         <div className="flex-1">
           <Input
             icon={Search}
-            placeholder="Search students by name..."
+            placeholder="Search students by name or email..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setPage(1);
+            }}
           />
         </div>
         <Select
           options={statusFilters}
           value={statusFilter}
-          onChange={setStatusFilter}
+          onChange={(val) => {
+            setStatusFilter(val as "all" | "active" | "inactive" | "placed");
+            setPage(1);
+          }}
         />
         <Select
-          options={yearFilters}
-          value={yearFilter}
-          onChange={setYearFilter}
+          options={branchOptions}
+          value={branchFilter}
+          onChange={(val) => {
+            setBranchFilter(val);
+            setPage(1);
+          }}
         />
       </div>
 
       {/* Students List */}
-      {filteredStudents.length === 0 ? (
+      {students.length === 0 ? (
         <Card>
           <CardContent className="p-12 text-center">
             <Users className="h-12 w-12 text-[#D1D5DB] mx-auto mb-4" />
@@ -129,17 +140,26 @@ export default function CollegeStudentsPage() {
                 <thead>
                   <tr className="border-b border-[#E5E7EB] bg-[#F9FAFB]">
                     <th className="text-left p-4 font-medium text-[#6B7280]">Student</th>
-                    <th className="text-left p-4 font-medium text-[#6B7280]">Score</th>
+                    <th className="text-left p-4 font-medium text-[#6B7280]">Branch</th>
+                    <th className="text-left p-4 font-medium text-[#6B7280]">Year</th>
                     <th className="text-left p-4 font-medium text-[#6B7280]">Rank</th>
                     <th className="text-left p-4 font-medium text-[#6B7280]">Status</th>
                     <th className="text-right p-4 font-medium text-[#6B7280]">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                  {filteredStudents.map((student: any, index: number) => (
+                  {students.map((student: {
+                    id: string;
+                    name: string;
+                    email: string;
+                    branch?: string | null;
+                    graduationYear?: number | null;
+                    rank?: number | null;
+                    isPlaced: boolean;
+                    isActive: boolean;
+                  }, index: number) => (
                     <motion.tr
-                      key={student.userId}
+                      key={student.id}
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: index * 0.02 }}
@@ -147,31 +167,49 @@ export default function CollegeStudentsPage() {
                     >
                       <td className="p-4">
                         <div className="flex items-center gap-3">
-                          <Avatar fallback={student.name || "?"} size="sm" src={student.avatarUrl} />
+                          <Avatar fallback={student.name || "?"} size="sm" />
                           <div>
                             <p className="font-medium text-[#1F2937]">{student.name}</p>
-                            <p className="text-sm text-[#6B7280]">{student.collegeName}</p>
+                            <p className="text-sm text-[#6B7280]">{student.email}</p>
                           </div>
                         </div>
                       </td>
                       <td className="p-4">
-                        <span className="font-semibold text-[#0EA5E9]">
-                          {student.score?.toLocaleString() || "-"}
-                        </span>
+                        <span className="text-[#1F2937]">{student.branch || "-"}</span>
                       </td>
                       <td className="p-4">
-                        <span className="text-[#1F2937]">
-                          {student.rank ? `#${student.rank}` : "-"}
-                        </span>
+                        <span className="text-[#1F2937]">{student.graduationYear || "-"}</span>
                       </td>
                       <td className="p-4">
-                        <Badge variant="success" className="gap-1">
-                          <CheckCircle2 className="h-3 w-3" />
-                          Active
-                        </Badge>
+                        {student.rank ? (
+                          <span className="font-semibold text-[#0EA5E9] flex items-center gap-1">
+                            <Award className="h-4 w-4" />
+                            #{student.rank}
+                          </span>
+                        ) : (
+                          <span className="text-[#6B7280]">-</span>
+                        )}
+                      </td>
+                      <td className="p-4">
+                        {student.isPlaced ? (
+                          <Badge variant="success" className="gap-1">
+                            <CheckCircle2 className="h-3 w-3" />
+                            Placed
+                          </Badge>
+                        ) : student.isActive ? (
+                          <Badge variant="info" className="gap-1">
+                            <CheckCircle2 className="h-3 w-3" />
+                            Active
+                          </Badge>
+                        ) : (
+                          <Badge variant="secondary" className="gap-1">
+                            <XCircle className="h-3 w-3" />
+                            Inactive
+                          </Badge>
+                        )}
                       </td>
                       <td className="p-4 text-right">
-                        <Link href={`/college/students/${student.userId}`}>
+                        <Link href={`/college/students/${student.id}`}>
                           <Button variant="outline" size="sm" className="gap-1">
                             View
                             <ChevronRight className="h-4 w-4" />
@@ -183,6 +221,40 @@ export default function CollegeStudentsPage() {
                 </tbody>
               </table>
             </div>
+
+            {/* Pagination */}
+            {pagination.totalPages > 1 && (
+              <div className="flex items-center justify-between p-4 border-t border-[#E5E7EB]">
+                <p className="text-sm text-[#6B7280]">
+                  Showing {(page - 1) * pagination.limit + 1} to {Math.min(page * pagination.limit, pagination.total)} of {pagination.total} students
+                </p>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={page <= 1}
+                    onClick={() => setPage(page - 1)}
+                    className="gap-1"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                    Previous
+                  </Button>
+                  <span className="text-sm text-[#6B7280]">
+                    Page {page} of {pagination.totalPages}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={page >= pagination.totalPages}
+                    onClick={() => setPage(page + 1)}
+                    className="gap-1"
+                  >
+                    Next
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
