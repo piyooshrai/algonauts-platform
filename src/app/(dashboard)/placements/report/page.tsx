@@ -87,7 +87,7 @@ export default function ReportPlacementPage() {
             </div>
 
             <div className="flex flex-col gap-3">
-              <Link href="/placements">
+              <Link href="/activity?tab=placements">
                 <Button className="w-full gap-2">
                   <CheckCircle2 className="h-4 w-4" />
                   View My Placements
@@ -113,7 +113,7 @@ export default function ReportPlacementPage() {
     >
       {/* Header */}
       <div className="flex items-center gap-4">
-        <Link href="/placements">
+        <Link href="/activity?tab=placements">
           <Button variant="outline" size="sm" className="gap-1">
             <ArrowLeft className="h-4 w-4" />
             Back

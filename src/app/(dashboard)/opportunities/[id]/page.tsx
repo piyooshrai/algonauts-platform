@@ -409,9 +409,9 @@ export default function OpportunityDetailPage() {
                     </p>
                   </div>
                 </div>
-                <Link href="/applications" className="block mt-3">
+                <Link href="/activity" className="block mt-3">
                   <Button variant="outline" size="sm" className="w-full">
-                    View My Applications
+                    View My Activity
                   </Button>
                 </Link>
               </CardContent>

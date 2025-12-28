@@ -358,7 +358,7 @@ export default function ProfilePage() {
             </Card>
           </motion.div>
 
-          {/* Badges / Achievements */}
+          {/* Achievements */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -369,13 +369,11 @@ export default function ProfilePage() {
                 <div className="flex items-center justify-between">
                   <CardTitle className="flex items-center gap-2">
                     <Award className="h-5 w-5 text-muted-foreground" />
-                    Badges
+                    Your Achievements
                   </CardTitle>
-                  {badges.length > 4 && (
-                    <Link href="/badges" className="text-sm text-[#0EA5E9] hover:underline">
-                      View all
-                    </Link>
-                  )}
+                  <Link href="/activity?tab=achievements" className="text-sm text-[#0EA5E9] hover:underline">
+                    View all badges
+                  </Link>
                 </div>
               </CardHeader>
               <CardContent>
