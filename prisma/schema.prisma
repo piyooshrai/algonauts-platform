@@ -305,6 +305,9 @@ model Profile {
   @@index([city, state])
   @@index([graduationYear])
   @@index([skills])
+  @@index([collegeId, totalXp])  // Leaderboard by college
+  @@index([state, totalXp])      // Leaderboard by state
+  @@index([totalXp])             // National leaderboard
 }
 
 model Experience {
@@ -595,6 +598,8 @@ model Application {
   @@index([opportunityId])
   @@index([status])
   @@index([submittedAt])
+  @@index([opportunityId, submittedAt])  // For counting today's applications per opportunity
+  @@index([userId, status])              // For filtering user's applications by status
 }
 
 model Invite {

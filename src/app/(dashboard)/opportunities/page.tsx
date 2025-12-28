@@ -202,7 +202,8 @@ export default function OpportunitiesPage() {
       {/* Opportunities List */}
       {!isLoading && opportunities.length > 0 && (
         <div className="space-y-4">
-          {opportunities.map((opportunity, index) => (
+          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+          {opportunities.map((opportunity: any, index: number) => (
             <motion.div
               key={opportunity.id}
               initial={{ opacity: 0, y: 20 }}
