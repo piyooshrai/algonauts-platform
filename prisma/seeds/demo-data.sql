@@ -17,39 +17,39 @@ BEGIN
 -- ============================================================================
 
 -- IITs
-INSERT INTO "College" (id, name, "shortName", slug, city, state, type, "overallRank", "engineeringRank", "isVerified", "isActive", "totalStudents", "activeStudents", "createdAt", "updatedAt")
+INSERT INTO "College" (id, name, "shortName", slug, city, state, type, "overallRank", "isVerified", "isActive", "totalStudents", "activeStudents", "createdAt", "updatedAt")
 VALUES
-  ('iit-bombay', 'Indian Institute of Technology Bombay', 'IIT Bombay', 'iit-bombay', 'Mumbai', 'Maharashtra', 'IIT', 1, 1, true, true, 3500, 2800, now_ts, now_ts),
-  ('iit-delhi', 'Indian Institute of Technology Delhi', 'IIT Delhi', 'iit-delhi', 'New Delhi', 'Delhi', 'IIT', 2, 2, true, true, 3200, 2600, now_ts, now_ts),
-  ('iit-madras', 'Indian Institute of Technology Madras', 'IIT Madras', 'iit-madras', 'Chennai', 'Tamil Nadu', 'IIT', 3, 3, true, true, 3400, 2700, now_ts, now_ts),
-  ('iit-kanpur', 'Indian Institute of Technology Kanpur', 'IIT Kanpur', 'iit-kanpur', 'Kanpur', 'Uttar Pradesh', 'IIT', 4, 4, true, true, 3000, 2400, now_ts, now_ts),
-  ('iit-kharagpur', 'Indian Institute of Technology Kharagpur', 'IIT Kharagpur', 'iit-kharagpur', 'Kharagpur', 'West Bengal', 'IIT', 5, 5, true, true, 4000, 3200, now_ts, now_ts),
-  ('iit-roorkee', 'Indian Institute of Technology Roorkee', 'IIT Roorkee', 'iit-roorkee', 'Roorkee', 'Uttarakhand', 'IIT', 6, 6, true, true, 3100, 2500, now_ts, now_ts),
-  ('iit-guwahati', 'Indian Institute of Technology Guwahati', 'IIT Guwahati', 'iit-guwahati', 'Guwahati', 'Assam', 'IIT', 7, 7, true, true, 2800, 2200, now_ts, now_ts),
-  ('iit-hyderabad', 'Indian Institute of Technology Hyderabad', 'IIT Hyderabad', 'iit-hyderabad', 'Hyderabad', 'Telangana', 'IIT', 8, 8, true, true, 2500, 2000, now_ts, now_ts)
+  ('iit-bombay', 'Indian Institute of Technology Bombay', 'IIT Bombay', 'iit-bombay', 'Mumbai', 'Maharashtra', 'IIT', 1, true, true, 3500, 2800, now_ts, now_ts),
+  ('iit-delhi', 'Indian Institute of Technology Delhi', 'IIT Delhi', 'iit-delhi', 'New Delhi', 'Delhi', 'IIT', 2, true, true, 3200, 2600, now_ts, now_ts),
+  ('iit-madras', 'Indian Institute of Technology Madras', 'IIT Madras', 'iit-madras', 'Chennai', 'Tamil Nadu', 'IIT', 3, true, true, 3400, 2700, now_ts, now_ts),
+  ('iit-kanpur', 'Indian Institute of Technology Kanpur', 'IIT Kanpur', 'iit-kanpur', 'Kanpur', 'Uttar Pradesh', 'IIT', 4, true, true, 3000, 2400, now_ts, now_ts),
+  ('iit-kharagpur', 'Indian Institute of Technology Kharagpur', 'IIT Kharagpur', 'iit-kharagpur', 'Kharagpur', 'West Bengal', 'IIT', 5, true, true, 4000, 3200, now_ts, now_ts),
+  ('iit-roorkee', 'Indian Institute of Technology Roorkee', 'IIT Roorkee', 'iit-roorkee', 'Roorkee', 'Uttarakhand', 'IIT', 6, true, true, 3100, 2500, now_ts, now_ts),
+  ('iit-guwahati', 'Indian Institute of Technology Guwahati', 'IIT Guwahati', 'iit-guwahati', 'Guwahati', 'Assam', 'IIT', 7, true, true, 2800, 2200, now_ts, now_ts),
+  ('iit-hyderabad', 'Indian Institute of Technology Hyderabad', 'IIT Hyderabad', 'iit-hyderabad', 'Hyderabad', 'Telangana', 'IIT', 8, true, true, 2500, 2000, now_ts, now_ts)
 ON CONFLICT (id) DO NOTHING;
 
 -- NITs
-INSERT INTO "College" (id, name, "shortName", slug, city, state, type, "overallRank", "engineeringRank", "isVerified", "isActive", "totalStudents", "activeStudents", "createdAt", "updatedAt")
+INSERT INTO "College" (id, name, "shortName", slug, city, state, type, "overallRank", "isVerified", "isActive", "totalStudents", "activeStudents", "createdAt", "updatedAt")
 VALUES
-  ('nit-trichy', 'National Institute of Technology Trichy', 'NIT Trichy', 'nit-trichy', 'Tiruchirappalli', 'Tamil Nadu', 'NIT', 10, 10, true, true, 2800, 2200, now_ts, now_ts),
-  ('nit-warangal', 'National Institute of Technology Warangal', 'NIT Warangal', 'nit-warangal', 'Warangal', 'Telangana', 'NIT', 11, 11, true, true, 2600, 2100, now_ts, now_ts),
-  ('nit-surathkal', 'National Institute of Technology Surathkal', 'NIT Surathkal', 'nit-surathkal', 'Mangalore', 'Karnataka', 'NIT', 12, 12, true, true, 2500, 2000, now_ts, now_ts),
-  ('nit-rourkela', 'National Institute of Technology Rourkela', 'NIT Rourkela', 'nit-rourkela', 'Rourkela', 'Odisha', 'NIT', 13, 13, true, true, 2400, 1900, now_ts, now_ts),
-  ('nit-calicut', 'National Institute of Technology Calicut', 'NIT Calicut', 'nit-calicut', 'Calicut', 'Kerala', 'NIT', 14, 14, true, true, 2300, 1800, now_ts, now_ts)
+  ('nit-trichy', 'National Institute of Technology Trichy', 'NIT Trichy', 'nit-trichy', 'Tiruchirappalli', 'Tamil Nadu', 'NIT', 10, true, true, 2800, 2200, now_ts, now_ts),
+  ('nit-warangal', 'National Institute of Technology Warangal', 'NIT Warangal', 'nit-warangal', 'Warangal', 'Telangana', 'NIT', 11, true, true, 2600, 2100, now_ts, now_ts),
+  ('nit-surathkal', 'National Institute of Technology Surathkal', 'NIT Surathkal', 'nit-surathkal', 'Mangalore', 'Karnataka', 'NIT', 12, true, true, 2500, 2000, now_ts, now_ts),
+  ('nit-rourkela', 'National Institute of Technology Rourkela', 'NIT Rourkela', 'nit-rourkela', 'Rourkela', 'Odisha', 'NIT', 13, true, true, 2400, 1900, now_ts, now_ts),
+  ('nit-calicut', 'National Institute of Technology Calicut', 'NIT Calicut', 'nit-calicut', 'Calicut', 'Kerala', 'NIT', 14, true, true, 2300, 1800, now_ts, now_ts)
 ON CONFLICT (id) DO NOTHING;
 
 -- Other Top Colleges
-INSERT INTO "College" (id, name, "shortName", slug, city, state, type, "overallRank", "engineeringRank", "isVerified", "isActive", "totalStudents", "activeStudents", "createdAt", "updatedAt")
+INSERT INTO "College" (id, name, "shortName", slug, city, state, type, "overallRank", "isVerified", "isActive", "totalStudents", "activeStudents", "createdAt", "updatedAt")
 VALUES
-  ('bits-pilani', 'BITS Pilani', 'BITS', 'bits-pilani', 'Pilani', 'Rajasthan', 'Private', 9, 9, true, true, 3500, 2800, now_ts, now_ts),
-  ('vit-vellore', 'Vellore Institute of Technology', 'VIT', 'vit-vellore', 'Vellore', 'Tamil Nadu', 'Private', 18, 18, true, true, 5000, 4000, now_ts, now_ts),
-  ('srm-chennai', 'SRM Institute of Science and Technology', 'SRM', 'srm-chennai', 'Chennai', 'Tamil Nadu', 'Private', 20, 20, true, true, 4500, 3600, now_ts, now_ts),
-  ('mit-manipal', 'Manipal Institute of Technology', 'MIT Manipal', 'mit-manipal', 'Manipal', 'Karnataka', 'Private', 22, 22, true, true, 4000, 3200, now_ts, now_ts),
-  ('dtu-delhi', 'Delhi Technological University', 'DTU', 'dtu-delhi', 'New Delhi', 'Delhi', 'State', 19, 19, true, true, 3000, 2400, now_ts, now_ts),
-  ('nsut-delhi', 'Netaji Subhas University of Technology', 'NSUT', 'nsut-delhi', 'New Delhi', 'Delhi', 'State', 21, 21, true, true, 2800, 2200, now_ts, now_ts),
-  ('pes-bangalore', 'PES University', 'PES', 'pes-bangalore', 'Bangalore', 'Karnataka', 'Private', 30, 30, true, true, 3500, 2800, now_ts, now_ts),
-  ('rvce-bangalore', 'RV College of Engineering', 'RVCE', 'rvce-bangalore', 'Bangalore', 'Karnataka', 'Private', 32, 32, true, true, 3200, 2500, now_ts, now_ts)
+  ('bits-pilani', 'BITS Pilani', 'BITS', 'bits-pilani', 'Pilani', 'Rajasthan', 'Private', 9, true, true, 3500, 2800, now_ts, now_ts),
+  ('vit-vellore', 'Vellore Institute of Technology', 'VIT', 'vit-vellore', 'Vellore', 'Tamil Nadu', 'Private', 18, true, true, 5000, 4000, now_ts, now_ts),
+  ('srm-chennai', 'SRM Institute of Science and Technology', 'SRM', 'srm-chennai', 'Chennai', 'Tamil Nadu', 'Private', 20, true, true, 4500, 3600, now_ts, now_ts),
+  ('mit-manipal', 'Manipal Institute of Technology', 'MIT Manipal', 'mit-manipal', 'Manipal', 'Karnataka', 'Private', 22, true, true, 4000, 3200, now_ts, now_ts),
+  ('dtu-delhi', 'Delhi Technological University', 'DTU', 'dtu-delhi', 'New Delhi', 'Delhi', 'State', 19, true, true, 3000, 2400, now_ts, now_ts),
+  ('nsut-delhi', 'Netaji Subhas University of Technology', 'NSUT', 'nsut-delhi', 'New Delhi', 'Delhi', 'State', 21, true, true, 2800, 2200, now_ts, now_ts),
+  ('pes-bangalore', 'PES University', 'PES', 'pes-bangalore', 'Bangalore', 'Karnataka', 'Private', 30, true, true, 3500, 2800, now_ts, now_ts),
+  ('rvce-bangalore', 'RV College of Engineering', 'RVCE', 'rvce-bangalore', 'Bangalore', 'Karnataka', 'Private', 32, true, true, 3200, 2500, now_ts, now_ts)
 ON CONFLICT (id) DO NOTHING;
 
 -- ============================================================================
@@ -187,16 +187,16 @@ VALUES
   ('admin-pes-bangalore', 'admin@pes-bangalore.demo', password_hash, 'COLLEGE_ADMIN', now_ts, true, now_ts, now_ts)
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO "CollegeAdmin" (id, "userId", "collegeId", role, department, "canManageStudents", "canViewAnalytics", "createdAt", "updatedAt")
+INSERT INTO "CollegeAdmin" (id, "userId", "collegeId", role, department, "createdAt", "updatedAt")
 VALUES
-  ('ca-iit-bombay', 'admin-iit-bombay', 'iit-bombay', 'placement_officer', 'Placement Cell', true, true, now_ts, now_ts),
-  ('ca-iit-delhi', 'admin-iit-delhi', 'iit-delhi', 'placement_officer', 'Placement Cell', true, true, now_ts, now_ts),
-  ('ca-iit-madras', 'admin-iit-madras', 'iit-madras', 'placement_officer', 'Placement Cell', true, true, now_ts, now_ts),
-  ('ca-nit-trichy', 'admin-nit-trichy', 'nit-trichy', 'placement_officer', 'Placement Cell', true, true, now_ts, now_ts),
-  ('ca-bits-pilani', 'admin-bits-pilani', 'bits-pilani', 'placement_officer', 'Placement Cell', true, true, now_ts, now_ts),
-  ('ca-vit-vellore', 'admin-vit-vellore', 'vit-vellore', 'placement_officer', 'Placement Cell', true, true, now_ts, now_ts),
-  ('ca-dtu-delhi', 'admin-dtu-delhi', 'dtu-delhi', 'placement_officer', 'Placement Cell', true, true, now_ts, now_ts),
-  ('ca-pes-bangalore', 'admin-pes-bangalore', 'pes-bangalore', 'placement_officer', 'Placement Cell', true, true, now_ts, now_ts)
+  ('ca-iit-bombay', 'admin-iit-bombay', 'iit-bombay', 'placement_officer', 'Placement Cell', now_ts, now_ts),
+  ('ca-iit-delhi', 'admin-iit-delhi', 'iit-delhi', 'placement_officer', 'Placement Cell', now_ts, now_ts),
+  ('ca-iit-madras', 'admin-iit-madras', 'iit-madras', 'placement_officer', 'Placement Cell', now_ts, now_ts),
+  ('ca-nit-trichy', 'admin-nit-trichy', 'nit-trichy', 'placement_officer', 'Placement Cell', now_ts, now_ts),
+  ('ca-bits-pilani', 'admin-bits-pilani', 'bits-pilani', 'placement_officer', 'Placement Cell', now_ts, now_ts),
+  ('ca-vit-vellore', 'admin-vit-vellore', 'vit-vellore', 'placement_officer', 'Placement Cell', now_ts, now_ts),
+  ('ca-dtu-delhi', 'admin-dtu-delhi', 'dtu-delhi', 'placement_officer', 'Placement Cell', now_ts, now_ts),
+  ('ca-pes-bangalore', 'admin-pes-bangalore', 'pes-bangalore', 'placement_officer', 'Placement Cell', now_ts, now_ts)
 ON CONFLICT (id) DO NOTHING;
 
 -- ============================================================================
