@@ -132,43 +132,22 @@ ON CONFLICT (id) DO NOTHING;
 -- JOB OPPORTUNITIES
 -- ============================================================================
 
-INSERT INTO "Opportunity" (id, "companyId", title, description, type, "salaryMin", "salaryMax", location, "isRemote", skills, "experienceMin", "experienceMax", status, deadline, "isActive", openings, "createdAt", "updatedAt")
+INSERT INTO "Opportunity" (id, "companyId", slug, title, description, type, "salaryMin", "salaryMax", locations, "isRemote", "requiredSkills", "minExperience", "maxExperience", status, "expiresAt", "createdAt", "updatedAt")
 VALUES
-  -- TCS
-  ('opp-tcs-sde', 'company-tcs', 'Software Development Engineer', 'Join TCS as a Software Development Engineer. Work on cutting-edge enterprise solutions.', 'FULL_TIME', 400000, 800000, 'Mumbai', false, ARRAY['Java', 'Spring Boot', 'SQL', 'Git'], 0, 2, 'PUBLISHED', now_ts + interval '30 days', true, 50, now_ts, now_ts),
-  ('opp-tcs-fsd', 'company-tcs', 'Full Stack Developer', 'Build modern web applications using React and Node.js at TCS Digital.', 'FULL_TIME', 500000, 900000, 'Bangalore', false, ARRAY['React', 'Node.js', 'MongoDB', 'TypeScript'], 0, 2, 'PUBLISHED', now_ts + interval '30 days', true, 30, now_ts, now_ts),
-
-  -- Infosys
-  ('opp-infosys-sde', 'company-infosys', 'Systems Engineer', 'Start your career with Infosys as a Systems Engineer.', 'FULL_TIME', 350000, 700000, 'Mysore', false, ARRAY['Java', 'Python', 'SQL', 'Linux'], 0, 1, 'PUBLISHED', now_ts + interval '30 days', true, 100, now_ts, now_ts),
-  ('opp-infosys-ds', 'company-infosys', 'Data Scientist', 'Apply ML and AI to solve business problems at Infosys.', 'FULL_TIME', 800000, 1500000, 'Bangalore', false, ARRAY['Python', 'Machine Learning', 'TensorFlow', 'SQL'], 0, 2, 'PUBLISHED', now_ts + interval '30 days', true, 15, now_ts, now_ts),
-
-  -- Microsoft
-  ('opp-msft-sde', 'company-microsoft', 'Software Engineer', 'Build products that empower every person on the planet at Microsoft.', 'FULL_TIME', 1800000, 3500000, 'Hyderabad', true, ARRAY['C#', '.NET', 'Azure', 'System Design'], 0, 2, 'PUBLISHED', now_ts + interval '45 days', true, 20, now_ts, now_ts),
-  ('opp-msft-pm', 'company-microsoft', 'Product Manager', 'Shape the future of Microsoft products as a PM.', 'FULL_TIME', 2000000, 4000000, 'Bangalore', true, ARRAY['Product Management', 'SQL', 'Analytics', 'Communication'], 0, 3, 'PUBLISHED', now_ts + interval '45 days', true, 10, now_ts, now_ts),
-
-  -- Google
-  ('opp-google-swe', 'company-google', 'Software Engineer L3', 'Solve complex problems at scale at Google.', 'FULL_TIME', 2500000, 5000000, 'Bangalore', true, ARRAY['Algorithms', 'System Design', 'C++', 'Python'], 0, 2, 'PUBLISHED', now_ts + interval '60 days', true, 15, now_ts, now_ts),
-
-  -- Amazon
-  ('opp-amazon-sde', 'company-amazon', 'SDE I', 'Build and operate massively scalable systems at Amazon.', 'FULL_TIME', 2000000, 4000000, 'Hyderabad', false, ARRAY['Java', 'AWS', 'System Design', 'Algorithms'], 0, 2, 'PUBLISHED', now_ts + interval '45 days', true, 50, now_ts, now_ts),
-
-  -- Flipkart
-  ('opp-fk-sde', 'company-flipkart', 'SDE 1', 'Build India''s largest e-commerce platform at Flipkart.', 'FULL_TIME', 1800000, 3200000, 'Bangalore', false, ARRAY['Java', 'Spring', 'MySQL', 'Redis'], 0, 2, 'PUBLISHED', now_ts + interval '30 days', true, 25, now_ts, now_ts),
-
-  -- Razorpay
-  ('opp-rzp-be', 'company-razorpay', 'Backend Engineer', 'Build India''s payment infrastructure at Razorpay.', 'FULL_TIME', 1600000, 3000000, 'Bangalore', true, ARRAY['Go', 'Python', 'PostgreSQL', 'Redis'], 0, 2, 'PUBLISHED', now_ts + interval '30 days', true, 15, now_ts, now_ts),
-
-  -- CRED
-  ('opp-cred-sde', 'company-cred', 'Software Engineer', 'Build fintech products for the creditworthy at CRED.', 'FULL_TIME', 2000000, 4000000, 'Bangalore', true, ARRAY['Kotlin', 'Spring Boot', 'PostgreSQL', 'Kafka'], 0, 2, 'PUBLISHED', now_ts + interval '30 days', true, 10, now_ts, now_ts),
-
-  -- Swiggy
-  ('opp-swiggy-sde', 'company-swiggy', 'Software Development Engineer', 'Build hyperlocal commerce at Swiggy.', 'FULL_TIME', 1400000, 2800000, 'Bangalore', false, ARRAY['Java', 'Microservices', 'Kafka', 'MongoDB'], 0, 2, 'PUBLISHED', now_ts + interval '30 days', true, 20, now_ts, now_ts),
-
-  -- Freshworks
-  ('opp-frsh-sde', 'company-freshworks', 'Software Engineer', 'Build SaaS products loved by millions at Freshworks.', 'FULL_TIME', 1600000, 3200000, 'Chennai', true, ARRAY['Ruby', 'React', 'PostgreSQL', 'AWS'], 0, 2, 'PUBLISHED', now_ts + interval '30 days', true, 15, now_ts, now_ts),
-
-  -- Zoho
-  ('opp-zoho-member', 'company-zoho', 'Member Technical Staff', 'Join Zoho and work on enterprise software.', 'FULL_TIME', 800000, 1600000, 'Chennai', false, ARRAY['Java', 'JavaScript', 'SQL', 'Linux'], 0, 1, 'PUBLISHED', now_ts + interval '30 days', true, 40, now_ts, now_ts)
+  ('opp-tcs-sde', 'cp-tcs', 'tcs-sde-2025', 'Software Development Engineer', 'Join TCS as a Software Development Engineer. Work on cutting-edge enterprise solutions.', 'FULL_TIME', 400000, 800000, ARRAY['Mumbai'], false, ARRAY['Java', 'Spring Boot', 'SQL', 'Git'], 0, 24, 'PUBLISHED', now_ts + interval '30 days', now_ts, now_ts),
+  ('opp-tcs-fsd', 'cp-tcs', 'tcs-fsd-2025', 'Full Stack Developer', 'Build modern web applications using React and Node.js at TCS Digital.', 'FULL_TIME', 500000, 900000, ARRAY['Bangalore'], false, ARRAY['React', 'Node.js', 'MongoDB', 'TypeScript'], 0, 24, 'PUBLISHED', now_ts + interval '30 days', now_ts, now_ts),
+  ('opp-infosys-sde', 'cp-infosys', 'infosys-se-2025', 'Systems Engineer', 'Start your career with Infosys as a Systems Engineer.', 'FULL_TIME', 350000, 700000, ARRAY['Mysore'], false, ARRAY['Java', 'Python', 'SQL', 'Linux'], 0, 12, 'PUBLISHED', now_ts + interval '30 days', now_ts, now_ts),
+  ('opp-infosys-ds', 'cp-infosys', 'infosys-ds-2025', 'Data Scientist', 'Apply ML and AI to solve business problems at Infosys.', 'FULL_TIME', 800000, 1500000, ARRAY['Bangalore'], false, ARRAY['Python', 'Machine Learning', 'TensorFlow', 'SQL'], 0, 24, 'PUBLISHED', now_ts + interval '30 days', now_ts, now_ts),
+  ('opp-msft-sde', 'cp-microsoft', 'microsoft-swe-2025', 'Software Engineer', 'Build products that empower every person on the planet at Microsoft.', 'FULL_TIME', 1800000, 3500000, ARRAY['Hyderabad'], true, ARRAY['C#', '.NET', 'Azure', 'System Design'], 0, 24, 'PUBLISHED', now_ts + interval '45 days', now_ts, now_ts),
+  ('opp-msft-pm', 'cp-microsoft', 'microsoft-pm-2025', 'Product Manager', 'Shape the future of Microsoft products as a PM.', 'FULL_TIME', 2000000, 4000000, ARRAY['Bangalore'], true, ARRAY['Product Management', 'SQL', 'Analytics', 'Communication'], 0, 36, 'PUBLISHED', now_ts + interval '45 days', now_ts, now_ts),
+  ('opp-google-swe', 'cp-google', 'google-swe-l3-2025', 'Software Engineer L3', 'Solve complex problems at scale at Google.', 'FULL_TIME', 2500000, 5000000, ARRAY['Bangalore'], true, ARRAY['Algorithms', 'System Design', 'C++', 'Python'], 0, 24, 'PUBLISHED', now_ts + interval '60 days', now_ts, now_ts),
+  ('opp-amazon-sde', 'cp-amazon', 'amazon-sde1-2025', 'SDE I', 'Build and operate massively scalable systems at Amazon.', 'FULL_TIME', 2000000, 4000000, ARRAY['Hyderabad'], false, ARRAY['Java', 'AWS', 'System Design', 'Algorithms'], 0, 24, 'PUBLISHED', now_ts + interval '45 days', now_ts, now_ts),
+  ('opp-fk-sde', 'cp-flipkart', 'flipkart-sde1-2025', 'SDE 1', 'Build India''s largest e-commerce platform at Flipkart.', 'FULL_TIME', 1800000, 3200000, ARRAY['Bangalore'], false, ARRAY['Java', 'Spring', 'MySQL', 'Redis'], 0, 24, 'PUBLISHED', now_ts + interval '30 days', now_ts, now_ts),
+  ('opp-rzp-be', 'cp-razorpay', 'razorpay-be-2025', 'Backend Engineer', 'Build India''s payment infrastructure at Razorpay.', 'FULL_TIME', 1600000, 3000000, ARRAY['Bangalore'], true, ARRAY['Go', 'Python', 'PostgreSQL', 'Redis'], 0, 24, 'PUBLISHED', now_ts + interval '30 days', now_ts, now_ts),
+  ('opp-cred-sde', 'cp-cred', 'cred-swe-2025', 'Software Engineer', 'Build fintech products for the creditworthy at CRED.', 'FULL_TIME', 2000000, 4000000, ARRAY['Bangalore'], true, ARRAY['Kotlin', 'Spring Boot', 'PostgreSQL', 'Kafka'], 0, 24, 'PUBLISHED', now_ts + interval '30 days', now_ts, now_ts),
+  ('opp-swiggy-sde', 'cp-swiggy', 'swiggy-sde-2025', 'Software Development Engineer', 'Build hyperlocal commerce at Swiggy.', 'FULL_TIME', 1400000, 2800000, ARRAY['Bangalore'], false, ARRAY['Java', 'Microservices', 'Kafka', 'MongoDB'], 0, 24, 'PUBLISHED', now_ts + interval '30 days', now_ts, now_ts),
+  ('opp-frsh-sde', 'cp-freshworks', 'freshworks-swe-2025', 'Software Engineer', 'Build SaaS products loved by millions at Freshworks.', 'FULL_TIME', 1600000, 3200000, ARRAY['Chennai'], true, ARRAY['Ruby', 'React', 'PostgreSQL', 'AWS'], 0, 24, 'PUBLISHED', now_ts + interval '30 days', now_ts, now_ts),
+  ('opp-zoho-member', 'cp-zoho', 'zoho-mts-2025', 'Member Technical Staff', 'Join Zoho and work on enterprise software.', 'FULL_TIME', 800000, 1600000, ARRAY['Chennai'], false, ARRAY['Java', 'JavaScript', 'SQL', 'Linux'], 0, 12, 'PUBLISHED', now_ts + interval '30 days', now_ts, now_ts)
 ON CONFLICT (id) DO NOTHING;
 
 -- ============================================================================
@@ -218,18 +197,18 @@ VALUES
   ('student-iitb-10', 'kavya.nair@iit-bombay.demo', password_hash, 'STUDENT', now_ts, true, now_ts, now_ts)
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO "Profile" (id, "userId", "firstName", "lastName", "collegeId", "collegeName", branch, "graduationYear", skills, "totalXp", "layersRankOverall", "layersRankPercentile", "isProfileComplete", "createdAt", "updatedAt")
+INSERT INTO "Profile" (id, "userId", "firstName", "lastName", "collegeId", "collegeName", branch, "graduationYear", skills, "layersRankOverall", "createdAt", "updatedAt")
 VALUES
-  ('profile-iitb-1', 'student-iitb-1', 'Aarav', 'Sharma', 'iit-bombay', 'Indian Institute of Technology Bombay', 'Computer Science and Engineering', 2025, ARRAY['Python', 'Machine Learning', 'TensorFlow', 'SQL', 'Docker'], 4500, 150, 99, true, now_ts, now_ts),
-  ('profile-iitb-2', 'student-iitb-2', 'Ananya', 'Gupta', 'iit-bombay', 'Indian Institute of Technology Bombay', 'Computer Science and Engineering', 2025, ARRAY['Java', 'Spring Boot', 'React', 'PostgreSQL', 'AWS'], 4200, 280, 98, true, now_ts, now_ts),
-  ('profile-iitb-3', 'student-iitb-3', 'Vivaan', 'Singh', 'iit-bombay', 'Indian Institute of Technology Bombay', 'Electrical Engineering', 2025, ARRAY['C++', 'Embedded Systems', 'MATLAB', 'Python'], 3800, 450, 97, true, now_ts, now_ts),
-  ('profile-iitb-4', 'student-iitb-4', 'Priya', 'Patel', 'iit-bombay', 'Indian Institute of Technology Bombay', 'Computer Science and Engineering', 2026, ARRAY['JavaScript', 'TypeScript', 'React', 'Node.js', 'MongoDB'], 3500, 620, 96, true, now_ts, now_ts),
-  ('profile-iitb-5', 'student-iitb-5', 'Arjun', 'Reddy', 'iit-bombay', 'Indian Institute of Technology Bombay', 'Data Science and AI', 2025, ARRAY['Python', 'Deep Learning', 'PyTorch', 'NLP', 'Computer Vision'], 4100, 320, 98, true, now_ts, now_ts),
-  ('profile-iitb-6', 'student-iitb-6', 'Neha', 'Verma', 'iit-bombay', 'Indian Institute of Technology Bombay', 'Computer Science and Engineering', 2026, ARRAY['Go', 'Kubernetes', 'Docker', 'System Design'], 3200, 850, 95, true, now_ts, now_ts),
-  ('profile-iitb-7', 'student-iitb-7', 'Rohan', 'Kumar', 'iit-bombay', 'Indian Institute of Technology Bombay', 'Information Technology', 2025, ARRAY['Java', 'Microservices', 'Kafka', 'Redis', 'MySQL'], 3900, 400, 97, true, now_ts, now_ts),
-  ('profile-iitb-8', 'student-iitb-8', 'Shreya', 'Iyer', 'iit-bombay', 'Indian Institute of Technology Bombay', 'Computer Science and Engineering', 2025, ARRAY['Rust', 'WebAssembly', 'React', 'GraphQL'], 4000, 380, 97, true, now_ts, now_ts),
-  ('profile-iitb-9', 'student-iitb-9', 'Kabir', 'Joshi', 'iit-bombay', 'Indian Institute of Technology Bombay', 'Electronics and Communication', 2026, ARRAY['Verilog', 'FPGA', 'Python', 'Signal Processing'], 2800, 1200, 92, true, now_ts, now_ts),
-  ('profile-iitb-10', 'student-iitb-10', 'Kavya', 'Nair', 'iit-bombay', 'Indian Institute of Technology Bombay', 'Computer Science and Engineering', 2025, ARRAY['Python', 'Django', 'React', 'PostgreSQL', 'Docker'], 4300, 250, 98, true, now_ts, now_ts)
+  ('profile-iitb-1', 'student-iitb-1', 'Aarav', 'Sharma', 'iit-bombay', 'Indian Institute of Technology Bombay', 'Computer Science and Engineering', 2025, ARRAY['Python', 'Machine Learning', 'TensorFlow', 'SQL', 'Docker'], 92.5, now_ts, now_ts),
+  ('profile-iitb-2', 'student-iitb-2', 'Ananya', 'Gupta', 'iit-bombay', 'Indian Institute of Technology Bombay', 'Computer Science and Engineering', 2025, ARRAY['Java', 'Spring Boot', 'React', 'PostgreSQL', 'AWS'], 88.2, now_ts, now_ts),
+  ('profile-iitb-3', 'student-iitb-3', 'Vivaan', 'Singh', 'iit-bombay', 'Indian Institute of Technology Bombay', 'Electrical Engineering', 2025, ARRAY['C++', 'Embedded Systems', 'MATLAB', 'Python'], 85.7, now_ts, now_ts),
+  ('profile-iitb-4', 'student-iitb-4', 'Priya', 'Patel', 'iit-bombay', 'Indian Institute of Technology Bombay', 'Computer Science and Engineering', 2026, ARRAY['JavaScript', 'TypeScript', 'React', 'Node.js', 'MongoDB'], 78.3, now_ts, now_ts),
+  ('profile-iitb-5', 'student-iitb-5', 'Arjun', 'Reddy', 'iit-bombay', 'Indian Institute of Technology Bombay', 'Data Science and AI', 2025, ARRAY['Python', 'Deep Learning', 'PyTorch', 'NLP', 'Computer Vision'], 90.1, now_ts, now_ts),
+  ('profile-iitb-6', 'student-iitb-6', 'Neha', 'Verma', 'iit-bombay', 'Indian Institute of Technology Bombay', 'Computer Science and Engineering', 2026, ARRAY['Go', 'Kubernetes', 'Docker', 'System Design'], 75.4, now_ts, now_ts),
+  ('profile-iitb-7', 'student-iitb-7', 'Rohan', 'Kumar', 'iit-bombay', 'Indian Institute of Technology Bombay', 'Information Technology', 2025, ARRAY['Java', 'Microservices', 'Kafka', 'Redis', 'MySQL'], 86.8, now_ts, now_ts),
+  ('profile-iitb-8', 'student-iitb-8', 'Shreya', 'Iyer', 'iit-bombay', 'Indian Institute of Technology Bombay', 'Computer Science and Engineering', 2025, ARRAY['Rust', 'WebAssembly', 'React', 'GraphQL'], 87.2, now_ts, now_ts),
+  ('profile-iitb-9', 'student-iitb-9', 'Kabir', 'Joshi', 'iit-bombay', 'Indian Institute of Technology Bombay', 'Electronics and Communication', 2026, ARRAY['Verilog', 'FPGA', 'Python', 'Signal Processing'], 72.5, now_ts, now_ts),
+  ('profile-iitb-10', 'student-iitb-10', 'Kavya', 'Nair', 'iit-bombay', 'Indian Institute of Technology Bombay', 'Computer Science and Engineering', 2025, ARRAY['Python', 'Django', 'React', 'PostgreSQL', 'Docker'], 89.3, now_ts, now_ts)
 ON CONFLICT (id) DO NOTHING;
 
 -- VIT Vellore Students
@@ -247,45 +226,18 @@ VALUES
   ('student-vit-10', 'tanya.agarwal@vit-vellore.demo', password_hash, 'STUDENT', now_ts, true, now_ts, now_ts)
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO "Profile" (id, "userId", "firstName", "lastName", "collegeId", "collegeName", branch, "graduationYear", skills, "totalXp", "layersRankOverall", "layersRankPercentile", "isProfileComplete", "createdAt", "updatedAt")
+INSERT INTO "Profile" (id, "userId", "firstName", "lastName", "collegeId", "collegeName", branch, "graduationYear", skills, "layersRankOverall", "createdAt", "updatedAt")
 VALUES
-  ('profile-vit-1', 'student-vit-1', 'Aditya', 'Mishra', 'vit-vellore', 'Vellore Institute of Technology', 'Computer Science and Engineering', 2025, ARRAY['Java', 'Spring Boot', 'MySQL', 'Git'], 2800, 2500, 85, true, now_ts, now_ts),
-  ('profile-vit-2', 'student-vit-2', 'Riya', 'Saxena', 'vit-vellore', 'Vellore Institute of Technology', 'Information Technology', 2025, ARRAY['Python', 'Django', 'PostgreSQL', 'Docker'], 3100, 2100, 88, true, now_ts, now_ts),
-  ('profile-vit-3', 'student-vit-3', 'Sanjay', 'Menon', 'vit-vellore', 'Vellore Institute of Technology', 'Computer Science and Engineering', 2026, ARRAY['JavaScript', 'React', 'Node.js', 'MongoDB'], 2500, 3200, 82, true, now_ts, now_ts),
-  ('profile-vit-4', 'student-vit-4', 'Pooja', 'Das', 'vit-vellore', 'Vellore Institute of Technology', 'Data Science and AI', 2025, ARRAY['Python', 'Machine Learning', 'Pandas', 'TensorFlow'], 3400, 1800, 90, true, now_ts, now_ts),
-  ('profile-vit-5', 'student-vit-5', 'Vikram', 'Hegde', 'vit-vellore', 'Vellore Institute of Technology', 'Computer Science and Engineering', 2025, ARRAY['C++', 'Algorithms', 'System Design', 'Go'], 3000, 2300, 87, true, now_ts, now_ts),
-  ('profile-vit-6', 'student-vit-6', 'Divya', 'Pillai', 'vit-vellore', 'Vellore Institute of Technology', 'Electronics and Communication', 2026, ARRAY['Embedded C', 'Arduino', 'Python', 'MATLAB'], 2200, 4000, 78, true, now_ts, now_ts),
-  ('profile-vit-7', 'student-vit-7', 'Amit', 'Kulkarni', 'vit-vellore', 'Vellore Institute of Technology', 'Computer Science and Engineering', 2025, ARRAY['Java', 'Kotlin', 'Android', 'Firebase'], 2900, 2400, 86, true, now_ts, now_ts),
-  ('profile-vit-8', 'student-vit-8', 'Anjali', 'Rao', 'vit-vellore', 'Vellore Institute of Technology', 'Information Technology', 2025, ARRAY['Python', 'Flask', 'React', 'AWS'], 3200, 2000, 89, true, now_ts, now_ts),
-  ('profile-vit-9', 'student-vit-9', 'Karan', 'Shetty', 'vit-vellore', 'Vellore Institute of Technology', 'Computer Science and Engineering', 2026, ARRAY['TypeScript', 'Next.js', 'Prisma', 'PostgreSQL'], 2600, 3000, 83, true, now_ts, now_ts),
-  ('profile-vit-10', 'student-vit-10', 'Tanya', 'Agarwal', 'vit-vellore', 'Vellore Institute of Technology', 'Computer Science and Engineering', 2025, ARRAY['Python', 'Deep Learning', 'PyTorch', 'OpenCV'], 3500, 1700, 91, true, now_ts, now_ts)
-ON CONFLICT (id) DO NOTHING;
-
--- ============================================================================
--- LAUNCHPAD POSTS
--- ============================================================================
-
-INSERT INTO "LaunchpadPost" (id, slug, "authorId", title, content, category, status, upvotes, views, "isEditorPick", "publishedAt", "createdAt", "updatedAt")
-VALUES
-  ('post-1', 'how-i-cracked-google-sde-interview', 'student-iitb-1', 'How I Cracked Google''s SDE Interview', 'After 6 months of preparation and 2 previous rejections, I finally made it to Google! Here''s my detailed preparation strategy covering DSA, system design, and behavioral rounds. The key was consistent practice on LeetCode (solved 400+ problems) and mock interviews with friends. For system design, I read "Designing Data-Intensive Applications" cover to cover and practiced on Excalidraw.', 'interview_experience', 'PUBLISHED', 342, 4521, true, now_ts - interval '5 days', now_ts, now_ts),
-
-  ('post-2', 'system-design-url-shortener', 'student-iitb-2', 'System Design Interview: Building a URL Shortener', 'One of the most common system design questions. Let me walk you through how to design a scalable URL shortening service like bit.ly. Key components: 1) Base62 encoding for short URLs, 2) Distributed ID generation, 3) Redis caching for hot URLs, 4) Database sharding for scale. I''ll cover API design, database schema, and handling billions of URLs.', 'system_design', 'PUBLISHED', 289, 3890, true, now_ts - interval '10 days', now_ts, now_ts),
-
-  ('post-3', 'tier-3-college-to-amazon', 'student-vit-1', 'My Journey from Tier-3 College to Amazon', 'Coming from a tier-3 college, I had to work twice as hard. Here''s how I leveraged online resources, built projects, and networked my way to an offer from Amazon. The secret? Building real projects, contributing to open source, and cold messaging on LinkedIn. My first message got no reply, but my 50th got me a referral!', 'career_journey', 'PUBLISHED', 567, 8234, true, now_ts - interval '3 days', now_ts, now_ts),
-
-  ('post-4', 'top-50-dsa-problems', 'student-iitb-5', 'Top 50 DSA Problems Every Fresher Should Solve', 'Based on my experience and discussions with others who cracked FAANG, here''s a curated list of must-do problems. Organized by topic: Arrays (10), Strings (8), Trees (10), Graphs (8), DP (14). Each problem links to LeetCode with my solution and approach. Start with Easy, move to Medium, then tackle Hard.', 'dsa', 'PUBLISHED', 892, 12450, true, now_ts - interval '7 days', now_ts, now_ts),
-
-  ('post-5', 'resume-tips-10-interviews', 'student-vit-4', 'Resume Tips That Got Me 10+ Interview Calls', 'Your resume is your first impression. Here are the specific changes I made: 1) Quantified every achievement, 2) Used action verbs, 3) Tailored for ATS, 4) Kept it to 1 page. Before: "Worked on web development". After: "Built a React dashboard that reduced load time by 40% and increased user engagement by 25%".', 'career_advice', 'PUBLISHED', 423, 5678, false, now_ts - interval '12 days', now_ts, now_ts),
-
-  ('post-6', 'negotiate-first-salary', 'student-iitb-7', 'How to Negotiate Your First Salary', 'Most freshers don''t negotiate and leave money on the table. I negotiated a 30% higher offer at my first job. Key strategies: 1) Research market rates on Glassdoor/Levels.fyi, 2) Don''t reveal your current/expected salary first, 3) Have competing offers, 4) Negotiate for equity, joining bonus, or signing bonus if base is fixed.', 'career_advice', 'PUBLISHED', 312, 4123, false, now_ts - interval '8 days', now_ts, now_ts),
-
-  ('post-7', 'zero-to-fullstack-roadmap', 'student-iitb-4', 'Complete Roadmap: From Zero to Full Stack Developer', 'A month-by-month breakdown: Month 1-2: HTML, CSS, JavaScript basics. Month 3-4: React + APIs. Month 5-6: Node.js + Express + MongoDB. Month 7-8: Build 3 full projects. Month 9: Learn DevOps basics. Month 10-12: Apply and prepare for interviews. Resources: freeCodeCamp, The Odin Project, Frontend Mentor.', 'learning_roadmap', 'PUBLISHED', 678, 9876, true, now_ts - interval '15 days', now_ts, now_ts),
-
-  ('post-8', 'portfolio-that-stands-out', 'student-vit-8', 'Building a Portfolio That Stands Out', 'I reviewed 100+ portfolios during referrals. Common mistakes: 1) Too many projects with no depth, 2) No live demos, 3) Generic "TODO app" clones, 4) No GitHub activity. What works: 1) 3-5 quality projects with detailed READMEs, 2) Live deployments, 3) Clean design, 4) Blog posts showing thought process.', 'career_advice', 'PUBLISHED', 234, 3456, false, now_ts - interval '20 days', now_ts, now_ts),
-
-  ('post-9', 'off-campus-placement-strategy', 'student-vit-3', 'Off-Campus Placement Strategy That Works', 'If your college placements aren''t great, don''t worry. My strategy: 1) Apply on company career pages directly, 2) Use LinkedIn Premium free trial for InMails, 3) Build connections with recruiters, 4) Attend hackathons for visibility, 5) Contribute to open source for referrals. I got 5 offers, all off-campus!', 'placement_tips', 'PUBLISHED', 445, 6789, true, now_ts - interval '4 days', now_ts, now_ts),
-
-  ('post-10', 'time-complexity-visual-guide', 'student-iitb-10', 'Understanding Time Complexity: A Visual Guide', 'Many struggle with Big O notation. O(1) - Constant: Array access. O(log n) - Logarithmic: Binary search. O(n) - Linear: Simple loop. O(n log n) - Merge sort. O(n²) - Bubble sort. O(2^n) - Recursive fibonacci. I''ve created diagrams showing how runtime grows with input size for each complexity class.', 'dsa', 'PUBLISHED', 567, 7890, true, now_ts - interval '6 days', now_ts, now_ts)
+  ('profile-vit-1', 'student-vit-1', 'Aditya', 'Mishra', 'vit-vellore', 'Vellore Institute of Technology', 'Computer Science and Engineering', 2025, ARRAY['Java', 'Spring Boot', 'MySQL', 'Git'], 68.5, now_ts, now_ts),
+  ('profile-vit-2', 'student-vit-2', 'Riya', 'Saxena', 'vit-vellore', 'Vellore Institute of Technology', 'Information Technology', 2025, ARRAY['Python', 'Django', 'PostgreSQL', 'Docker'], 72.3, now_ts, now_ts),
+  ('profile-vit-3', 'student-vit-3', 'Sanjay', 'Menon', 'vit-vellore', 'Vellore Institute of Technology', 'Computer Science and Engineering', 2026, ARRAY['JavaScript', 'React', 'Node.js', 'MongoDB'], 65.8, now_ts, now_ts),
+  ('profile-vit-4', 'student-vit-4', 'Pooja', 'Das', 'vit-vellore', 'Vellore Institute of Technology', 'Data Science and AI', 2025, ARRAY['Python', 'Machine Learning', 'Pandas', 'TensorFlow'], 76.2, now_ts, now_ts),
+  ('profile-vit-5', 'student-vit-5', 'Vikram', 'Hegde', 'vit-vellore', 'Vellore Institute of Technology', 'Computer Science and Engineering', 2025, ARRAY['C++', 'Algorithms', 'System Design', 'Go'], 70.4, now_ts, now_ts),
+  ('profile-vit-6', 'student-vit-6', 'Divya', 'Pillai', 'vit-vellore', 'Vellore Institute of Technology', 'Electronics and Communication', 2026, ARRAY['Embedded C', 'Arduino', 'Python', 'MATLAB'], 58.9, now_ts, now_ts),
+  ('profile-vit-7', 'student-vit-7', 'Amit', 'Kulkarni', 'vit-vellore', 'Vellore Institute of Technology', 'Computer Science and Engineering', 2025, ARRAY['Java', 'Kotlin', 'Android', 'Firebase'], 69.1, now_ts, now_ts),
+  ('profile-vit-8', 'student-vit-8', 'Anjali', 'Rao', 'vit-vellore', 'Vellore Institute of Technology', 'Information Technology', 2025, ARRAY['Python', 'Flask', 'React', 'AWS'], 73.7, now_ts, now_ts),
+  ('profile-vit-9', 'student-vit-9', 'Karan', 'Shetty', 'vit-vellore', 'Vellore Institute of Technology', 'Computer Science and Engineering', 2026, ARRAY['TypeScript', 'Next.js', 'Prisma', 'PostgreSQL'], 66.2, now_ts, now_ts),
+  ('profile-vit-10', 'student-vit-10', 'Tanya', 'Agarwal', 'vit-vellore', 'Vellore Institute of Technology', 'Computer Science and Engineering', 2025, ARRAY['Python', 'Deep Learning', 'PyTorch', 'OpenCV'], 77.8, now_ts, now_ts)
 ON CONFLICT (id) DO NOTHING;
 
 END $$;
