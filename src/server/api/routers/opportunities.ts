@@ -755,7 +755,7 @@ export const opportunitiesRouter = createTRPCRouter({
     });
 
     return {
-      opportunities: saved.map((s) => ({
+      opportunities: saved.map((s: typeof saved[number]) => ({
         ...s.opportunity,
         savedAt: s.createdAt,
       })),
