@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft,
   MapPin,
@@ -20,6 +20,13 @@ import {
   ExternalLink,
   Share2,
   AlertCircle,
+  Copy,
+  Check,
+  X,
+  MessageCircle,
+  Linkedin,
+  Bookmark,
+  BookmarkCheck,
 } from "lucide-react";
 import { Button, Card, CardContent, CardHeader, CardTitle, Badge } from "@/components/ui";
 import { api } from "@/lib/trpc/client";
@@ -32,6 +39,8 @@ export default function OpportunityDetailPage() {
 
   const [isApplying, setIsApplying] = useState(false);
   const [applied, setApplied] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   // Fetch opportunity details
   const { data: opportunity, isLoading, error } = api.opportunities.getById.useQuery({
@@ -45,6 +54,21 @@ export default function OpportunityDetailPage() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (app: any) => app.opportunityId === opportunityId
   );
+
+  // Check if saved
+  const { data: savedData } = api.opportunities.isSaved.useQuery(
+    { opportunityId },
+    { enabled: !!opportunityId }
+  );
+  const isSaved = savedData?.saved ?? false;
+
+  // Toggle save mutation
+  const utils = api.useUtils();
+  const toggleSaveMutation = api.opportunities.toggleSave.useMutation({
+    onSuccess: () => {
+      utils.opportunities.isSaved.invalidate({ opportunityId });
+    },
+  });
 
   // Apply mutation
   const applyMutation = api.applications.start.useMutation({
@@ -221,9 +245,33 @@ export default function OpportunityDetailPage() {
                 "Apply Now"
               )}
             </Button>
-            <Button variant="outline" size="sm" className="gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={() => setShowShareModal(true)}
+            >
               <Share2 className="h-4 w-4" />
               Share
+            </Button>
+            <Button
+              variant={isSaved ? "default" : "outline"}
+              size="sm"
+              className="gap-2"
+              onClick={() => toggleSaveMutation.mutate({ opportunityId })}
+              disabled={toggleSaveMutation.isPending}
+            >
+              {isSaved ? (
+                <>
+                  <BookmarkCheck className="h-4 w-4" />
+                  Saved
+                </>
+              ) : (
+                <>
+                  <Bookmark className="h-4 w-4" />
+                  Save
+                </>
+              )}
             </Button>
           </div>
         </div>
@@ -419,6 +467,92 @@ export default function OpportunityDetailPage() {
           )}
         </div>
       </div>
+
+      {/* Share Modal */}
+      <AnimatePresence>
+        {showShareModal && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 z-50"
+              onClick={() => setShowShareModal(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="fixed inset-x-4 top-1/3 max-w-md mx-auto bg-white rounded-xl shadow-xl z-50 p-6"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold">Share Opportunity</h3>
+                <button
+                  onClick={() => setShowShareModal(false)}
+                  className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <X className="h-5 w-5 text-gray-500" />
+                </button>
+              </div>
+
+              <div className="space-y-3">
+                {/* Copy Link */}
+                <button
+                  onClick={async () => {
+                    const url = window.location.href;
+                    await navigator.clipboard.writeText(url);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                  }}
+                  className="w-full flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+                >
+                  {copied ? (
+                    <Check className="h-5 w-5 text-green-500" />
+                  ) : (
+                    <Copy className="h-5 w-5 text-gray-500" />
+                  )}
+                  <span className="flex-1 text-left">
+                    {copied ? "Copied!" : "Copy link"}
+                  </span>
+                </button>
+
+                {/* WhatsApp */}
+                <button
+                  onClick={() => {
+                    const url = window.location.href;
+                    const text = `Check out this opportunity: ${opportunity?.title} at ${opportunity?.company?.companyName} - ${url}`;
+                    window.open(
+                      `https://wa.me/?text=${encodeURIComponent(text)}`,
+                      "_blank"
+                    );
+                    setShowShareModal(false);
+                  }}
+                  className="w-full flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+                >
+                  <MessageCircle className="h-5 w-5 text-green-500" />
+                  <span className="flex-1 text-left">Share on WhatsApp</span>
+                </button>
+
+                {/* LinkedIn */}
+                <button
+                  onClick={() => {
+                    const url = window.location.href;
+                    window.open(
+                      `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
+                      "_blank"
+                    );
+                    setShowShareModal(false);
+                  }}
+                  className="w-full flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+                >
+                  <Linkedin className="h-5 w-5 text-blue-600" />
+                  <span className="flex-1 text-left">Share on LinkedIn</span>
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

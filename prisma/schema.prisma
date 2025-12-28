@@ -184,6 +184,7 @@ model User {
   posts         Post[]
   postUpvotes   PostUpvote[]
   comments      Comment[]
+  savedOpportunities SavedOpportunity[]
 
   @@index([email])
   @@index([userType])
@@ -600,12 +601,28 @@ model Opportunity {
   company           CompanyProfile    @relation(fields: [companyId], references: [id])
   applications      Application[]
   invites           Invite[]
+  savedBy           SavedOpportunity[]
 
   @@index([companyId])
   @@index([status])
   @@index([type])
   @@index([locations])
   @@index([publishedAt])
+}
+
+model SavedOpportunity {
+  id            String      @id @default(cuid())
+  userId        String
+  opportunityId String
+  createdAt     DateTime    @default(now())
+
+  // Relations
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  opportunity   Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, opportunityId])
+  @@index([userId])
+  @@index([opportunityId])
 }
 
 // ============================================================================

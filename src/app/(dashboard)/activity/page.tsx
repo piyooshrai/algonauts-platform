@@ -2,7 +2,7 @@
 
 import { Suspense, useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   FileText,
   Clock,
@@ -21,6 +21,7 @@ import {
   DollarSign,
   Lock,
   Share2,
+  X,
 } from "lucide-react";
 import Link from "next/link";
 import { api } from "@/lib/trpc/client";
@@ -59,6 +60,17 @@ function ActivityContent() {
   const [verifyingId, setVerifyingId] = useState<string | null>(null);
   const [verificationNotes, setVerificationNotes] = useState("");
   const [stillEmployed, setStillEmployed] = useState(true);
+  const [withdrawingId, setWithdrawingId] = useState<string | null>(null);
+
+  const utils = api.useUtils();
+
+  // Withdraw mutation
+  const withdrawMutation = api.applications.withdraw.useMutation({
+    onSuccess: () => {
+      setWithdrawingId(null);
+      utils.applications.getMyApplications.invalidate();
+    },
+  });
 
   // Check for success message or tab param
   useEffect(() => {
@@ -242,17 +254,21 @@ function ActivityContent() {
                   const status = statusConfig[app.status] || statusConfig.SUBMITTED;
                   const StatusIcon = status.icon;
 
+                  const canWithdraw = ["DRAFT", "SUBMITTED", "UNDER_REVIEW"].includes(app.status);
+
                   return (
-                    <Link
+                    <div
                       key={app.id}
-                      href={`/opportunities/${app.opportunityId}`}
-                      className="block p-5 hover:bg-[#F9FAFB] transition-colors"
+                      className="p-5 hover:bg-[#F9FAFB] transition-colors"
                     >
                       <div className="flex gap-4">
-                        <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-sky-400 to-sky-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                        <Link
+                          href={`/opportunities/${app.opportunityId}`}
+                          className="w-12 h-12 rounded-lg bg-gradient-to-br from-sky-400 to-sky-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
+                        >
                           {app.opportunity?.company?.companyName?.substring(0, 2).toUpperCase() || "CO"}
-                        </div>
-                        <div className="flex-1 min-w-0">
+                        </Link>
+                        <Link href={`/opportunities/${app.opportunityId}`} className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-3">
                             <div>
                               <h3 className="font-semibold text-[#1F2937]">{app.opportunity?.title || "Position"}</h3>
@@ -273,10 +289,27 @@ function ActivityContent() {
                               Applied {formatDate(new Date(app.submittedAt || app.createdAt))}
                             </span>
                           </div>
+                        </Link>
+                        <div className="flex items-start gap-2">
+                          {canWithdraw && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-[#EF4444] hover:text-[#DC2626] hover:bg-red-50"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                setWithdrawingId(app.id);
+                              }}
+                            >
+                              Withdraw
+                            </Button>
+                          )}
+                          <Link href={`/opportunities/${app.opportunityId}`}>
+                            <ChevronRight className="h-5 w-5 text-[#D1D5DB] mt-1" />
+                          </Link>
                         </div>
-                        <ChevronRight className="h-5 w-5 text-[#D1D5DB] flex-shrink-0 mt-1" />
                       </div>
-                    </Link>
+                    </div>
                   );
                 })}
               </div>
@@ -582,6 +615,69 @@ function ActivityContent() {
           </div>
         </div>
       )}
+
+      {/* Withdraw Confirmation Modal */}
+      <AnimatePresence>
+        {withdrawingId && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 z-50"
+              onClick={() => setWithdrawingId(null)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="fixed inset-x-4 top-1/3 max-w-md mx-auto bg-white rounded-xl shadow-xl z-50 p-6"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-[#1F2937]">Withdraw Application?</h3>
+                <button
+                  onClick={() => setWithdrawingId(null)}
+                  className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <X className="h-5 w-5 text-gray-500" />
+                </button>
+              </div>
+              <p className="text-[#6B7280] mb-6">
+                Are you sure you want to withdraw this application? This action cannot be undone.
+              </p>
+              <div className="flex gap-3 justify-end">
+                <Button
+                  variant="outline"
+                  onClick={() => setWithdrawingId(null)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={() => {
+                    withdrawMutation.mutate({ applicationId: withdrawingId });
+                  }}
+                  disabled={withdrawMutation.isPending}
+                >
+                  {withdrawMutation.isPending ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      Withdrawing...
+                    </>
+                  ) : (
+                    "Withdraw"
+                  )}
+                </Button>
+              </div>
+              {withdrawMutation.isError && (
+                <p className="mt-4 text-sm text-red-500">
+                  {withdrawMutation.error?.message || "Failed to withdraw application"}
+                </p>
+              )}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

@@ -674,4 +674,109 @@ export const opportunitiesRouter = createTRPCRouter({
 
       return { success: true };
     }),
+
+  /**
+   * Toggle save/bookmark an opportunity
+   */
+  toggleSave: studentProcedure
+    .input(z.object({ opportunityId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+
+      // Check if already saved
+      const existing = await ctx.prisma.savedOpportunity.findUnique({
+        where: {
+          userId_opportunityId: {
+            userId,
+            opportunityId: input.opportunityId,
+          },
+        },
+      });
+
+      if (existing) {
+        // Unsave
+        await ctx.prisma.savedOpportunity.delete({
+          where: { id: existing.id },
+        });
+
+        // Log event
+        await queueEvent(EventTypes.OPPORTUNITY_UNSAVE, {
+          userId,
+          userType: ctx.session.user.userType,
+          entityType: "opportunity",
+          entityId: input.opportunityId,
+        });
+
+        return { saved: false };
+      } else {
+        // Save
+        await ctx.prisma.savedOpportunity.create({
+          data: {
+            userId,
+            opportunityId: input.opportunityId,
+          },
+        });
+
+        // Log event
+        await queueEvent(EventTypes.OPPORTUNITY_SAVE, {
+          userId,
+          userType: ctx.session.user.userType,
+          entityType: "opportunity",
+          entityId: input.opportunityId,
+        });
+
+        return { saved: true };
+      }
+    }),
+
+  /**
+   * Get saved opportunities
+   */
+  getSaved: studentProcedure.query(async ({ ctx }) => {
+    const userId = ctx.session.user.id;
+
+    const saved = await ctx.prisma.savedOpportunity.findMany({
+      where: { userId },
+      orderBy: { createdAt: "desc" },
+      include: {
+        opportunity: {
+          include: {
+            company: {
+              select: {
+                id: true,
+                companyName: true,
+                logoUrl: true,
+                industry: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return {
+      opportunities: saved.map((s) => ({
+        ...s.opportunity,
+        savedAt: s.createdAt,
+      })),
+    };
+  }),
+
+  /**
+   * Check if opportunity is saved
+   */
+  isSaved: studentProcedure
+    .input(z.object({ opportunityId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const existing = await ctx.prisma.savedOpportunity.findUnique({
+        where: {
+          userId_opportunityId: {
+            userId: ctx.session.user.id,
+            opportunityId: input.opportunityId,
+          },
+        },
+      });
+
+      return { saved: !!existing };
+    }),
 });

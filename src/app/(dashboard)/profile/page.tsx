@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useSession } from "next-auth/react";
 import {
   User,
@@ -20,6 +21,10 @@ import {
   Flame,
   CheckCircle2,
   Trophy,
+  Copy,
+  Check,
+  X,
+  MessageCircle,
 } from "lucide-react";
 import { Button, Card, CardContent, CardHeader, CardTitle, Progress, Avatar, Badge } from "@/components/ui";
 import { LayersRank } from "@/components/layers-rank";
@@ -28,6 +33,8 @@ import Link from "next/link";
 
 export default function ProfilePage() {
   const { data: session } = useSession();
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   // Fetch real profile data
   const { data: profileData, isLoading: profileLoading } = api.profile.get.useQuery();
@@ -84,7 +91,12 @@ export default function ProfilePage() {
     <div className="space-y-6">
       {/* Header Actions */}
       <div className="flex items-center justify-end gap-2">
-        <Button variant="outline" size="sm" className="gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-2"
+          onClick={() => setShowShareModal(true)}
+        >
           <Share2 className="h-4 w-4" />
           Share Profile
         </Button>
@@ -445,6 +457,92 @@ export default function ProfilePage() {
           </motion.div>
         </div>
       </div>
+
+      {/* Share Modal */}
+      <AnimatePresence>
+        {showShareModal && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 z-50"
+              onClick={() => setShowShareModal(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="fixed inset-x-4 top-1/3 max-w-md mx-auto bg-white rounded-xl shadow-xl z-50 p-6"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold">Share Your Profile</h3>
+                <button
+                  onClick={() => setShowShareModal(false)}
+                  className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <X className="h-5 w-5 text-gray-500" />
+                </button>
+              </div>
+
+              <div className="space-y-3">
+                {/* Copy Link */}
+                <button
+                  onClick={async () => {
+                    const profileUrl = `${window.location.origin}/u/${session?.user?.id}`;
+                    await navigator.clipboard.writeText(profileUrl);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                  }}
+                  className="w-full flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+                >
+                  {copied ? (
+                    <Check className="h-5 w-5 text-green-500" />
+                  ) : (
+                    <Copy className="h-5 w-5 text-gray-500" />
+                  )}
+                  <span className="flex-1 text-left">
+                    {copied ? "Copied!" : "Copy profile link"}
+                  </span>
+                </button>
+
+                {/* WhatsApp */}
+                <button
+                  onClick={() => {
+                    const profileUrl = `${window.location.origin}/u/${session?.user?.id}`;
+                    const text = `Check out my profile on Algonauts: ${profileUrl}`;
+                    window.open(
+                      `https://wa.me/?text=${encodeURIComponent(text)}`,
+                      "_blank"
+                    );
+                    setShowShareModal(false);
+                  }}
+                  className="w-full flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+                >
+                  <MessageCircle className="h-5 w-5 text-green-500" />
+                  <span className="flex-1 text-left">Share on WhatsApp</span>
+                </button>
+
+                {/* LinkedIn */}
+                <button
+                  onClick={() => {
+                    const profileUrl = `${window.location.origin}/u/${session?.user?.id}`;
+                    window.open(
+                      `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(profileUrl)}`,
+                      "_blank"
+                    );
+                    setShowShareModal(false);
+                  }}
+                  className="w-full flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+                >
+                  <Linkedin className="h-5 w-5 text-blue-600" />
+                  <span className="flex-1 text-left">Share on LinkedIn</span>
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

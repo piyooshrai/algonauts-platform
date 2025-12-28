@@ -20,9 +20,11 @@ const envSchema = z.object({
   NEXTAUTH_SECRET: z.string().min(32).describe("NextAuth secret (min 32 chars)"),
 
   // ========== Optional Services ==========
-  // Email
-  RESEND_API_KEY: z.string().optional().describe("Resend API key for emails"),
-  EMAIL_FROM: z.string().email().optional().default("noreply@algonauts.in"),
+  // Email (Amazon SES)
+  AWS_ACCESS_KEY_ID: z.string().optional().describe("AWS Access Key ID for SES"),
+  AWS_SECRET_ACCESS_KEY: z.string().optional().describe("AWS Secret Access Key for SES"),
+  AWS_SES_REGION: z.string().optional().default("ap-south-1").describe("AWS SES region"),
+  EMAIL_FROM: z.string().optional().default("Algonauts <noreply@algonauts.in>"),
   EMAIL_REPLY_TO: z.string().email().optional().default("support@algonauts.in"),
 
   // Supabase
@@ -93,9 +95,9 @@ export function validateEnv(): EnvValidationResult {
   // Add warnings for optional but recommended variables
   const warnings = [
     {
-      variable: "RESEND_API_KEY",
-      condition: !process.env.RESEND_API_KEY,
-      message: "Email functionality will be disabled",
+      variable: "AWS_ACCESS_KEY_ID",
+      condition: !process.env.AWS_ACCESS_KEY_ID || !process.env.AWS_SECRET_ACCESS_KEY,
+      message: "Email functionality will be disabled (AWS SES credentials not configured)",
     },
     {
       variable: "CRON_SECRET",
@@ -179,7 +181,7 @@ export function getAppUrl(): string {
  * Check if email is enabled
  */
 export function isEmailEnabled(): boolean {
-  return !!process.env.RESEND_API_KEY;
+  return !!process.env.AWS_ACCESS_KEY_ID && !!process.env.AWS_SECRET_ACCESS_KEY;
 }
 
 /**
