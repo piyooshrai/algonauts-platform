@@ -26,8 +26,7 @@ import {
   UserSearch,
   CheckSquare,
   ShieldCheck,
-  Award,
-  PartyPopper,
+  ClipboardList,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/logo";
@@ -37,11 +36,9 @@ import { api } from "@/lib/trpc/client";
 // Tabs for different user roles
 const studentTabs = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Opportunities", href: "/opportunities", icon: Briefcase },
-  { name: "Applications", href: "/applications", icon: FileText },
+  { name: "Jobs", href: "/opportunities", icon: Briefcase },
+  { name: "My Activity", href: "/activity", icon: ClipboardList },
   { name: "Leaderboard", href: "/leaderboard", icon: Trophy },
-  { name: "Badges", href: "/badges", icon: Award },
-  { name: "Placements", href: "/placements", icon: PartyPopper },
 ];
 
 const companyTabs = [
@@ -147,7 +144,7 @@ export default function DashboardLayout({
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#6B7280]" />
                 <input
                   type="text"
-                  placeholder="Search opportunities, companies..."
+                  placeholder="Search jobs, companies..."
                   className="w-full pl-10 pr-4 py-2 bg-[#F3F4F6] border border-[#E5E7EB] rounded-lg text-sm text-[#1F2937] placeholder:text-[#6B7280] focus:outline-none focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent transition-all"
                 />
               </div>

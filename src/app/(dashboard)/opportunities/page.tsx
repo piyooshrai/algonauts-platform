@@ -95,7 +95,7 @@ export default function OpportunitiesPage() {
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <Briefcase className="h-6 w-6 text-primary" />
-            Opportunities
+            Jobs
           </h1>
           <p className="text-muted-foreground">
             Companies that match your profile are waiting to connect
