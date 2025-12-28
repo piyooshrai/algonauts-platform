@@ -98,34 +98,34 @@ VALUES
 ON CONFLICT (id) DO NOTHING;
 
 -- Company Profiles
-INSERT INTO "CompanyProfile" (id, "userId", "companyName", "shortName", industry, size, location, website, description, "isVerified", "createdAt", "updatedAt")
+INSERT INTO "CompanyProfile" (id, "userId", "companyName", industry, "companySize", headquarters, website, description, "isVerified", "createdAt", "updatedAt")
 VALUES
-  ('cp-tcs', 'company-tcs', 'Tata Consultancy Services', 'TCS', 'IT Services', '500000+', 'Mumbai, India', 'https://www.tcs.com', 'TCS is a leading global IT services, consulting and business solutions organization.', true, now_ts, now_ts),
-  ('cp-infosys', 'company-infosys', 'Infosys', 'Infosys', 'IT Services', '100000+', 'Bangalore, India', 'https://www.infosys.com', 'Infosys is a global leader in next-generation digital services and consulting.', true, now_ts, now_ts),
-  ('cp-wipro', 'company-wipro', 'Wipro', 'Wipro', 'IT Services', '100000+', 'Bangalore, India', 'https://www.wipro.com', 'Wipro Limited is a leading technology services and consulting company.', true, now_ts, now_ts),
-  ('cp-hcl', 'company-hcl', 'HCL Technologies', 'HCL', 'IT Services', '100000+', 'Noida, India', 'https://www.hcltech.com', 'HCL Technologies is a next-generation global technology company.', true, now_ts, now_ts),
-  ('cp-techm', 'company-techm', 'Tech Mahindra', 'TechM', 'IT Services', '100000+', 'Pune, India', 'https://www.techmahindra.com', 'Tech Mahindra offers innovative and customer-centric digital experiences.', true, now_ts, now_ts),
-  ('cp-cognizant', 'company-cognizant', 'Cognizant', 'CTS', 'IT Services', '100000+', 'Chennai, India', 'https://www.cognizant.com', 'Cognizant helps companies modernize technology, reimagine processes and transform experiences.', true, now_ts, now_ts),
-  ('cp-accenture', 'company-accenture', 'Accenture', 'ACN', 'Consulting', '100000+', 'Bangalore, India', 'https://www.accenture.com', 'Accenture is a global professional services company with leading capabilities in digital, cloud and security.', true, now_ts, now_ts),
-  ('cp-capgemini', 'company-capgemini', 'Capgemini', 'Cap', 'Consulting', '50000+', 'Mumbai, India', 'https://www.capgemini.com', 'Capgemini is a global leader in consulting, digital transformation, technology and engineering services.', true, now_ts, now_ts),
-  ('cp-microsoft', 'company-microsoft', 'Microsoft India', 'MSFT', 'Product', '10000+', 'Hyderabad, India', 'https://www.microsoft.com', 'Microsoft is the worldwide leader in software, services, devices, and solutions.', true, now_ts, now_ts),
-  ('cp-google', 'company-google', 'Google India', 'GOOGL', 'Product', '5000+', 'Bangalore, India', 'https://www.google.com', 'Google''s mission is to organize the world''s information and make it universally accessible.', true, now_ts, now_ts),
-  ('cp-amazon', 'company-amazon', 'Amazon India', 'AMZN', 'Product', '50000+', 'Hyderabad, India', 'https://www.amazon.in', 'Amazon is guided by customer obsession rather than competitor focus.', true, now_ts, now_ts),
-  ('cp-adobe', 'company-adobe', 'Adobe India', 'ADBE', 'Product', '5000+', 'Noida, India', 'https://www.adobe.com', 'Adobe is changing the world through digital experiences.', true, now_ts, now_ts),
-  ('cp-flipkart', 'company-flipkart', 'Flipkart', 'FK', 'E-commerce', '10000+', 'Bangalore, India', 'https://www.flipkart.com', 'Flipkart is India''s leading e-commerce marketplace.', true, now_ts, now_ts),
-  ('cp-oracle', 'company-oracle', 'Oracle India', 'ORCL', 'Product', '10000+', 'Bangalore, India', 'https://www.oracle.com', 'Oracle offers integrated suites of applications plus secure, autonomous infrastructure.', true, now_ts, now_ts),
-  ('cp-razorpay', 'company-razorpay', 'Razorpay', 'RZP', 'Fintech', '1000+', 'Bangalore, India', 'https://www.razorpay.com', 'Razorpay is India''s leading full-stack financial solutions company.', true, now_ts, now_ts),
-  ('cp-zerodha', 'company-zerodha', 'Zerodha', 'ZRD', 'Fintech', '1000+', 'Bangalore, India', 'https://www.zerodha.com', 'Zerodha is India''s largest stock broker offering the lowest brokerage.', true, now_ts, now_ts),
-  ('cp-cred', 'company-cred', 'CRED', 'CRED', 'Fintech', '500+', 'Bangalore, India', 'https://www.cred.club', 'CRED is a members-only credit card bill payment platform.', true, now_ts, now_ts),
-  ('cp-phonepe', 'company-phonepe', 'PhonePe', 'PPe', 'Fintech', '2000+', 'Bangalore, India', 'https://www.phonepe.com', 'PhonePe is India''s leading digital payments platform.', true, now_ts, now_ts),
-  ('cp-swiggy', 'company-swiggy', 'Swiggy', 'SWG', 'Food Tech', '5000+', 'Bangalore, India', 'https://www.swiggy.com', 'Swiggy is India''s largest food ordering and delivery platform.', true, now_ts, now_ts),
-  ('cp-zomato', 'company-zomato', 'Zomato', 'ZMT', 'Food Tech', '5000+', 'Gurugram, India', 'https://www.zomato.com', 'Zomato is an Indian multinational restaurant aggregator and food delivery company.', true, now_ts, now_ts),
-  ('cp-meesho', 'company-meesho', 'Meesho', 'MSH', 'E-commerce', '2000+', 'Bangalore, India', 'https://www.meesho.com', 'Meesho is India''s fastest growing e-commerce company.', true, now_ts, now_ts),
-  ('cp-groww', 'company-groww', 'Groww', 'GRW', 'Fintech', '500+', 'Bangalore, India', 'https://www.groww.in', 'Groww is making investing accessible and transparent for Indians.', true, now_ts, now_ts),
-  ('cp-dream11', 'company-dream11', 'Dream11', 'D11', 'Gaming', '1000+', 'Mumbai, India', 'https://www.dream11.com', 'Dream11 is India''s biggest fantasy sports platform.', true, now_ts, now_ts),
-  ('cp-freshworks', 'company-freshworks', 'Freshworks', 'FRSH', 'SaaS', '5000+', 'Chennai, India', 'https://www.freshworks.com', 'Freshworks makes business software that people love to use.', true, now_ts, now_ts),
-  ('cp-zoho', 'company-zoho', 'Zoho', 'ZOHO', 'SaaS', '10000+', 'Chennai, India', 'https://www.zoho.com', 'Zoho Corporation is an Indian multinational technology company.', true, now_ts, now_ts),
-  ('cp-postman', 'company-postman', 'Postman', 'POST', 'Developer Tools', '500+', 'Bangalore, India', 'https://www.postman.com', 'Postman is an API platform for building and using APIs.', true, now_ts, now_ts)
+  ('cp-tcs', 'company-tcs', 'Tata Consultancy Services', 'IT Services', '500000+', 'Mumbai, India', 'https://www.tcs.com', 'TCS is a leading global IT services, consulting and business solutions organization.', true, now_ts, now_ts),
+  ('cp-infosys', 'company-infosys', 'Infosys', 'IT Services', '100000+', 'Bangalore, India', 'https://www.infosys.com', 'Infosys is a global leader in next-generation digital services and consulting.', true, now_ts, now_ts),
+  ('cp-wipro', 'company-wipro', 'Wipro', 'IT Services', '100000+', 'Bangalore, India', 'https://www.wipro.com', 'Wipro Limited is a leading technology services and consulting company.', true, now_ts, now_ts),
+  ('cp-hcl', 'company-hcl', 'HCL Technologies', 'IT Services', '100000+', 'Noida, India', 'https://www.hcltech.com', 'HCL Technologies is a next-generation global technology company.', true, now_ts, now_ts),
+  ('cp-techm', 'company-techm', 'Tech Mahindra', 'IT Services', '100000+', 'Pune, India', 'https://www.techmahindra.com', 'Tech Mahindra offers innovative and customer-centric digital experiences.', true, now_ts, now_ts),
+  ('cp-cognizant', 'company-cognizant', 'Cognizant', 'IT Services', '100000+', 'Chennai, India', 'https://www.cognizant.com', 'Cognizant helps companies modernize technology, reimagine processes and transform experiences.', true, now_ts, now_ts),
+  ('cp-accenture', 'company-accenture', 'Accenture', 'Consulting', '100000+', 'Bangalore, India', 'https://www.accenture.com', 'Accenture is a global professional services company with leading capabilities in digital, cloud and security.', true, now_ts, now_ts),
+  ('cp-capgemini', 'company-capgemini', 'Capgemini', 'Consulting', '50000+', 'Mumbai, India', 'https://www.capgemini.com', 'Capgemini is a global leader in consulting, digital transformation, technology and engineering services.', true, now_ts, now_ts),
+  ('cp-microsoft', 'company-microsoft', 'Microsoft India', 'Product', '10000+', 'Hyderabad, India', 'https://www.microsoft.com', 'Microsoft is the worldwide leader in software, services, devices, and solutions.', true, now_ts, now_ts),
+  ('cp-google', 'company-google', 'Google India', 'Product', '5000+', 'Bangalore, India', 'https://www.google.com', 'Google''s mission is to organize the world''s information and make it universally accessible.', true, now_ts, now_ts),
+  ('cp-amazon', 'company-amazon', 'Amazon India', 'Product', '50000+', 'Hyderabad, India', 'https://www.amazon.in', 'Amazon is guided by customer obsession rather than competitor focus.', true, now_ts, now_ts),
+  ('cp-adobe', 'company-adobe', 'Adobe India', 'Product', '5000+', 'Noida, India', 'https://www.adobe.com', 'Adobe is changing the world through digital experiences.', true, now_ts, now_ts),
+  ('cp-flipkart', 'company-flipkart', 'Flipkart', 'E-commerce', '10000+', 'Bangalore, India', 'https://www.flipkart.com', 'Flipkart is India''s leading e-commerce marketplace.', true, now_ts, now_ts),
+  ('cp-oracle', 'company-oracle', 'Oracle India', 'Product', '10000+', 'Bangalore, India', 'https://www.oracle.com', 'Oracle offers integrated suites of applications plus secure, autonomous infrastructure.', true, now_ts, now_ts),
+  ('cp-razorpay', 'company-razorpay', 'Razorpay', 'Fintech', '1000+', 'Bangalore, India', 'https://www.razorpay.com', 'Razorpay is India''s leading full-stack financial solutions company.', true, now_ts, now_ts),
+  ('cp-zerodha', 'company-zerodha', 'Zerodha', 'Fintech', '1000+', 'Bangalore, India', 'https://www.zerodha.com', 'Zerodha is India''s largest stock broker offering the lowest brokerage.', true, now_ts, now_ts),
+  ('cp-cred', 'company-cred', 'CRED', 'Fintech', '500+', 'Bangalore, India', 'https://www.cred.club', 'CRED is a members-only credit card bill payment platform.', true, now_ts, now_ts),
+  ('cp-phonepe', 'company-phonepe', 'PhonePe', 'Fintech', '2000+', 'Bangalore, India', 'https://www.phonepe.com', 'PhonePe is India''s leading digital payments platform.', true, now_ts, now_ts),
+  ('cp-swiggy', 'company-swiggy', 'Swiggy', 'Food Tech', '5000+', 'Bangalore, India', 'https://www.swiggy.com', 'Swiggy is India''s largest food ordering and delivery platform.', true, now_ts, now_ts),
+  ('cp-zomato', 'company-zomato', 'Zomato', 'Food Tech', '5000+', 'Gurugram, India', 'https://www.zomato.com', 'Zomato is an Indian multinational restaurant aggregator and food delivery company.', true, now_ts, now_ts),
+  ('cp-meesho', 'company-meesho', 'Meesho', 'E-commerce', '2000+', 'Bangalore, India', 'https://www.meesho.com', 'Meesho is India''s fastest growing e-commerce company.', true, now_ts, now_ts),
+  ('cp-groww', 'company-groww', 'Groww', 'Fintech', '500+', 'Bangalore, India', 'https://www.groww.in', 'Groww is making investing accessible and transparent for Indians.', true, now_ts, now_ts),
+  ('cp-dream11', 'company-dream11', 'Dream11', 'Gaming', '1000+', 'Mumbai, India', 'https://www.dream11.com', 'Dream11 is India''s biggest fantasy sports platform.', true, now_ts, now_ts),
+  ('cp-freshworks', 'company-freshworks', 'Freshworks', 'SaaS', '5000+', 'Chennai, India', 'https://www.freshworks.com', 'Freshworks makes business software that people love to use.', true, now_ts, now_ts),
+  ('cp-zoho', 'company-zoho', 'Zoho', 'SaaS', '10000+', 'Chennai, India', 'https://www.zoho.com', 'Zoho Corporation is an Indian multinational technology company.', true, now_ts, now_ts),
+  ('cp-postman', 'company-postman', 'Postman', 'Developer Tools', '500+', 'Bangalore, India', 'https://www.postman.com', 'Postman is an API platform for building and using APIs.', true, now_ts, now_ts)
 ON CONFLICT (id) DO NOTHING;
 
 -- ============================================================================
