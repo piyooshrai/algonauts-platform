@@ -331,90 +331,105 @@ export const opportunitiesRouter = createTRPCRouter({
         },
       });
 
-      // Enrich with scarcity signals
-      const enrichedOpportunities = await Promise.all(
+      // Batch fetch scarcity data to avoid N+1 queries
+      const opportunityIds = opportunities.map((opp: { id: string }) => opp.id);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      // Single query for today's applications per opportunity
+      const applicationsTodayData = await ctx.prisma.application.groupBy({
+        by: ["opportunityId"],
+        where: {
+          opportunityId: { in: opportunityIds },
+          submittedAt: { gte: today },
+        },
+        _count: { id: true },
+      });
+      const applicationsTodayMap = new Map(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        opportunities.map(async (opp: any, index: number) => {
-          // Get today's application count
-          const today = new Date();
-          today.setHours(0, 0, 0, 0);
-
-          const applicationsToday = await ctx.prisma.application.count({
-            where: {
-              opportunityId: opp.id,
-              submittedAt: { gte: today },
-            },
-          });
-
-          // Get applications from user's college
-          let applicationsFromYourCollege = 0;
-          if (userProfile?.collegeId) {
-            applicationsFromYourCollege = await ctx.prisma.application.count({
-              where: {
-                opportunityId: opp.id,
-                user: {
-                  profile: {
-                    collegeId: userProfile.collegeId,
-                  },
-                },
-              },
-            });
-          }
-
-          // Calculate days since published
-          const daysSincePublished = opp.publishedAt
-            ? Math.floor((Date.now() - opp.publishedAt.getTime()) / (1000 * 60 * 60 * 24))
-            : 0;
-
-          // Calculate scarcity signals
-          const demandLevel = calculateDemandLevel(
-            opp._count.applications,
-            opp.viewCount,
-            daysSincePublished
-          );
-
-          const closingIn = getClosingIn(
-            opp.expiresAt,
-            null, // maxApplications would go here
-            opp._count.applications
-          );
-
-          // Log impression event (queued for performance)
-          queueEvent("OPPORTUNITY_IMPRESSION" as EventType, {
-            userId,
-            entityType: "opportunity",
-            entityId: opp.id,
-            source: "search" as EventSource,
-            position: index,
-          });
-
-          return {
-            id: opp.id,
-            title: opp.title,
-            slug: opp.slug,
-            description: opp.description.slice(0, 300) + (opp.description.length > 300 ? "..." : ""),
-            type: opp.type,
-            isRemote: opp.isRemote,
-            locations: opp.locations,
-            salaryMin: opp.salaryMin,
-            salaryMax: opp.salaryMax,
-            salaryCurrency: opp.salaryCurrency,
-            requiredSkills: opp.requiredSkills,
-            publishedAt: opp.publishedAt,
-            company: opp.company,
-
-            // SCARCITY SIGNALS - these drive engagement
-            scarcity: {
-              totalApplications: opp._count.applications,
-              applicationsToday,
-              applicationsFromYourCollege,
-              demandLevel,
-              closingIn,
-              spotsRemaining: closingIn.type === "spots" ? closingIn.value : null,
-            },
-          };
-        })
+        applicationsTodayData.map((a: any) => [a.opportunityId, a._count.id])
       );
+
+      // Single query for applications from user's college
+      let collegeApplicationsMap = new Map<string, number>();
+      if (userProfile?.collegeId) {
+        const collegeApplicationsData = await ctx.prisma.application.groupBy({
+          by: ["opportunityId"],
+          where: {
+            opportunityId: { in: opportunityIds },
+            user: {
+              profile: {
+                collegeId: userProfile.collegeId,
+              },
+            },
+          },
+          _count: { id: true },
+        });
+        collegeApplicationsMap = new Map(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          collegeApplicationsData.map((a: any) => [a.opportunityId, a._count.id])
+        );
+      }
+
+      // Enrich with scarcity signals (no more N+1 queries)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const enrichedOpportunities = opportunities.map((opp: any, index: number) => {
+        const applicationsToday = applicationsTodayMap.get(opp.id) || 0;
+        const applicationsFromYourCollege = collegeApplicationsMap.get(opp.id) || 0;
+
+        // Calculate days since published
+        const daysSincePublished = opp.publishedAt
+          ? Math.floor((Date.now() - opp.publishedAt.getTime()) / (1000 * 60 * 60 * 24))
+          : 0;
+
+        // Calculate scarcity signals
+        const demandLevel = calculateDemandLevel(
+          opp._count.applications,
+          opp.viewCount,
+          daysSincePublished
+        );
+
+        const closingIn = getClosingIn(
+          opp.expiresAt,
+          null, // maxApplications would go here
+          opp._count.applications
+        );
+
+        // Log impression event (queued for performance)
+        queueEvent("OPPORTUNITY_IMPRESSION" as EventType, {
+          userId,
+          entityType: "opportunity",
+          entityId: opp.id,
+          source: "search" as EventSource,
+          position: index,
+        });
+
+        return {
+          id: opp.id,
+          title: opp.title,
+          slug: opp.slug,
+          description: opp.description.slice(0, 300) + (opp.description.length > 300 ? "..." : ""),
+          type: opp.type,
+          isRemote: opp.isRemote,
+          locations: opp.locations,
+          salaryMin: opp.salaryMin,
+          salaryMax: opp.salaryMax,
+          salaryCurrency: opp.salaryCurrency,
+          requiredSkills: opp.requiredSkills,
+          publishedAt: opp.publishedAt,
+          company: opp.company,
+
+          // SCARCITY SIGNALS - these drive engagement
+          scarcity: {
+            totalApplications: opp._count.applications,
+            applicationsToday,
+            applicationsFromYourCollege,
+            demandLevel,
+            closingIn,
+            spotsRemaining: closingIn.type === "spots" ? closingIn.value : null,
+          },
+        };
+      });
 
       return {
         opportunities: enrichedOpportunities,

@@ -203,7 +203,8 @@ export default function DashboardPage() {
                     <p className="text-[#6B7280]">No opportunities yet. Check back soon!</p>
                   </div>
                 ) : (
-                  opportunities.map((opp) => (
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  opportunities.map((opp: any) => (
                     <Link
                       key={opp.id}
                       href={`/opportunities/${opp.id}`}
