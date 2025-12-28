@@ -411,7 +411,7 @@ export const applicationsRouter = createTRPCRouter({
         orderBy: { createdAt: "desc" },
       });
 
-      return applications;
+      return { applications };
     }),
 
   /**

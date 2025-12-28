@@ -412,7 +412,7 @@ export const badgesRouter = createTRPCRouter({
       await ctx.prisma.profile.update({
         where: { userId },
         data: {
-          xpTotal: { increment: badge.xpReward },
+          totalXp: { increment: badge.xpReward },
         },
       });
 
@@ -500,7 +500,7 @@ export const badgesRouter = createTRPCRouter({
 
       await ctx.prisma.profile.update({
         where: { userId },
-        data: { xpTotal: { increment: badge.xpReward } },
+        data: { totalXp: { increment: badge.xpReward } },
       });
 
       await logEvent(EventTypes.BADGE_EARNED, {
@@ -682,7 +682,7 @@ export const badgesRouter = createTRPCRouter({
       // Award XP for sharing
       await ctx.prisma.profile.update({
         where: { userId: ctx.session.user.id },
-        data: { xpTotal: { increment: 5 } },
+        data: { totalXp: { increment: 5 } },
       });
 
       // Generate share URL

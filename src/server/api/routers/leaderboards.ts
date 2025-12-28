@@ -120,10 +120,12 @@ export const leaderboardsRouter = createTRPCRouter({
           collegeName: true,
           avatarUrl: true,
           layersRankOverall: true,
+          displayName: true,
+          firstName: true,
+          lastName: true,
           user: {
             select: {
               id: true,
-              name: true,
             },
           },
         },
@@ -167,7 +169,7 @@ export const leaderboardsRouter = createTRPCRouter({
         const entry = {
           rank: index + 1,
           userId: p.user?.id,
-          name: p.user?.name,
+          name: p.displayName || `${p.firstName || ""} ${p.lastName || ""}`.trim() || "Anonymous",
           avatarUrl: p.avatarUrl,
           collegeName: p.collegeName,
           score: input.metric === "streak" ? p.currentStreak : p.totalXp,
@@ -199,10 +201,12 @@ export const leaderboardsRouter = createTRPCRouter({
             collegeName: true,
             avatarUrl: true,
             layersRankOverall: true,
+            displayName: true,
+            firstName: true,
+            lastName: true,
             user: {
               select: {
                 id: true,
-                name: true,
               },
             },
           },
@@ -212,7 +216,7 @@ export const leaderboardsRouter = createTRPCRouter({
         contextUsers = contextProfiles.map((p: any, index: number) => ({
           rank: userRank - 2 + index,
           userId: p.user?.id,
-          name: p.user?.name,
+          name: p.displayName || `${p.firstName || ""} ${p.lastName || ""}`.trim() || "Anonymous",
           avatarUrl: p.avatarUrl,
           collegeName: p.collegeName,
           score: input.metric === "streak" ? p.currentStreak : p.totalXp,
@@ -616,7 +620,9 @@ export const leaderboardsRouter = createTRPCRouter({
           totalXp: true,
           avatarUrl: true,
           collegeName: true,
-          user: { select: { name: true } },
+          displayName: true,
+          firstName: true,
+          lastName: true,
         },
       });
 
@@ -633,7 +639,9 @@ export const leaderboardsRouter = createTRPCRouter({
           totalXp: true,
           avatarUrl: true,
           collegeName: true,
-          user: { select: { name: true } },
+          displayName: true,
+          firstName: true,
+          lastName: true,
         },
       });
 
@@ -650,12 +658,16 @@ export const leaderboardsRouter = createTRPCRouter({
         },
       });
 
+      // Helper to get name from profile
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const getName = (u: any) => u.displayName || `${u.firstName || ""} ${u.lastName || ""}`.trim() || "Anonymous";
+
       return {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         above: usersAbove.reverse().map((u: any, index: number) => ({
           rank: userRank - (usersAbove.length - index),
           userId: u.userId,
-          name: u.user?.name,
+          name: getName(u),
           avatarUrl: u.avatarUrl,
           collegeName: u.collegeName,
           xp: u.totalXp,
@@ -670,7 +682,7 @@ export const leaderboardsRouter = createTRPCRouter({
         below: usersBelow.map((u: any, index: number) => ({
           rank: userRank + index + 1,
           userId: u.userId,
-          name: u.user?.name,
+          name: getName(u),
           avatarUrl: u.avatarUrl,
           collegeName: u.collegeName,
           xp: u.totalXp,
@@ -679,7 +691,7 @@ export const leaderboardsRouter = createTRPCRouter({
         // Scarcity signal
         catchUpMessage: usersAbove[0]
           ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            `🎯 Just ${(usersAbove[0] as any).totalXp - (profileData?.totalXp || 0)} XP to overtake ${(usersAbove[0] as any).user?.name}!`
+            `🎯 Just ${(usersAbove[0] as any).totalXp - (profileData?.totalXp || 0)} XP to overtake ${getName(usersAbove[0])}!`
           : "🏆 You're #1!",
       };
     }),
